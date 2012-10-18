@@ -1,0 +1,29 @@
+{
+	"LOCAL_PROXY_SERVER":
+	{
+		"PORT": 1080
+	},
+	"REMOTE_PROXY_SERVERS":
+	[
+		{
+			"TYPE": "HTTPS",
+			"ADDRESS": "xxx-xxx.dotcloud.com",
+			"PORT": 443,
+			"AUTHORIZATION":
+			{
+				"USERNAME": "xxx",
+				"PASSWORD": "xxx"
+			}
+		}
+	],
+	"PROXY_SERVER":
+	{
+		"ADDRESS": "",
+		"PORT": 0,
+		"AUTHORIZATION":
+		{
+			"USERNAME": "",
+			"PASSWORD": ""
+		}
+	}
+}

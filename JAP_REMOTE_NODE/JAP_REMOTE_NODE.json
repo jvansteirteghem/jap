@@ -1,0 +1,13 @@
+{
+	"REMOTE_PROXY_SERVER":
+	{
+		"PORT": 8080,
+		"AUTHORIZATION":
+		[
+			{
+				"USERNAME": "xxx",
+				"PASSWORD": "xxx"
+			}
+		]
+	}
+}
