@@ -12,18 +12,51 @@ You should have received a copy of the GNU General Public License along with thi
 (function() {
 	var fs = require("fs");
 	var http = require("http");
+	var https = require("https");
 	var net = require("net");
 	
-	var configuration = JSON.parse(fs.readFileSync("JAP_REMOTE_NODE.json"));
+	var configurationFile = process.argv[2] || "JAP_REMOTE_NODE.json";
+	var configuration = JSON.parse(fs.readFileSync(configurationFile));
+	configuration = configuration || {};
+	configuration.REMOTE_PROXY_SERVER = configuration.REMOTE_PROXY_SERVER || {};
+	configuration.REMOTE_PROXY_SERVER.TYPE = configuration.REMOTE_PROXY_SERVER.TYPE || "";
+	configuration.REMOTE_PROXY_SERVER.ADDRESS = configuration.REMOTE_PROXY_SERVER.ADDRESS || "";
+	configuration.REMOTE_PROXY_SERVER.PORT = configuration.REMOTE_PROXY_SERVER.PORT || 0;
+	configuration.REMOTE_PROXY_SERVER.AUTHENTICATION = configuration.REMOTE_PROXY_SERVER.AUTHENTICATION || [];
+	for(var i = 0; i < configuration.REMOTE_PROXY_SERVER.AUTHENTICATION.length; i = i + 1) {
+		configuration.REMOTE_PROXY_SERVER.AUTHENTICATION[i].USERNAME = configuration.REMOTE_PROXY_SERVER.AUTHENTICATION[i].USERNAME || "";
+		configuration.REMOTE_PROXY_SERVER.AUTHENTICATION[i].PASSWORD = configuration.REMOTE_PROXY_SERVER.AUTHENTICATION[i].PASSWORD || "";
+	}
+	configuration.REMOTE_PROXY_SERVER.CERTIFICATE = configuration.REMOTE_PROXY_SERVER.CERTIFICATE || {};
+	configuration.REMOTE_PROXY_SERVER.CERTIFICATE.KEY = configuration.REMOTE_PROXY_SERVER.CERTIFICATE.KEY || {};
+	configuration.REMOTE_PROXY_SERVER.CERTIFICATE.KEY.FILE = configuration.REMOTE_PROXY_SERVER.CERTIFICATE.KEY.FILE || "";
+	configuration.REMOTE_PROXY_SERVER.CERTIFICATE.FILE = configuration.REMOTE_PROXY_SERVER.CERTIFICATE.FILE || "";
 	
-	var server = http.createServer(function(req, res) {
-		res.writeHead(200, {
-			'Content-Type': 'text/plain'
+	var server = null;
+	
+	if(configuration.REMOTE_PROXY_SERVER.TYPE === 'HTTP') {
+		server = http.createServer(function(req, res) {
+			res.writeHead(200, {
+				'Content-Type': 'text/plain'
+			});
+			res.end('HTTP OK');
+			
+			return;
 		});
-		res.end('200');
+	} else {
+		var serverOptions = {};
+		serverOptions.key = fs.readFileSync(configuration.REMOTE_PROXY_SERVER.CERTIFICATE.KEY.FILE);
+		serverOptions.cert = fs.readFileSync(configuration.REMOTE_PROXY_SERVER.CERTIFICATE.FILE);
 		
-		return;
-	});
+		server = https.createServer(serverOptions, function(req, res) {
+			res.writeHead(200, {
+				'Content-Type': 'text/plain'
+			});
+			res.end('HTTPS OK');
+			
+			return;
+		});
+	}
 	
 	server.on('upgrade', function(req, connection, head) {
 		console.log("server connected");
@@ -39,7 +72,7 @@ You should have received a copy of the GNU General Public License along with thi
 		
 		var authorized = false;
 		
-		if(configuration.REMOTE_PROXY_SERVER.AUTHORIZATION.length === 0) {
+		if(configuration.REMOTE_PROXY_SERVER.AUTHENTICATION.length === 0) {
 			authorized = true;
 		}
 		
@@ -47,8 +80,8 @@ You should have received a copy of the GNU General Public License along with thi
 			if(req.headers.authorization) {
 				var i = 0;
 				
-				while(i < configuration.REMOTE_PROXY_SERVER.AUTHORIZATION.length) {
-					var authorization = 'Basic ' + new Buffer(configuration.REMOTE_PROXY_SERVER.AUTHORIZATION[i].USERNAME + ':' + configuration.REMOTE_PROXY_SERVER.AUTHORIZATION[i].PASSWORD).toString('base64');
+				while(i < configuration.REMOTE_PROXY_SERVER.AUTHENTICATION.length) {
+					var authorization = 'Basic ' + new Buffer(configuration.REMOTE_PROXY_SERVER.AUTHENTICATION[i].USERNAME + ':' + configuration.REMOTE_PROXY_SERVER.AUTHENTICATION[i].PASSWORD).toString('base64');
 					
 					if(req.headers.authorization === authorization) {
 						authorized = true;
@@ -62,21 +95,33 @@ You should have received a copy of the GNU General Public License along with thi
 		}
 		
 		if(authorized === false) {
-			localConnection.write(
-				'HTTP/1.1 401 Unauthorized\r\n' + 
-				'WWW-Authenticate: Basic realm=\"JAP\"\r\n' + 
-				'\r\n'
-			);
+			try {
+				localConnection.write(
+					'HTTP/1.1 401 Unauthorized\r\n' + 
+					'WWW-Authenticate: Basic realm=\"JAP\"\r\n' + 
+					'\r\n'
+				);
+			} catch (e) {
+				console.log("localConnection error: " + e);
+				
+				return;
+			}
 			
 			return;
 		}
 		
-		localConnection.write(
-			'HTTP/1.1 101 Web Socket Protocol Handshake\r\n' + 
-			'Upgrade: WebSocket\r\n' + 
-			'Connection: Upgrade\r\n' + 
-			'\r\n'
-		);
+		try {
+			localConnection.write(
+				'HTTP/1.1 101 Web Socket Protocol Handshake\r\n' + 
+				'Upgrade: WebSocket\r\n' + 
+				'Connection: Upgrade\r\n' + 
+				'\r\n'
+			);
+		} catch (e) {
+			console.log("localConnection error: " + e);
+			
+			return;
+		}
 		
 		localConnection.on("data", function(data) {
 			if (stage === 0) {
@@ -105,7 +150,7 @@ You should have received a copy of the GNU General Public License along with thi
 					destinationPort = data.readUInt16BE(5 + destinationAddressLength);
 				}
 				
-				console.log(destinationAddress);
+				console.log("connecting " + destinationAddress);
 				
 				remoteConnection = net.connect(destinationPort, destinationAddress, function() {
 					// response
@@ -126,10 +171,12 @@ You should have received a copy of the GNU General Public License along with thi
 					//   field 6: network byte order port number, 2 bytes
 					buffer.writeInt16BE(destinationPort, 8);
 					
-					if (localConnection.writable) {
-						if (!localConnection.write(buffer)) {
-							return remoteConnection.pause();
-						}
+					try {
+						localConnection.write(buffer);
+					} catch (e) {
+						console.log("localConnection error: " + e);
+						
+						return;
 					}
 					
 					stage = 1;
@@ -138,10 +185,14 @@ You should have received a copy of the GNU General Public License along with thi
 				});
 				
 				remoteConnection.on("data", function(data) {
-					if (localConnection.writable) {
+					try {
 						if (!localConnection.write(data)) {
-							return remoteConnection.pause();
+							remoteConnection.pause();
 						}
+					} catch (e) {
+						console.log("localConnection error: " + e);
+						
+						return;
 					}
 				});
 				
@@ -152,7 +203,7 @@ You should have received a copy of the GNU General Public License along with thi
 				});
 				
 				remoteConnection.on("error", function() {
-					console.warn("remoteConnection error");
+					console.log("remoteConnection error");
 					localConnection.end();
 					return console.log("concurrent connections: " + server.connections);
 				});
@@ -170,10 +221,15 @@ You should have received a copy of the GNU General Public License along with thi
 			}
 			
 			if (stage === 1) {
-				if (!remoteConnection.write(data)) {
-					localConnection.pause();
+				try {
+					if (!remoteConnection.write(data)) {
+						localConnection.pause();
+					}
+				} catch (e) {
+					console.log("remoteConnection error: " + e);
+					
+					return;
 				}
-				return;
 			}
 		});
 		
@@ -186,7 +242,7 @@ You should have received a copy of the GNU General Public License along with thi
 		});
 		
 		localConnection.on("error", function() {
-			console.warn("server error");
+			console.log("server error");
 			if (remoteConnection) {
 				remoteConnection.end();
 			}
@@ -200,14 +256,13 @@ You should have received a copy of the GNU General Public License along with thi
 		});
 	});
 	
-	server.listen(configuration.REMOTE_PROXY_SERVER.PORT, function() {
+	server.listen(configuration.REMOTE_PROXY_SERVER.PORT, configuration.REMOTE_PROXY_SERVER.ADDRESS, 511, function() {
 		return console.log("server listening at port " + configuration.REMOTE_PROXY_SERVER.PORT);
 	});
 	
 	server.on("error", function(e) {
 		if (e.code === "EADDRINUSE") {
-			return console.warn("address in use, aborting");
+			return console.log("address in use, aborting");
 		}
 	});
-	
 }).call(this);

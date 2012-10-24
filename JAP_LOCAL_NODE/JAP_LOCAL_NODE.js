@@ -16,7 +16,30 @@ You should have received a copy of the GNU General Public License along with thi
 	var net = require("net");
 	var tunnel = require("./NODE/tunnel");
 	
-	var configuration = JSON.parse(fs.readFileSync("JAP_LOCAL_NODE.json"));
+	var configurationFile = process.argv[2] || "JAP_LOCAL_NODE.json";
+	var configuration = JSON.parse(fs.readFileSync(configurationFile));
+	configuration = configuration || {};
+	configuration.LOCAL_PROXY_SERVER = configuration.LOCAL_PROXY_SERVER || {};
+	configuration.LOCAL_PROXY_SERVER.ADDRESS = configuration.LOCAL_PROXY_SERVER.ADDRESS || "";
+	configuration.LOCAL_PROXY_SERVER.PORT = configuration.LOCAL_PROXY_SERVER.PORT || 0;
+	configuration.REMOTE_PROXY_SERVERS = configuration.REMOTE_PROXY_SERVERS || [];
+	for(var i = 0; i < configuration.REMOTE_PROXY_SERVERS.length; i = i + 1) {
+		configuration.REMOTE_PROXY_SERVERS[i].TYPE = configuration.REMOTE_PROXY_SERVERS[i].TYPE || "";
+		configuration.REMOTE_PROXY_SERVERS[i].ADDRESS = configuration.REMOTE_PROXY_SERVERS[i].ADDRESS || "";
+		configuration.REMOTE_PROXY_SERVERS[i].PORT = configuration.REMOTE_PROXY_SERVERS[i].PORT || 0;
+		configuration.REMOTE_PROXY_SERVERS[i].AUTHENTICATION = configuration.REMOTE_PROXY_SERVERS[i].AUTHENTICATION || {};
+		configuration.REMOTE_PROXY_SERVERS[i].AUTHENTICATION.USERNAME = configuration.REMOTE_PROXY_SERVERS[i].AUTHENTICATION.USERNAME || "";
+		configuration.REMOTE_PROXY_SERVERS[i].AUTHENTICATION.PASSWORD = configuration.REMOTE_PROXY_SERVERS[i].AUTHENTICATION.PASSWORD || "";
+		configuration.REMOTE_PROXY_SERVERS[i].CERTIFICATE = configuration.REMOTE_PROXY_SERVERS[i].CERTIFICATE || {};
+		configuration.REMOTE_PROXY_SERVERS[i].CERTIFICATE.AUTHENTICATION = configuration.REMOTE_PROXY_SERVERS[i].CERTIFICATE.AUTHENTICATION || {};
+		configuration.REMOTE_PROXY_SERVERS[i].CERTIFICATE.AUTHENTICATION.FILE = configuration.REMOTE_PROXY_SERVERS[i].CERTIFICATE.AUTHENTICATION.FILE || "";
+	}
+	configuration.PROXY_SERVER = configuration.PROXY_SERVER || {};
+	configuration.PROXY_SERVER.ADDRESS = configuration.PROXY_SERVER.ADDRESS || "";
+	configuration.PROXY_SERVER.PORT = configuration.PROXY_SERVER.PORT || 0;
+	configuration.PROXY_SERVER.AUTHENTICATION = configuration.PROXY_SERVER.AUTHENTICATION || {};
+	configuration.PROXY_SERVER.AUTHENTICATION.USERNAME = configuration.PROXY_SERVER.AUTHENTICATION.USERNAME || "";
+	configuration.PROXY_SERVER.AUTHENTICATION.PASSWORD = configuration.PROXY_SERVER.AUTHENTICATION.PASSWORD || "";
 	
 	server = net.createServer(function(connection) {
 		console.log("local connected");
@@ -41,7 +64,13 @@ You should have received a copy of the GNU General Public License along with thi
 				//     0x00 = request granted
 				buffer.write("\u0000", 1, 1, "binary");
 				
-				localConnection.write(buffer);
+				try {
+					localConnection.write(buffer);
+				} catch (e) {
+					console.log("localConnection error: " + e);
+					
+					return;
+				}
 				
 				stage = 1;
 				
@@ -143,31 +172,49 @@ You should have received a copy of the GNU General Public License along with thi
 				  'Upgrade': 'WebSocket'
 				};
 				
-				if(configuration.PROXY_SERVER.ADDRESS !== '') {
-					var agentOptions = {};
-					agentOptions.maxSockets = 100;
-					agentOptions.proxy = {};
-					agentOptions.proxy.host = configuration.PROXY_SERVER.ADDRESS;
-					agentOptions.proxy.port = configuration.PROXY_SERVER.PORT;
-					
-					if(configuration.PROXY_SERVER.AUTHORIZATION.USERNAME !== '') {
-						agentOptions.proxy.proxyAuth = configuration.PROXY_SERVER.AUTHORIZATION.USERNAME + ':' + configuration.PROXY_SERVER.AUTHORIZATION.PASSWORD;
-					}
-					
-					if(configuration.REMOTE_PROXY_SERVERS[i].TYPE === 'HTTP') {
-						requestOptions.agent = tunnel.httpOverHttp(agentOptions);
-					} else {
-						requestOptions.agent = tunnel.httpsOverHttp(agentOptions);
-					}
-				}
-				
-				if(configuration.REMOTE_PROXY_SERVERS[i].AUTHORIZATION.USERNAME !== '') {
-					requestOptions.auth = configuration.REMOTE_PROXY_SERVERS[i].AUTHORIZATION.USERNAME + ':' + configuration.REMOTE_PROXY_SERVERS[i].AUTHORIZATION.PASSWORD;
+				if(configuration.REMOTE_PROXY_SERVERS[i].AUTHENTICATION.USERNAME !== '') {
+					requestOptions.auth = configuration.REMOTE_PROXY_SERVERS[i].AUTHENTICATION.USERNAME + ':' + configuration.REMOTE_PROXY_SERVERS[i].AUTHENTICATION.PASSWORD;
 				}
 				
 				if(configuration.REMOTE_PROXY_SERVERS[i].TYPE === 'HTTP') {
+					if(configuration.PROXY_SERVER.ADDRESS === '') {
+						requestOptions.agent = new http.Agent(requestOptions);
+					} else {
+						requestOptions.maxSockets = 100;
+						requestOptions.proxy = {};
+						requestOptions.proxy.host = configuration.PROXY_SERVER.ADDRESS;
+						requestOptions.proxy.port = configuration.PROXY_SERVER.PORT;
+						
+						if(configuration.PROXY_SERVER.AUTHENTICATION.USERNAME !== '') {
+							requestOptions.proxy.proxyAuth = configuration.PROXY_SERVER.AUTHENTICATION.USERNAME + ':' + configuration.PROXY_SERVER.AUTHENTICATION.PASSWORD;
+						}
+						
+						requestOptions.agent = tunnel.httpOverHttp(requestOptions);
+					}
+					
 					request = http.request(requestOptions);
 				} else {
+					if(configuration.REMOTE_PROXY_SERVERS[i].CERTIFICATE.AUTHENTICATION.FILE !== '') {
+						requestOptions.ca = fs.readFileSync(configuration.REMOTE_PROXY_SERVERS[i].CERTIFICATE.AUTHENTICATION.FILE);
+					}
+					
+					requestOptions.rejectUnauthorized = true;
+					
+					if(configuration.PROXY_SERVER.ADDRESS === '') {
+						requestOptions.agent = new https.Agent(requestOptions);
+					} else {
+						requestOptions.maxSockets = 100;
+						requestOptions.proxy = {};
+						requestOptions.proxy.host = configuration.PROXY_SERVER.ADDRESS;
+						requestOptions.proxy.port = configuration.PROXY_SERVER.PORT;
+						
+						if(configuration.PROXY_SERVER.AUTHENTICATION.USERNAME !== '') {
+							requestOptions.proxy.proxyAuth = configuration.PROXY_SERVER.AUTHENTICATION.USERNAME + ':' + configuration.PROXY_SERVER.AUTHENTICATION.PASSWORD;
+						}
+						
+						requestOptions.agent = tunnel.httpsOverHttp(requestOptions);
+					}
+					
 					request = https.request(requestOptions);
 				}
 				
@@ -208,17 +255,27 @@ You should have received a copy of the GNU General Public License along with thi
 							//   field 6: network byte order port number, 2 bytes
 							buffer.writeInt16BE(destinationPort, 8);
 							
-							localConnection.write(buffer);
+							try {
+								localConnection.write(buffer);
+							} catch (e) {
+								console.log("localConnection error: " + e);
+								
+								return;
+							}
 							
 							stage = 2;
 							
 							return;
 						}
 						
-						if (localConnection.writable) {
+						try {
 							if (!localConnection.write(data)) {
-								return remoteConnection.pause();
+								remoteConnection.pause();
 							}
+						} catch (e) {
+							console.log("localConnection error: " + e);
+							
+							return;
 						}
 					});
 					
@@ -244,20 +301,26 @@ You should have received a copy of the GNU General Public License along with thi
 						return remoteConnection.end();
 					});
 					
-					remoteConnection.write(data);
-					
-					return;
+					try {
+						remoteConnection.write(data);
+					} catch (e) {
+						console.log("remoteConnection error: " + e);
+						
+						return;
+					}
 				});
 			}
 			
 			if (stage === 2) {
-				if (remoteConnection.writable) {
+				try {
 					if (!remoteConnection.write(data)) {
 						localConnection.pause();
 					}
+				} catch (e) {
+					console.log("remoteConnection error: " + e);
+					
+					return;
 				}
-				
-				return;
 			}
 		});
 		
@@ -305,7 +368,7 @@ You should have received a copy of the GNU General Public License along with thi
 		});
 	});
 	
-	server.listen(configuration.LOCAL_PROXY_SERVER.PORT, function() {
+	server.listen(configuration.LOCAL_PROXY_SERVER.PORT, configuration.LOCAL_PROXY_SERVER.ADDRESS, 511, function() {
 		return console.log("server listening at port " + configuration.LOCAL_PROXY_SERVER.PORT);
 	});
 	

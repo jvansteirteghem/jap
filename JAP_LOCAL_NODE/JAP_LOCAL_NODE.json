@@ -1,18 +1,26 @@
 {
 	"LOCAL_PROXY_SERVER":
 	{
+		"ADDRESS": "127.0.0.1",
 		"PORT": 1080
 	},
 	"REMOTE_PROXY_SERVERS":
 	[
 		{
-			"TYPE": "HTTPS",
-			"ADDRESS": "xxx-xxx.dotcloud.com",
-			"PORT": 443,
-			"AUTHORIZATION":
+			"TYPE": "",
+			"ADDRESS": "",
+			"PORT": 0,
+			"AUTHENTICATION":
 			{
-				"USERNAME": "xxx",
-				"PASSWORD": "xxx"
+				"USERNAME": "",
+				"PASSWORD": ""
+			},
+			"CERTIFICATE":
+			{
+				"AUTHENTICATION":
+				{
+					"FILE": ""
+				}
 			}
 		}
 	],
@@ -20,7 +28,7 @@
 	{
 		"ADDRESS": "",
 		"PORT": 0,
-		"AUTHORIZATION":
+		"AUTHENTICATION":
 		{
 			"USERNAME": "",
 			"PASSWORD": ""

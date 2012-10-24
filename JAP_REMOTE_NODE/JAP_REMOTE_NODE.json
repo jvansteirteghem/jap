@@ -1,13 +1,23 @@
 {
 	"REMOTE_PROXY_SERVER":
 	{
-		"PORT": 8080,
-		"AUTHORIZATION":
+		"TYPE": "",
+		"ADDRESS": "",
+		"PORT": 0,
+		"AUTHENTICATION":
 		[
 			{
-				"USERNAME": "xxx",
-				"PASSWORD": "xxx"
+				"USERNAME": "",
+				"PASSWORD": ""
 			}
-		]
+		],
+		"CERTIFICATE":
+		{
+			"KEY":
+			{
+				"FILE": ""
+			},
+			"FILE": ""
+		}
 	}
 }
