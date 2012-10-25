@@ -1,8 +1,8 @@
+module.exports = 
 {
 	"REMOTE_PROXY_SERVER":
 	{
 		"TYPE": "HTTP",
-		"ADDRESS": "127.0.0.1",
 		"PORT": 8080,
 		"AUTHENTICATION":
 		[

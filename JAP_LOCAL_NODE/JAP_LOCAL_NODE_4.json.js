@@ -1,3 +1,4 @@
+module.exports = 
 {
 	"LOCAL_PROXY_SERVER":
 	{
@@ -7,9 +8,9 @@
 	"REMOTE_PROXY_SERVERS":
 	[
 		{
-			"TYPE": "HTTP",
-			"ADDRESS": "127.0.0.1",
-			"PORT": 80,
+			"TYPE": "HTTPS",
+			"ADDRESS": "1-2.dotcloud.com",
+			"PORT": 443,
 			"AUTHENTICATION":
 			{
 				"USERNAME": "1",

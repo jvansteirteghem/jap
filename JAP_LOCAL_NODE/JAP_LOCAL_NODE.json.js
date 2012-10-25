@@ -1,3 +1,4 @@
+module.exports = 
 {
 	"LOCAL_PROXY_SERVER":
 	{

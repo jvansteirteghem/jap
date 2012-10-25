@@ -1,9 +1,10 @@
+module.exports = 
 {
 	"REMOTE_PROXY_SERVER":
 	{
-		"TYPE": "HTTPS",
+		"TYPE": "HTTP",
 		"ADDRESS": "127.0.0.1",
-		"PORT": 443,
+		"PORT": 80,
 		"AUTHENTICATION":
 		[
 			{
@@ -14,14 +15,6 @@
 				"USERNAME": "2",
 				"PASSWORD": "2"
 			}
-		],
-		"CERTIFICATE":
-		{
-			"KEY":
-			{
-				"FILE": "CK.pem"
-			},
-			"FILE": "C.pem"
-		}
+		]
 	}
 }

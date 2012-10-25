@@ -6,7 +6,7 @@ INSTALLATION
 ------------
 - unzip JAP_LOCAL_NODE-X.X.X.zip
 - open JAP_LOCAL_NODE-X.X.X
-- configure JAP_LOCAL_NODE.json
+- configure JAP_LOCAL_NODE.json.js
 - execute JAP_LOCAL_NODE.bat
 - open
 	- FIREFOX

@@ -16,8 +16,8 @@ You should have received a copy of the GNU General Public License along with thi
 	var net = require("net");
 	var tunnel = require("./NODE/tunnel");
 	
-	var configurationFile = process.argv[2] || "JAP_LOCAL_NODE.json";
-	var configuration = JSON.parse(fs.readFileSync(configurationFile));
+	var configurationFile = process.argv[2] || "JAP_LOCAL_NODE.json.js";
+	var configuration = require("./" + configurationFile);
 	configuration = configuration || {};
 	configuration.LOCAL_PROXY_SERVER = configuration.LOCAL_PROXY_SERVER || {};
 	configuration.LOCAL_PROXY_SERVER.ADDRESS = configuration.LOCAL_PROXY_SERVER.ADDRESS || "";
@@ -368,7 +368,13 @@ You should have received a copy of the GNU General Public License along with thi
 		});
 	});
 	
-	server.listen(configuration.LOCAL_PROXY_SERVER.PORT, configuration.LOCAL_PROXY_SERVER.ADDRESS, 511, function() {
+	if (configuration.LOCAL_PROXY_SERVER.ADDRESS === '') {
+		server.listen(configuration.LOCAL_PROXY_SERVER.PORT);
+	} else {
+		server.listen(configuration.LOCAL_PROXY_SERVER.PORT, configuration.LOCAL_PROXY_SERVER.ADDRESS);
+	}
+	
+	server.on("listening", function() {
 		return console.log("server listening at port " + configuration.LOCAL_PROXY_SERVER.PORT);
 	});
 	

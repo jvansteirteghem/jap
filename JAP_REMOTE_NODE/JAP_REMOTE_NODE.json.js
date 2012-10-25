@@ -1,3 +1,4 @@
+module.exports = 
 {
 	"REMOTE_PROXY_SERVER":
 	{
