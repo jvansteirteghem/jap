@@ -1,0 +1,12 @@
+{
+    "REMOTE_PROXY_SERVER":
+    {
+        "AUTHENTICATION":
+        [
+            {
+                "USERNAME": "",
+                "PASSWORD": ""
+            }
+        ]
+    }
+}
