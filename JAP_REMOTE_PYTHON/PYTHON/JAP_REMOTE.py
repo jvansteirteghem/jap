@@ -49,6 +49,9 @@ class InputProtocol(protocol.Protocol):
     def processState0(self):
         print "InputProtocol.processState0"
         
+        if self.stateBuffer.find("\r\n\r\n") == -1:
+            return
+        
         authorized = False;
 
         if len(self.configuration["REMOTE_PROXY_SERVER"]["AUTHENTICATION"]) == 0:

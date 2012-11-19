@@ -66,6 +66,9 @@ class OutputProtocol(protocol.Protocol):
     def processState0(self):
         print "OutputProtocol.processState0"
         
+        if self.stateBuffer.find("\r\n\r\n") == -1:
+            return
+        
         #IPv4
         if self.peer.remoteAddressType == 0x01:
             request = struct.pack('!BBBBIH', 0x05, 0x00, 0, 0x01, self.peer.remoteAddress, self.peer.remotePort)
