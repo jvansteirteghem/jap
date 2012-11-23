@@ -16,6 +16,7 @@ import json
 import random
 import OpenSSL
 import base64
+import socket
 
 class OutputProtocol(protocol.Protocol):
     def __init__(self):
@@ -71,7 +72,8 @@ class OutputProtocol(protocol.Protocol):
         
         #IPv4
         if self.peer.remoteAddressType == 0x01:
-            request = struct.pack('!BBBBIH', 0x05, 0x00, 0, 0x01, self.peer.remoteAddress, self.peer.remotePort)
+            remoteAddress = struct.unpack('!I', socket.inet_aton(self.peer.remoteAddress))[0]
+            request = struct.pack('!BBBBIH', 0x05, 0x00, 0, 0x01, remoteAddress, self.peer.remotePort)
         else:
             # DN
             if self.peer.remoteAddressType == 0x03:
@@ -88,7 +90,8 @@ class OutputProtocol(protocol.Protocol):
         
         #IPv4
         if self.peer.remoteAddressType == 0x01:
-            response = struct.pack('!BBBBIH', 0x05, 0x00, 0, 0x01, self.peer.remoteAddress, self.peer.remotePort)
+            remoteAddress = struct.unpack('!I', socket.inet_aton(self.peer.remoteAddress))[0]
+            response = struct.pack('!BBBBIH', 0x05, 0x00, 0, 0x01, remoteAddress, self.peer.remotePort)
         else:
             # DN
             if self.peer.remoteAddressType == 0x03:
@@ -170,7 +173,8 @@ class InputProtocol(protocol.Protocol):
         
         # IPv4
         if self.remoteAddressType == 0x01:
-            self.remoteAddress, self.remotePort = struct.unpack('!IH', self.stateBuffer[4:10])
+            remoteAddress, self.remotePort = struct.unpack('!IH', self.stateBuffer[4:10])
+            self.remoteAddress = socket.inet_ntoa(struct.pack('!I', remoteAddress))
             self.stateBuffer = self.stateBuffer[10:]
         else:
             # DN
@@ -184,6 +188,10 @@ class InputProtocol(protocol.Protocol):
                 self.transport.write(response)
                 self.transport.loseConnection()
                 return
+        
+        print "InputProtocol.remoteAddressType: " + str(self.remoteAddressType)
+        print "InputProtocol.remoteAddress: " + self.remoteAddress
+        print "InputProtocol.remotePort: " + str(self.remotePort)
         
         # connect
         if c == 0x01:
@@ -216,7 +224,7 @@ class InputProtocol(protocol.Protocol):
             return
             
     def processState2(self):
-        print "InputProtocol.processState0"
+        print "InputProtocol.processState2"
         self.peer.transport.write(self.stateBuffer)
         
         self.stateBuffer = ""

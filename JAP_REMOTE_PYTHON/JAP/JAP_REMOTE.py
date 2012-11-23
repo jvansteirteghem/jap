@@ -13,6 +13,7 @@ from twisted.internet import reactor, protocol, ssl
 import struct
 import json
 import base64
+import socket
 
 class InputProtocol(protocol.Protocol):
     def __init__(self):
@@ -102,12 +103,17 @@ class InputProtocol(protocol.Protocol):
         
         # IPv4
         if self.remoteAddressType == 0x01:
-            self.remoteAddress, self.remotePort = struct.unpack('!IH', self.stateBuffer[4:10])
+            remoteAddress, self.remotePort = struct.unpack('!IH', self.stateBuffer[4:10])
+            self.remoteAddress = socket.inet_ntoa(struct.pack('!I', remoteAddress))
         else:
             # DN
             if self.remoteAddressType == 0x03:
                 remoteAddressLength = ord(self.stateBuffer[4])
                 self.remoteAddress, self.remotePort = struct.unpack('!%dsH' % remoteAddressLength, self.stateBuffer[5:])
+        
+        print "InputProtocol.remoteAddressType: " + str(self.remoteAddressType)
+        print "InputProtocol.remoteAddress: " + self.remoteAddress
+        print "InputProtocol.remotePort: " + str(self.remotePort)
         
         factory = OutputProtocolFactory(self)
         factory.protocol = OutputProtocol
@@ -157,7 +163,8 @@ class OutputProtocol(protocol.Protocol):
         
         #IPv4
         if self.peer.remoteAddressType == 0x01:
-            response = struct.pack('!BBBBIH', 0x05, 0x00, 0, 0x01, self.peer.remoteAddress, self.peer.remotePort)
+            remoteAddress = struct.unpack('!I', socket.inet_aton(self.peer.remoteAddress))[0]
+            response = struct.pack('!BBBBIH', 0x05, 0x00, 0, 0x01, remoteAddress, self.peer.remotePort)
         else:
             # DN
             if self.peer.remoteAddressType == 0x03:
