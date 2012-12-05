@@ -3,4 +3,4 @@ www:
   ports:
     www: http
   processes:
-    app: python JAP_REMOTE.py
+    app: python JAP_WS_REMOTE.py

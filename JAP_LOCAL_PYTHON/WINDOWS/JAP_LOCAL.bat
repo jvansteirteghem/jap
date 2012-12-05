@@ -1,0 +1,2 @@
+JAP_LOCAL.exe
+pause

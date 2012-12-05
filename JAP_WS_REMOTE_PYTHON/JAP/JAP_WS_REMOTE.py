@@ -15,7 +15,7 @@ import json
 import base64
 import socket
 
-class InputProtocol(protocol.Protocol):
+class WSInputProtocol(protocol.Protocol):
     def __init__(self):
         self.peer = None
         self.remoteAddressType = 0
@@ -25,16 +25,16 @@ class InputProtocol(protocol.Protocol):
         self.stateBuffer = ""
     
     def connectionMade(self):
-        print "InputProtocol.connectionMade"
+        print "WSInputProtocol.connectionMade"
 
     def connectionLost(self, reason):
-        print "InputProtocol.connectionLost"
+        print "WSInputProtocol.connectionLost"
         if self.peer is not None:
             self.peer.transport.loseConnection()
             self.peer = None
             
     def dataReceived(self, stateBuffer):
-        print "InputProtocol.dataReceived"
+        print "WSInputProtocol.dataReceived"
         
         self.stateBuffer = self.stateBuffer + stateBuffer
         if self.state == 0:
@@ -48,7 +48,7 @@ class InputProtocol(protocol.Protocol):
             return
     
     def processState0(self):
-        print "InputProtocol.processState0"
+        print "WSInputProtocol.processState0"
         
         if self.stateBuffer.find("\r\n\r\n") == -1:
             return
@@ -97,7 +97,7 @@ class InputProtocol(protocol.Protocol):
         self.stateBuffer = ""
     
     def processState1(self):
-        print "InputProtocol.processState1"
+        print "WSInputProtocol.processState1"
         
         v, c, r, self.remoteAddressType = struct.unpack('!BBBB', self.stateBuffer[:4])
         
@@ -111,23 +111,23 @@ class InputProtocol(protocol.Protocol):
                 remoteAddressLength = ord(self.stateBuffer[4])
                 self.remoteAddress, self.remotePort = struct.unpack('!%dsH' % remoteAddressLength, self.stateBuffer[5:])
         
-        print "InputProtocol.remoteAddressType: " + str(self.remoteAddressType)
-        print "InputProtocol.remoteAddress: " + self.remoteAddress
-        print "InputProtocol.remotePort: " + str(self.remotePort)
+        print "WSInputProtocol.remoteAddressType: " + str(self.remoteAddressType)
+        print "WSInputProtocol.remoteAddress: " + self.remoteAddress
+        print "WSInputProtocol.remotePort: " + str(self.remotePort)
         
         factory = OutputProtocolFactory(self)
         factory.protocol = OutputProtocol
         reactor.connectTCP(self.remoteAddress, int(self.remotePort), factory)
     
     def processState2(self):
-        print "InputProtocol.processState2"
+        print "WSInputProtocol.processState2"
         self.peer.transport.write(self.stateBuffer)
         
         self.stateBuffer = ""
 
-class InputProtocolFactory(protocol.ClientFactory):
+class WSInputProtocolFactory(protocol.ClientFactory):
     def __init__(self, configuration):
-        print "InputProtocolFactory.__init__"
+        print "WSInputProtocolFactory.__init__"
         self.configuration = configuration
         self.configuration.setdefault("REMOTE_PROXY_SERVER", {})
         self.configuration["REMOTE_PROXY_SERVER"].setdefault("TYPE", "")

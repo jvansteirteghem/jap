@@ -1,0 +1,2 @@
+python JAP_WS_REMOTE.exe
+pause

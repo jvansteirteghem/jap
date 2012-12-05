@@ -9,20 +9,20 @@ This program is distributed in the hope that it will be useful, but WITHOUT ANY 
 You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 """
 
-from JAP.JAP_REMOTE import InputProtocolFactory, InputProtocol
+from JAP.JAP_WS_REMOTE import WSInputProtocolFactory, WSInputProtocol
 from twisted.internet import reactor, ssl
 import json
 
-configuration = json.load(open('JAP_REMOTE.json'))
+configuration = json.load(open('JAP_WS_REMOTE.json'))
 
-factory = InputProtocolFactory(configuration)
-factory.protocol = InputProtocol
+factory = WSInputProtocolFactory(configuration)
+factory.protocol = WSInputProtocol
 
-if configuration["REMOTE_PROXY_SERVER"]["TYPE"] == "HTTPS":
-    contextFactory = ssl.DefaultOpenSSLContextFactory(configuration["REMOTE_PROXY_SERVER"]["CERTIFICATE"]["KEY"]["FILE"], configuration["REMOTE_PROXY_SERVER"]["CERTIFICATE"]["FILE"])
+if factory.configuration["REMOTE_PROXY_SERVER"]["TYPE"] == "HTTPS":
+    contextFactory = ssl.DefaultOpenSSLContextFactory(factory.configuration["REMOTE_PROXY_SERVER"]["CERTIFICATE"]["KEY"]["FILE"], factory.configuration["REMOTE_PROXY_SERVER"]["CERTIFICATE"]["FILE"])
     
-    reactor.listenSSL(configuration["REMOTE_PROXY_SERVER"]["PORT"], factory, contextFactory, 50, configuration["REMOTE_PROXY_SERVER"]["ADDRESS"])
+    reactor.listenSSL(factory.configuration["REMOTE_PROXY_SERVER"]["PORT"], factory, contextFactory, 50, factory.configuration["REMOTE_PROXY_SERVER"]["ADDRESS"])
 else:
-    reactor.listenTCP(configuration["REMOTE_PROXY_SERVER"]["PORT"], factory, 50, configuration["REMOTE_PROXY_SERVER"]["ADDRESS"])
+    reactor.listenTCP(factory.configuration["REMOTE_PROXY_SERVER"]["PORT"], factory, 50, factory.configuration["REMOTE_PROXY_SERVER"]["ADDRESS"])
 
 reactor.run()

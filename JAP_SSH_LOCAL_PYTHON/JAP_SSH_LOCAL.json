@@ -1,0 +1,50 @@
+{
+    "LOCAL_PROXY_SERVER":
+    {
+        "ADDRESS": "127.0.0.1",
+        "PORT": 1080,
+        "KEYS": 
+        [
+            {
+                "PUBLIC": 
+                {
+                    "FILE": "KP.pub"
+                },
+                "PRIVATE": 
+                {
+                    "FILE": "KP",
+                    "PASSPHRASE": "passphrase"
+                }
+            }
+        ]
+    },
+    "REMOTE_PROXY_SERVERS":
+    [
+        {
+            "ADDRESS": "",
+            "PORT": 0,
+            "AUTHENTICATION":
+            {
+                "USERNAME": "",
+                "PASSWORD": ""
+            },
+            "KEY": 
+            {
+                "AUTHENTICATION": 
+                {
+                    "FINGERPRINT": ""
+                }
+            }
+        }
+    ],
+    "PROXY_SERVER":
+    {
+        "ADDRESS": "",
+        "PORT": 0,
+        "AUTHENTICATION":
+        {
+            "USERNAME": "",
+            "PASSWORD": ""
+        }
+    }
+}

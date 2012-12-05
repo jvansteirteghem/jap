@@ -1,12 +1,15 @@
 PRE-INSTALLATION
 ----------------
+- install PYTHON >= 2.7.0
+- install TWISTED
+- install PYOPENSSL
 
 INSTALLATION
 ------------
-- unzip JAP_LOCAL_PYTHON_WINDOWS-X.X.X.zip
-- open JAP_LOCAL_PYTHON_WINDOWS-X.X.X
-- configure JAP_LOCAL.json
-- execute JAP_LOCAL.exe
+- unzip JAP_SSH_LOCAL_PYTHON-X.X.X.zip
+- open JAP_SSH_LOCAL_PYTHON-X.X.X
+- configure JAP_SSH_LOCAL.json
+- execute JAP_SSH_LOCAL.bat
 - open
 	- FIREFOX
 		- click TOOLS, OPTIONS
