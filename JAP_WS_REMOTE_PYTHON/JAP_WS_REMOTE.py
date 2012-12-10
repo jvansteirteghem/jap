@@ -9,20 +9,27 @@ This program is distributed in the hope that it will be useful, but WITHOUT ANY 
 You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 """
 
-from JAP.JAP_WS_REMOTE import WSInputProtocolFactory, WSInputProtocol
 from twisted.internet import reactor, ssl
 import json
+import logging
+import JAP.JAP_WS_REMOTE
 
-configuration = json.load(open('JAP_WS_REMOTE.json'))
+configuration = json.load(open("JAP_WS_REMOTE.json"))
 
-factory = WSInputProtocolFactory(configuration)
-factory.protocol = WSInputProtocol
+JAP.JAP_WS_REMOTE.setDefaultConfiguration(configuration)
 
-if factory.configuration["REMOTE_PROXY_SERVER"]["TYPE"] == "HTTPS":
-    contextFactory = ssl.DefaultOpenSSLContextFactory(factory.configuration["REMOTE_PROXY_SERVER"]["CERTIFICATE"]["KEY"]["FILE"], factory.configuration["REMOTE_PROXY_SERVER"]["CERTIFICATE"]["FILE"])
+logging.basicConfig()
+logger = logging.getLogger("JAP")
+logger.setLevel(configuration["LOGGER"]["LEVEL"])
+
+factory = JAP.JAP_WS_REMOTE.WSInputProtocolFactory(configuration)
+factory.protocol = JAP.JAP_WS_REMOTE.WSInputProtocol
+
+if configuration["REMOTE_PROXY_SERVER"]["TYPE"] == "HTTPS":
+    contextFactory = ssl.DefaultOpenSSLContextFactory(configuration["REMOTE_PROXY_SERVER"]["CERTIFICATE"]["KEY"]["FILE"], configuration["REMOTE_PROXY_SERVER"]["CERTIFICATE"]["FILE"])
     
-    reactor.listenSSL(factory.configuration["REMOTE_PROXY_SERVER"]["PORT"], factory, contextFactory, 50, factory.configuration["REMOTE_PROXY_SERVER"]["ADDRESS"])
+    reactor.listenSSL(configuration["REMOTE_PROXY_SERVER"]["PORT"], factory, contextFactory, 50, configuration["REMOTE_PROXY_SERVER"]["ADDRESS"])
 else:
-    reactor.listenTCP(factory.configuration["REMOTE_PROXY_SERVER"]["PORT"], factory, 50, factory.configuration["REMOTE_PROXY_SERVER"]["ADDRESS"])
+    reactor.listenTCP(configuration["REMOTE_PROXY_SERVER"]["PORT"], factory, 50, configuration["REMOTE_PROXY_SERVER"]["ADDRESS"])
 
 reactor.run()

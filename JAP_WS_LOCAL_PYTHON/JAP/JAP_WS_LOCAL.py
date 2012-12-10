@@ -16,12 +16,32 @@ import random
 import OpenSSL
 import base64
 import socket
+import logging
 import JAP_LOCAL
 import TUNNEL
 
+logger = logging.getLogger("JAP.JAP_WS_LOCAL")
+
+def setDefaultConfiguration(configuration):
+    JAP_LOCAL.setDefaultConfiguration(configuration)
+    
+    configuration.setdefault("REMOTE_PROXY_SERVERS", [])
+    i = 0
+    while i < len(configuration["REMOTE_PROXY_SERVERS"]):
+        configuration["REMOTE_PROXY_SERVERS"][i].setdefault("TYPE", "")
+        configuration["REMOTE_PROXY_SERVERS"][i].setdefault("ADDRESS", "")
+        configuration["REMOTE_PROXY_SERVERS"][i].setdefault("PORT", 0)
+        configuration["REMOTE_PROXY_SERVERS"][i].setdefault("AUTHENTICATION", {})
+        configuration["REMOTE_PROXY_SERVERS"][i]["AUTHENTICATION"].setdefault("USERNAME", "")
+        configuration["REMOTE_PROXY_SERVERS"][i]["AUTHENTICATION"].setdefault("PASSWORD", "")
+        configuration["REMOTE_PROXY_SERVERS"][i].setdefault("CERTIFICATE", {})
+        configuration["REMOTE_PROXY_SERVERS"][i]["CERTIFICATE"].setdefault("AUTHENTICATION", {})
+        configuration["REMOTE_PROXY_SERVERS"][i]["CERTIFICATE"]["AUTHENTICATION"].setdefault("FILE", "")
+        i = i + 1
+
 class WSOutputProtocol(JAP_LOCAL.OutputProtocol):
     def __init__(self):
-        print "WSOutputProtocol.__init__"
+        logger.debug("WSOutputProtocol.__init__")
         
         JAP_LOCAL.OutputProtocol.__init__(self)
         
@@ -29,7 +49,7 @@ class WSOutputProtocol(JAP_LOCAL.OutputProtocol):
         self.stateBuffer = ""
         
     def connectionMade(self):
-        print "WSOutputProtocol.connectionMade"
+        logger.debug("WSOutputProtocol.connectionMade")
         
         self.peer.peer = self
         
@@ -49,7 +69,7 @@ class WSOutputProtocol(JAP_LOCAL.OutputProtocol):
         self.stateBuffer = ""
         
     def dataReceived(self, data):
-        print "WSOutputProtocol.dataReceived"
+        logger.debug("WSOutputProtocol.dataReceived")
         
         self.stateBuffer = self.stateBuffer + data
         if self.state == 0:
@@ -63,7 +83,7 @@ class WSOutputProtocol(JAP_LOCAL.OutputProtocol):
             return
         
     def processState0(self):
-        print "WSOutputProtocol.processState0"
+        logger.debug("WSOutputProtocol.processState0")
         
         if self.stateBuffer.find("\r\n\r\n") == -1:
             return
@@ -84,7 +104,7 @@ class WSOutputProtocol(JAP_LOCAL.OutputProtocol):
         self.stateBuffer = ""
         
     def processState1(self):
-        print "WSOutputProtocol.processState1"
+        logger.debug("WSOutputProtocol.processState1")
         
         self.peer.peer_connectionMade()
         
@@ -92,7 +112,7 @@ class WSOutputProtocol(JAP_LOCAL.OutputProtocol):
         self.stateBuffer = ""
         
     def processState2(self):
-        print "WSOutputProtocol.processState2"
+        logger.debug("WSOutputProtocol.processState2")
         
         self.peer.peer_dataReceived(self.stateBuffer)
         
@@ -103,13 +123,15 @@ class WSOutputProtocolFactory(JAP_LOCAL.OutputProtocolFactory):
 
 class WSInputProtocol(JAP_LOCAL.InputProtocol):
     def __init__(self):
-        print "WSInputProtocol.__init__"
+        logger.debug("WSInputProtocol.__init__")
         
         JAP_LOCAL.InputProtocol.__init__(self)
         
         self.i = 0
         
     def do_CONNECT(self):
+        logger.debug("WSInputProtocol.do_CONNECT")
+        
         self.i = random.randrange(0, len(self.configuration["REMOTE_PROXY_SERVERS"]))
         
         factory = WSOutputProtocolFactory(self)
@@ -135,9 +157,13 @@ class WSInputProtocol(JAP_LOCAL.InputProtocol):
 
 class ClientContextFactory(ssl.ClientContextFactory):
     def __init__(self, verify_locations):
+        logger.debug("ClientContextFactory.__init__")
+        
         self.verify_locations = verify_locations
         
     def getContext(self):
+        logger.debug("ClientContextFactory.getContext")
+        
         self.method = OpenSSL.SSL.TLSv1_METHOD
         
         context = ssl.ClientContextFactory.getContext(self)
@@ -147,29 +173,17 @@ class ClientContextFactory(ssl.ClientContextFactory):
         return context
         
     def verify(self, connection, certificate, errorNumber, errorDepth, certificateOk):
+        logger.debug("ClientContextFactory.verify")
+        
         if certificateOk:
-            print "ClientContextFactory: certificate ok"
+            logger.debug("ClientContextFactory: certificate ok")
         else:
-            print "ClientContextFactory: certificate not ok"
+            logger.debug("ClientContextFactory: certificate not ok")
         
         return certificateOk
 
 class WSInputProtocolFactory(JAP_LOCAL.InputProtocolFactory):
     def __init__(self, configuration):
-        print "WSInputProtocolFactory.__init__"
+        logger.debug("WSInputProtocolFactory.__init__")
         
         JAP_LOCAL.InputProtocolFactory.__init__(self, configuration)
-        
-        self.configuration.setdefault("REMOTE_PROXY_SERVERS", [])
-        i = 0
-        while i < len(self.configuration["REMOTE_PROXY_SERVERS"]):
-            self.configuration["REMOTE_PROXY_SERVERS"][i].setdefault("TYPE", "")
-            self.configuration["REMOTE_PROXY_SERVERS"][i].setdefault("ADDRESS", "")
-            self.configuration["REMOTE_PROXY_SERVERS"][i].setdefault("PORT", 0)
-            self.configuration["REMOTE_PROXY_SERVERS"][i].setdefault("AUTHENTICATION", {})
-            self.configuration["REMOTE_PROXY_SERVERS"][i]["AUTHENTICATION"].setdefault("USERNAME", "")
-            self.configuration["REMOTE_PROXY_SERVERS"][i]["AUTHENTICATION"].setdefault("PASSWORD", "")
-            self.configuration["REMOTE_PROXY_SERVERS"][i].setdefault("CERTIFICATE", {})
-            self.configuration["REMOTE_PROXY_SERVERS"][i]["CERTIFICATE"].setdefault("AUTHENTICATION", {})
-            self.configuration["REMOTE_PROXY_SERVERS"][i]["CERTIFICATE"]["AUTHENTICATION"].setdefault("FILE", "")
-            i = i + 1

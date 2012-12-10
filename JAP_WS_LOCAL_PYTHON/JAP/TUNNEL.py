@@ -12,6 +12,9 @@ You should have received a copy of the GNU General Public License along with thi
 from twisted.protocols import basic
 from twisted.internet import protocol, reactor
 import base64
+import logging
+
+logger = logging.getLogger("JAP.TUNNEL")
 
 class TunnelProtocol(basic.LineReceiver):
     delimiter = "\r\n"

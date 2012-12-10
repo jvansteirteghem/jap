@@ -13,48 +13,64 @@ from twisted.internet import protocol, reactor
 import struct
 import json
 import socket
+import logging
 import TUNNEL
+
+logger = logging.getLogger("JAP.JAP_LOCAL")
+
+def setDefaultConfiguration(configuration):
+    configuration.setdefault("LOGGER", {})
+    configuration["LOGGER"].setdefault("LEVEL", 10)
+    configuration.setdefault("LOCAL_PROXY_SERVER", {})
+    configuration["LOCAL_PROXY_SERVER"].setdefault("ADDRESS", "")
+    configuration["LOCAL_PROXY_SERVER"].setdefault("PORT", 0)
+    configuration.setdefault("PROXY_SERVER", {})
+    configuration["PROXY_SERVER"].setdefault("ADDRESS", "")
+    configuration["PROXY_SERVER"].setdefault("PORT", 0)
+    configuration["PROXY_SERVER"].setdefault("AUTHENTICATION", {})
+    configuration["PROXY_SERVER"]["AUTHENTICATION"].setdefault("USERNAME", "")
+    configuration["PROXY_SERVER"]["AUTHENTICATION"].setdefault("PASSWORD", "")
 
 class OutputProtocol(protocol.Protocol):
     def __init__(self):
-        print "OutputProtocol.__init__"
+        logger.debug("OutputProtocol.__init__")
         
         self.peer = None
         
     def connectionMade(self):
-        print "OutputProtocol.connectionMade"
+        logger.debug("OutputProtocol.connectionMade")
         
         self.peer.peer = self
         self.peer.peer_connectionMade()
         
     def connectionLost(self, reason):
-        print "OutputProtocol.connectionLost"
+        logger.debug("OutputProtocol.connectionLost")
         
         if self.peer is not None:
             self.peer.peer_connectionLost(reason)
             self.peer = None
         
     def dataReceived(self, data):
-        print "OutputProtocol.dataReceived"
+        logger.debug("OutputProtocol.dataReceived")
         
         self.peer.peer_dataReceived(data)
         
     def peer_connectionMade(self):
-        print "OutputProtocol.peer_connectionMade"
+        logger.debug("OutputProtocol.peer_connectionMade")
         
     def peer_connectionLost(self, reason):
-        print "OutputProtocol.peer_connectionLost"
+        logger.debug("OutputProtocol.peer_connectionLost")
         
         self.transport.loseConnection()
         
     def peer_dataReceived(self, data):
-        print "OutputProtocol.peer_dataReceived"
+        logger.debug("OutputProtocol.peer_dataReceived")
         
         self.transport.write(data)
 
 class OutputProtocolFactory(protocol.ClientFactory):
     def __init__(self, peer):
-        print "OutputProtocolFactory.__init__"
+        logger.debug("OutputProtocolFactory.__init__")
         
         self.peer = peer
         
@@ -65,7 +81,7 @@ class OutputProtocolFactory(protocol.ClientFactory):
 
 class InputProtocol(protocol.Protocol):
     def __init__(self):
-        print "InputProtocol.__init__"
+        logger.debug("InputProtocol.__init__")
         
         self.peer = None
         self.remoteAddressType = 0
@@ -75,17 +91,17 @@ class InputProtocol(protocol.Protocol):
         self.stateBuffer = ""
     
     def connectionMade(self):
-        print "InputProtocol.connectionMade"
+        logger.debug("InputProtocol.connectionMade")
     
     def connectionLost(self, reason):
-        print "InputProtocol.connectionLost"
+        logger.debug("InputProtocol.connectionLost")
         
         if self.peer is not None:
             self.peer.peer_connectionLost(reason)
             self.peer = None
     
     def dataReceived(self, data):
-        print "InputProtocol.dataReceived"
+        logger.debug("InputProtocol.dataReceived")
         
         self.stateBuffer = self.stateBuffer + data
         if self.state == 0:
@@ -99,7 +115,7 @@ class InputProtocol(protocol.Protocol):
             return
     
     def processState0(self):
-        print "InputProtocol.processState0"
+        logger.debug("InputProtocol.processState0")
         
         # no authentication
         self.transport.write(struct.pack('!BB', 0x05, 0x00))
@@ -108,7 +124,7 @@ class InputProtocol(protocol.Protocol):
         self.stateBuffer = ""
     
     def processState1(self):
-        print "InputProtocol.processState1"
+        logger.debug("InputProtocol.processState1")
         
         v, c, r, self.remoteAddressType = struct.unpack('!BBBB', self.stateBuffer[:4])
         
@@ -130,9 +146,9 @@ class InputProtocol(protocol.Protocol):
                 self.transport.loseConnection()
                 return
         
-        print "InputProtocol.remoteAddressType: " + str(self.remoteAddressType)
-        print "InputProtocol.remoteAddress: " + self.remoteAddress
-        print "InputProtocol.remotePort: " + str(self.remotePort)
+        logger.debug("InputProtocol.remoteAddressType: " + str(self.remoteAddressType))
+        logger.debug("InputProtocol.remoteAddress: " + self.remoteAddress)
+        logger.debug("InputProtocol.remotePort: " + str(self.remotePort))
         
         # connect
         if c == 0x01:
@@ -144,6 +160,8 @@ class InputProtocol(protocol.Protocol):
             return
             
     def do_CONNECT(self):
+        logger.debug("InputProtocol.do_CONNECT")
+        
         factory = OutputProtocolFactory(self)
         factory.protocol = OutputProtocol
         
@@ -154,14 +172,14 @@ class InputProtocol(protocol.Protocol):
             reactor.connectTCP(self.remoteAddress, self.remotePort, factory, 50, None)
         
     def processState2(self):
-        print "InputProtocol.processState2"
+        logger.debug("InputProtocol.processState2")
         
         self.peer.peer_dataReceived(self.stateBuffer)
         
         self.stateBuffer = ""
         
     def peer_connectionMade(self):
-        print "InputProtocol.peer_connectionMade"
+        logger.debug("InputProtocol.peer_connectionMade")
         
         #IPv4
         if self.remoteAddressType == 0x01:
@@ -179,7 +197,7 @@ class InputProtocol(protocol.Protocol):
         self.stateBuffer = ""
         
     def peer_connectionLost(self, reason):
-        print "InputProtocol.peer_connectionLost"
+        logger.debug("InputProtocol.peer_connectionLost")
         
         if self.state != 2:
             response = struct.pack('!BBBBIH', 0x05, 0x05, 0, 1, 0, 0)
@@ -188,24 +206,15 @@ class InputProtocol(protocol.Protocol):
         self.transport.loseConnection()
         
     def peer_dataReceived(self, stateBuffer):
-        print "InputProtocol.peer_dataReceived"
+        logger.debug("InputProtocol.peer_dataReceived")
         
         self.transport.write(stateBuffer)
         
 class InputProtocolFactory(protocol.ClientFactory):
     def __init__(self, configuration):
-        print "InputProtocolFactory.__init__"
+        logger.debug("InputProtocolFactory.__init__")
         
         self.configuration = configuration
-        self.configuration.setdefault("LOCAL_PROXY_SERVER", {})
-        self.configuration["LOCAL_PROXY_SERVER"].setdefault("ADDRESS", "")
-        self.configuration["LOCAL_PROXY_SERVER"].setdefault("PORT", 0)
-        self.configuration.setdefault("PROXY_SERVER", {})
-        self.configuration["PROXY_SERVER"].setdefault("ADDRESS", "")
-        self.configuration["PROXY_SERVER"].setdefault("PORT", 0)
-        self.configuration["PROXY_SERVER"].setdefault("AUTHENTICATION", {})
-        self.configuration["PROXY_SERVER"]["AUTHENTICATION"].setdefault("USERNAME", "")
-        self.configuration["PROXY_SERVER"]["AUTHENTICATION"].setdefault("PASSWORD", "")
     
     def buildProtocol(self, *args, **kw):
         p = protocol.ClientFactory.buildProtocol(self, *args, **kw)

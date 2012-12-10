@@ -9,15 +9,22 @@ This program is distributed in the hope that it will be useful, but WITHOUT ANY 
 You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 """
 
-from JAP.JAP_WS_REMOTE import WSInputProtocolFactory, WSInputProtocol
 from twisted.internet import reactor
 import json
 import os
+import logging
+import JAP.JAP_WS_REMOTE
 
-configuration = json.load(open('JAP_WS_REMOTE.json'))
+configuration = json.load(open("JAP_WS_REMOTE.json"))
 
-factory = WSInputProtocolFactory(configuration)
-factory.protocol = WSInputProtocol
+JAP.JAP_WS_REMOTE.setDefaultConfiguration(configuration)
+
+logging.basicConfig()
+logger = logging.getLogger("JAP")
+logger.setLevel(configuration["LOGGER"]["LEVEL"])
+
+factory = JAP.JAP_WS_REMOTE.WSInputProtocolFactory(configuration)
+factory.protocol = JAP.JAP_WS_REMOTE.WSInputProtocol
 
 reactor.listenTCP(int(os.environ["PORT_WWW"]), factory, 50, "")
 

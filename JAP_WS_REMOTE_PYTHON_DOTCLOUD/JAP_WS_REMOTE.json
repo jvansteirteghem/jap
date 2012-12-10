@@ -1,4 +1,8 @@
 {
+    "LOGGER":
+    {
+        "LEVEL": 10
+    },
     "REMOTE_PROXY_SERVER":
     {
         "AUTHENTICATION":
