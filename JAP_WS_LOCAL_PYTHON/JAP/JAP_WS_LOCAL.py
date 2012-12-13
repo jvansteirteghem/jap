@@ -45,13 +45,13 @@ class WSOutputProtocol(JAP_LOCAL.OutputProtocol):
         
         JAP_LOCAL.OutputProtocol.__init__(self)
         
-        self.state = 0
-        self.stateBuffer = ""
+        self.data = ""
+        self.dataState = 0
         
     def connectionMade(self):
         logger.debug("WSOutputProtocol.connectionMade")
         
-        self.peer.peer = self
+        self.connectionState = 1
         
         request = "GET / HTTP/1.1\r\n"
         request = request + "Host: " + str(self.peer.configuration["REMOTE_PROXY_SERVERS"][self.peer.i]["ADDRESS"]) + ":" + str(self.peer.configuration["REMOTE_PROXY_SERVERS"][self.peer.i]["PORT"]) + "\r\n"
@@ -65,27 +65,27 @@ class WSOutputProtocol(JAP_LOCAL.OutputProtocol):
         
         self.transport.write(request)
         
-        self.state = 0
-        self.stateBuffer = ""
+        self.data = ""
+        self.dataState = 0
         
     def dataReceived(self, data):
         logger.debug("WSOutputProtocol.dataReceived")
         
-        self.stateBuffer = self.stateBuffer + data
-        if self.state == 0:
-            self.processState0()
+        self.data = self.data + data
+        if self.dataState == 0:
+            self.processDataState0()
             return
-        if self.state == 1:
-            self.processState1();
+        if self.dataState == 1:
+            self.processDataState1();
             return
-        if self.state == 2:
-            self.processState2();
+        if self.dataState == 2:
+            self.processDataState2();
             return
         
-    def processState0(self):
-        logger.debug("WSOutputProtocol.processState0")
+    def processDataState0(self):
+        logger.debug("WSOutputProtocol.processDataState0")
         
-        if self.stateBuffer.find("\r\n\r\n") == -1:
+        if self.data.find("\r\n\r\n") == -1:
             return
         
         #IPv4
@@ -100,23 +100,23 @@ class WSOutputProtocol(JAP_LOCAL.OutputProtocol):
         
         self.transport.write(request)
         
-        self.state = 1
-        self.stateBuffer = ""
+        self.data = ""
+        self.dataState = 1
         
-    def processState1(self):
-        logger.debug("WSOutputProtocol.processState1")
+    def processDataState1(self):
+        logger.debug("WSOutputProtocol.processDataState1")
         
         self.peer.peer_connectionMade()
         
-        self.state = 2
-        self.stateBuffer = ""
+        self.data = ""
+        self.dataState = 2
         
-    def processState2(self):
-        logger.debug("WSOutputProtocol.processState2")
+    def processDataState2(self):
+        logger.debug("WSOutputProtocol.processDataState2")
         
-        self.peer.peer_dataReceived(self.stateBuffer)
+        self.peer.peer_dataReceived(self.data)
         
-        self.stateBuffer = ""
+        self.data = ""
 
 class WSOutputProtocolFactory(JAP_LOCAL.OutputProtocolFactory):
     pass
@@ -183,7 +183,4 @@ class ClientContextFactory(ssl.ClientContextFactory):
         return certificateOk
 
 class WSInputProtocolFactory(JAP_LOCAL.InputProtocolFactory):
-    def __init__(self, configuration):
-        logger.debug("WSInputProtocolFactory.__init__")
-        
-        JAP_LOCAL.InputProtocolFactory.__init__(self, configuration)
+    pass

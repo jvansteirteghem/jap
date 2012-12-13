@@ -42,37 +42,41 @@ class WSInputProtocol(protocol.Protocol):
         self.remoteAddressType = 0
         self.remoteAddress = ""
         self.remotePort = 0
-        self.state = 0
-        self.stateBuffer = ""
+        self.connectionState = 0
+        self.data = ""
+        self.dataState = 0
     
     def connectionMade(self):
         logger.debug("WSInputProtocol.connectionMade")
+        
+        self.connectionState = 1
 
     def connectionLost(self, reason):
         logger.debug("WSInputProtocol.connectionLost")
         
+        self.connectionState = 2
+        
         if self.peer is not None:
-            self.peer.transport.loseConnection()
-            self.peer = None
+            self.peer.peer_connectionLost(reason)
             
-    def dataReceived(self, stateBuffer):
+    def dataReceived(self, data):
         logger.debug("WSInputProtocol.dataReceived")
         
-        self.stateBuffer = self.stateBuffer + stateBuffer
-        if self.state == 0:
-            self.processState0()
+        self.data = self.data + data
+        if self.dataState == 0:
+            self.processDataState0()
             return
-        if self.state == 1:
-            self.processState1()
+        if self.dataState == 1:
+            self.processDataState1()
             return
-        if self.state == 2:
-            self.processState2()
+        if self.dataState == 2:
+            self.processDataState2()
             return
     
-    def processState0(self):
-        logger.debug("WSInputProtocol.processState0")
+    def processDataState0(self):
+        logger.debug("WSInputProtocol.processDataState0")
         
-        if self.stateBuffer.find("\r\n\r\n") == -1:
+        if self.data.find("\r\n\r\n") == -1:
             return
         
         authorized = False;
@@ -81,7 +85,7 @@ class WSInputProtocol(protocol.Protocol):
             authorized = True
         
         if authorized == False:
-            headers = self.stateBuffer.split("\r\n")
+            headers = self.data.split("\r\n")
             
             for header in headers:
                 headerValues = header.split(": ")
@@ -115,38 +119,78 @@ class WSInputProtocol(protocol.Protocol):
         
         self.transport.write(response)
         
-        self.state = 1
-        self.stateBuffer = ""
+        self.data = ""
+        self.dataState = 1
     
-    def processState1(self):
-        logger.debug("WSInputProtocol.processState1")
+    def processDataState1(self):
+        logger.debug("WSInputProtocol.processDataState1")
         
-        v, c, r, self.remoteAddressType = struct.unpack('!BBBB', self.stateBuffer[:4])
+        v, c, r, self.remoteAddressType = struct.unpack('!BBBB', self.data[:4])
         
         # IPv4
         if self.remoteAddressType == 0x01:
-            remoteAddress, self.remotePort = struct.unpack('!IH', self.stateBuffer[4:10])
+            remoteAddress, self.remotePort = struct.unpack('!IH', self.data[4:10])
             self.remoteAddress = socket.inet_ntoa(struct.pack('!I', remoteAddress))
         else:
             # DN
             if self.remoteAddressType == 0x03:
-                remoteAddressLength = ord(self.stateBuffer[4])
-                self.remoteAddress, self.remotePort = struct.unpack('!%dsH' % remoteAddressLength, self.stateBuffer[5:])
+                remoteAddressLength = ord(self.data[4])
+                self.remoteAddress, self.remotePort = struct.unpack('!%dsH' % remoteAddressLength, self.data[5:])
         
         logger.debug("WSInputProtocol.remoteAddressType: " + str(self.remoteAddressType))
         logger.debug("WSInputProtocol.remoteAddress: " + self.remoteAddress)
         logger.debug("WSInputProtocol.remotePort: " + str(self.remotePort))
         
-        factory = OutputProtocolFactory(self)
-        factory.protocol = OutputProtocol
+        factory = WSOutputProtocolFactory(self)
+        factory.protocol = WSOutputProtocol
         reactor.connectTCP(self.remoteAddress, int(self.remotePort), factory)
     
-    def processState2(self):
-        logger.debug("WSInputProtocol.processState2")
+    def processDataState2(self):
+        logger.debug("WSInputProtocol.processDataState2")
         
-        self.peer.transport.write(self.stateBuffer)
+        self.peer.peer_dataReceived(self.data)
         
-        self.stateBuffer = ""
+        self.data = ""
+        
+    def peer_connectionMade(self):
+        logger.debug("InputProtocol.peer_connectionMade")
+        
+        if self.connectionState == 1:
+            #IPv4
+            if self.remoteAddressType == 0x01:
+                remoteAddress = struct.unpack('!I', socket.inet_aton(self.remoteAddress))[0]
+                response = struct.pack('!BBBBIH', 0x05, 0x00, 0, 0x01, remoteAddress, self.remotePort)
+            else:
+                # DN
+                if self.remoteAddressType == 0x03:
+                    remoteAddressLength = len(self.remoteAddress)
+                    response = struct.pack('!BBBBB%dsH' % remoteAddressLength, 0x05, 0x00, 0, 0x03, remoteAddressLength, self.remoteAddress, self.remotePort)
+            
+            self.transport.write(response)
+            
+            self.data = ""
+            self.dataState = 2
+        else:
+            if self.connectionState == 2:
+                self.peer.peer_connectionLost(None)
+        
+    def peer_connectionLost(self, reason):
+        logger.debug("InputProtocol.peer_connectionLost")
+        
+        if self.connectionState == 1:
+            self.transport.loseConnection()
+        else:
+            if self.connectionState == 2:
+                self.peer.peer_connectionLost(None)
+        
+    def peer_dataReceived(self, data):
+        logger.debug("InputProtocol.peer_dataReceived")
+        
+        if self.connectionState == 1:
+            self.transport.write(data)
+        else:
+            if self.connectionState == 2:
+                self.peer.peer_connectionLost(None)
 
 class WSInputProtocolFactory(protocol.ClientFactory):
     def __init__(self, configuration):
@@ -159,52 +203,56 @@ class WSInputProtocolFactory(protocol.ClientFactory):
         p.configuration = self.configuration
         return p
 
-class OutputProtocol(protocol.Protocol):
+class WSOutputProtocol(protocol.Protocol):
     def __init__(self):
-        logger.debug("OutputProtocol.__init__")
+        logger.debug("WSOutputProtocol.__init__")
         
         self.peer = None
+        self.connectionState = 0
     
     def connectionMade(self):
-        logger.debug("OutputProtocol.connectionMade")
+        logger.debug("WSOutputProtocol.connectionMade")
         
-        self.peer.peer = self
+        self.connectionState = 1
         
-        self.peer.state = 2
-        self.peer.stateBuffer = ""
-        
-        #IPv4
-        if self.peer.remoteAddressType == 0x01:
-            remoteAddress = struct.unpack('!I', socket.inet_aton(self.peer.remoteAddress))[0]
-            response = struct.pack('!BBBBIH', 0x05, 0x00, 0, 0x01, remoteAddress, self.peer.remotePort)
-        else:
-            # DN
-            if self.peer.remoteAddressType == 0x03:
-                remoteAddressLength = len(self.peer.remoteAddress)
-                response = struct.pack('!BBBBB%dsH' % remoteAddressLength, 0x05, 0x00, 0, 0x03, remoteAddressLength, self.peer.remoteAddress, self.peer.remotePort)
-        
-        self.peer.transport.write(response)
+        self.peer.peer_connectionMade()
 
     def connectionLost(self, reason):
-        logger.debug("OutputProtocol.connectionLost")
+        logger.debug("WSOutputProtocol.connectionLost")
         
-        if self.peer is not None:
-            self.peer.transport.loseConnection()
-            self.peer = None
+        self.connectionState = 2
         
-    def dataReceived(self, stateBuffer):
-        logger.debug("OutputProtocol.dataReceived")
+        self.peer.peer_connectionLost(reason)
         
-        self.peer.transport.write(stateBuffer)
+    def dataReceived(self, data):
+        logger.debug("WSOutputProtocol.dataReceived")
+        
+        self.peer.peer_dataReceived(data)
+        
+    def peer_connectionMade(self):
+        logger.debug("WSOutputProtocol.peer_connectionMade")
+        
+    def peer_connectionLost(self, reason):
+        logger.debug("WSOutputProtocol.peer_connectionLost")
+        
+        if self.connectionState == 1:
+            self.transport.abortConnection()
+        
+    def peer_dataReceived(self, data):
+        logger.debug("WSOutputProtocol.peer_dataReceived")
+        
+        if self.connectionState == 1:
+            self.transport.write(data)
 
 
-class OutputProtocolFactory(protocol.ClientFactory):
+class WSOutputProtocolFactory(protocol.ClientFactory):
     def __init__(self, peer):
-        logger.debug("OutputProtocolFactory.__init__")
+        logger.debug("WSOutputProtocolFactory.__init__")
         
         self.peer = peer
     
     def buildProtocol(self, *args, **kw):
         p = protocol.ClientFactory.buildProtocol(self, *args, **kw)
         p.peer = self.peer
+        p.peer.peer = p
         return p

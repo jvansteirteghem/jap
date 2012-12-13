@@ -12,12 +12,12 @@
             {
                 "PUBLIC": 
                 {
-                    "FILE": "KP.pub"
+                    "FILE": ""
                 },
                 "PRIVATE": 
                 {
-                    "FILE": "KP",
-                    "PASSPHRASE": "passphrase"
+                    "FILE": "",
+                    "PASSPHRASE": ""
                 }
             }
         ]

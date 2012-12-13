@@ -36,19 +36,21 @@ class OutputProtocol(protocol.Protocol):
         logger.debug("OutputProtocol.__init__")
         
         self.peer = None
+        self.connectionState = 0
         
     def connectionMade(self):
         logger.debug("OutputProtocol.connectionMade")
         
-        self.peer.peer = self
+        self.connectionState = 1
+        
         self.peer.peer_connectionMade()
         
     def connectionLost(self, reason):
         logger.debug("OutputProtocol.connectionLost")
         
-        if self.peer is not None:
-            self.peer.peer_connectionLost(reason)
-            self.peer = None
+        self.connectionState = 2
+        
+        self.peer.peer_connectionLost(reason)
         
     def dataReceived(self, data):
         logger.debug("OutputProtocol.dataReceived")
@@ -61,12 +63,14 @@ class OutputProtocol(protocol.Protocol):
     def peer_connectionLost(self, reason):
         logger.debug("OutputProtocol.peer_connectionLost")
         
-        self.transport.loseConnection()
+        if self.connectionState == 1:
+            self.transport.abortConnection()
         
     def peer_dataReceived(self, data):
         logger.debug("OutputProtocol.peer_dataReceived")
         
-        self.transport.write(data)
+        if self.connectionState == 1:
+            self.transport.write(data)
 
 class OutputProtocolFactory(protocol.ClientFactory):
     def __init__(self, peer):
@@ -77,6 +81,7 @@ class OutputProtocolFactory(protocol.ClientFactory):
     def buildProtocol(self, *args, **kw):
         p = protocol.ClientFactory.buildProtocol(self, *args, **kw)
         p.peer = self.peer
+        p.peer.peer = p
         return p
 
 class InputProtocol(protocol.Protocol):
@@ -87,58 +92,62 @@ class InputProtocol(protocol.Protocol):
         self.remoteAddressType = 0
         self.remoteAddress = ""
         self.remotePort = 0
-        self.state = 0
-        self.stateBuffer = ""
+        self.connectionState = 0
+        self.data = ""
+        self.dataState = 0
     
     def connectionMade(self):
         logger.debug("InputProtocol.connectionMade")
+        
+        self.connectionState = 1
     
     def connectionLost(self, reason):
         logger.debug("InputProtocol.connectionLost")
         
+        self.connectionState = 2
+        
         if self.peer is not None:
             self.peer.peer_connectionLost(reason)
-            self.peer = None
     
     def dataReceived(self, data):
         logger.debug("InputProtocol.dataReceived")
         
-        self.stateBuffer = self.stateBuffer + data
-        if self.state == 0:
-            self.processState0()
+        self.data = self.data + data
+        if self.dataState == 0:
+            self.processDataState0()
             return
-        if self.state == 1:
-            self.processState1()
+        if self.dataState == 1:
+            self.processDataState1()
             return
-        if self.state == 2:
-            self.processState2()
+        if self.dataState == 2:
+            self.processDataState2()
             return
     
-    def processState0(self):
-        logger.debug("InputProtocol.processState0")
+    def processDataState0(self):
+        logger.debug("InputProtocol.processDataState0")
         
         # no authentication
         self.transport.write(struct.pack('!BB', 0x05, 0x00))
         
-        self.state = 1
-        self.stateBuffer = ""
+        self.data = ""
+        self.dataState = 1
     
-    def processState1(self):
-        logger.debug("InputProtocol.processState1")
+    def processDataState1(self):
+        logger.debug("InputProtocol.processDataState1")
         
-        v, c, r, self.remoteAddressType = struct.unpack('!BBBB', self.stateBuffer[:4])
+        v, c, r, self.remoteAddressType = struct.unpack('!BBBB', self.data[:4])
         
         # IPv4
         if self.remoteAddressType == 0x01:
-            remoteAddress, self.remotePort = struct.unpack('!IH', self.stateBuffer[4:10])
+            remoteAddress, self.remotePort = struct.unpack('!IH', self.data[4:10])
             self.remoteAddress = socket.inet_ntoa(struct.pack('!I', remoteAddress))
-            self.stateBuffer = self.stateBuffer[10:]
+            self.data = self.data[10:]
         else:
             # DN
             if self.remoteAddressType == 0x03:
-                remoteAddressLength = ord(self.stateBuffer[4])
-                self.remoteAddress, self.remotePort = struct.unpack('!%dsH' % remoteAddressLength, self.stateBuffer[5:])
-                self.stateBuffer = self.stateBuffer[7 + remoteAddressLength:]
+                remoteAddressLength = ord(self.data[4])
+                self.remoteAddress, self.remotePort = struct.unpack('!%dsH' % remoteAddressLength, self.data[5:])
+                self.data = self.data[7 + remoteAddressLength:]
             # IPv6
             else:
                 response = struct.pack('!BBBBIH', 0x05, 0x08, 0, 1, 0, 0)
@@ -171,44 +180,56 @@ class InputProtocol(protocol.Protocol):
         else:
             reactor.connectTCP(self.remoteAddress, self.remotePort, factory, 50, None)
         
-    def processState2(self):
-        logger.debug("InputProtocol.processState2")
+    def processDataState2(self):
+        logger.debug("InputProtocol.processDataState2")
         
-        self.peer.peer_dataReceived(self.stateBuffer)
+        self.peer.peer_dataReceived(self.data)
         
-        self.stateBuffer = ""
+        self.data = ""
         
     def peer_connectionMade(self):
         logger.debug("InputProtocol.peer_connectionMade")
         
-        #IPv4
-        if self.remoteAddressType == 0x01:
-            remoteAddress = struct.unpack('!I', socket.inet_aton(self.remoteAddress))[0]
-            response = struct.pack('!BBBBIH', 0x05, 0x00, 0, 0x01, remoteAddress, self.remotePort)
+        if self.connectionState == 1:
+            #IPv4
+            if self.remoteAddressType == 0x01:
+                remoteAddress = struct.unpack('!I', socket.inet_aton(self.remoteAddress))[0]
+                response = struct.pack('!BBBBIH', 0x05, 0x00, 0, 0x01, remoteAddress, self.remotePort)
+            else:
+                # DN
+                if self.remoteAddressType == 0x03:
+                    remoteAddressLength = len(self.remoteAddress)
+                    response = struct.pack('!BBBBB%dsH' % remoteAddressLength, 0x05, 0x00, 0, 0x03, remoteAddressLength, self.remoteAddress, self.remotePort)
+            
+            self.transport.write(response)
+            
+            self.data = ""
+            self.dataState = 2
         else:
-            # DN
-            if self.remoteAddressType == 0x03:
-                remoteAddressLength = len(self.remoteAddress)
-                response = struct.pack('!BBBBB%dsH' % remoteAddressLength, 0x05, 0x00, 0, 0x03, remoteAddressLength, self.remoteAddress, self.remotePort)
-        
-        self.transport.write(response)
-        
-        self.state = 2
-        self.stateBuffer = ""
+            if self.connectionState == 2:
+                self.peer.peer_connectionLost(None)
         
     def peer_connectionLost(self, reason):
         logger.debug("InputProtocol.peer_connectionLost")
         
-        if self.state != 2:
-            response = struct.pack('!BBBBIH', 0x05, 0x05, 0, 1, 0, 0)
-            self.transport.write(response)
+        if self.connectionState == 1:
+            if self.dataState != 2:
+                response = struct.pack('!BBBBIH', 0x05, 0x05, 0, 1, 0, 0)
+                self.transport.write(response)
+            
+            self.transport.loseConnection()
+        else:
+            if self.connectionState == 2:
+                self.peer.peer_connectionLost(None)
         
-        self.transport.loseConnection()
-        
-    def peer_dataReceived(self, stateBuffer):
+    def peer_dataReceived(self, data):
         logger.debug("InputProtocol.peer_dataReceived")
         
-        self.transport.write(stateBuffer)
+        if self.connectionState == 1:
+            self.transport.write(data)
+        else:
+            if self.connectionState == 2:
+                self.peer.peer_connectionLost(None)
         
 class InputProtocolFactory(protocol.ClientFactory):
     def __init__(self, configuration):
