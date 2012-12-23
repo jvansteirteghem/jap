@@ -17,6 +17,7 @@ import OpenSSL
 import base64
 import socket
 import logging
+import autobahn.websocket
 import JAP_LOCAL
 import TUNNEL
 
@@ -39,87 +40,100 @@ def setDefaultConfiguration(configuration):
         configuration["REMOTE_PROXY_SERVERS"][i]["CERTIFICATE"]["AUTHENTICATION"].setdefault("FILE", "")
         i = i + 1
 
-class WSOutputProtocol(JAP_LOCAL.OutputProtocol):
+class WSOutputProtocol(autobahn.websocket.WebSocketClientProtocol):
     def __init__(self):
         logger.debug("WSOutputProtocol.__init__")
         
-        JAP_LOCAL.OutputProtocol.__init__(self)
+        self.inputProtocol = None
+        self.connectionState = 0
+        self.message = ""
+        self.messageState = 0
         
-        self.data = ""
-        self.dataState = 0
-        
-    def connectionMade(self):
-        logger.debug("WSOutputProtocol.connectionMade")
+    def onOpen(self):
+        logger.debug("WSOutputProtocol.onOpen")
         
         self.connectionState = 1
         
-        request = "GET / HTTP/1.1\r\n"
-        request = request + "Host: " + str(self.peer.configuration["REMOTE_PROXY_SERVERS"][self.peer.i]["ADDRESS"]) + ":" + str(self.peer.configuration["REMOTE_PROXY_SERVERS"][self.peer.i]["PORT"]) + "\r\n"
+        request = {}
+        request["REMOTE_PROXY_SERVER"] = {}
+        request["REMOTE_PROXY_SERVER"]["AUTHENTICATION"] = {}
+        request["REMOTE_PROXY_SERVER"]["AUTHENTICATION"]["USERNAME"] = str(self.inputProtocol.configuration["REMOTE_PROXY_SERVERS"][self.inputProtocol.i]["AUTHENTICATION"]["USERNAME"])
+        request["REMOTE_PROXY_SERVER"]["AUTHENTICATION"]["PASSWORD"] = str(self.inputProtocol.configuration["REMOTE_PROXY_SERVERS"][self.inputProtocol.i]["AUTHENTICATION"]["PASSWORD"])
+        request["REMOTE_ADDRESS"] = str(self.inputProtocol.remoteAddress)
+        request["REMOTE_PORT"] = self.inputProtocol.remotePort
         
-        if self.peer.configuration["REMOTE_PROXY_SERVERS"][self.peer.i]["AUTHENTICATION"]["USERNAME"] != "":
-            request = request + "Authorization: Basic " + base64.standard_b64encode(self.peer.configuration["REMOTE_PROXY_SERVERS"][self.peer.i]["AUTHENTICATION"]["USERNAME"] + ":" + self.peer.configuration["REMOTE_PROXY_SERVERS"][self.peer.i]["AUTHENTICATION"]["PASSWORD"]) + "\r\n"
+        encoder = json.JSONEncoder()
+        message = encoder.encode(request)
         
-        request = request + "Upgrade: WebSocket\r\n"
-        request = request + "Connection: Upgrade\r\n"
-        request = request + "\r\n"
+        self.sendMessage(message, False)
         
-        self.transport.write(request)
-        
-        self.data = ""
-        self.dataState = 0
-        
-    def dataReceived(self, data):
-        logger.debug("WSOutputProtocol.dataReceived")
-        
-        self.data = self.data + data
-        if self.dataState == 0:
-            self.processDataState0()
-            return
-        if self.dataState == 1:
-            self.processDataState1();
-            return
-        if self.dataState == 2:
-            self.processDataState2();
-            return
-        
-    def processDataState0(self):
-        logger.debug("WSOutputProtocol.processDataState0")
-        
-        if self.data.find("\r\n\r\n") == -1:
-            return
-        
-        #IPv4
-        if self.peer.remoteAddressType == 0x01:
-            remoteAddress = struct.unpack('!I', socket.inet_aton(self.peer.remoteAddress))[0]
-            request = struct.pack('!BBBBIH', 0x05, 0x00, 0, 0x01, remoteAddress, self.peer.remotePort)
-        else:
-            # DN
-            if self.peer.remoteAddressType == 0x03:
-                remoteAddressLength = len(self.peer.remoteAddress)
-                request = struct.pack('!BBBBB%dsH' % remoteAddressLength, 0x05, 0x00, 0, 0x03, remoteAddressLength, self.peer.remoteAddress, self.peer.remotePort)
-        
-        self.transport.write(request)
-        
-        self.data = ""
-        self.dataState = 1
-        
-    def processDataState1(self):
-        logger.debug("WSOutputProtocol.processDataState1")
-        
-        self.peer.peer_connectionMade()
-        
-        self.data = ""
-        self.dataState = 2
-        
-    def processDataState2(self):
-        logger.debug("WSOutputProtocol.processDataState2")
-        
-        self.peer.peer_dataReceived(self.data)
-        
-        self.data = ""
+        self.message = ""
+        self.messageState = 0
 
-class WSOutputProtocolFactory(JAP_LOCAL.OutputProtocolFactory):
-    pass
+    def onClose(self, wasClean, code, reason):
+        logger.debug("WSOutputProtocol.onClose")
+        
+        self.connectionState = 2
+        
+        self.inputProtocol.outputProtocol_connectionLost(reason)
+        
+    def onMessage(self, message, binary):
+        logger.debug("WSOutputProtocol.onMessage")
+        
+        self.message = self.message + message
+        if self.messageState == 0:
+            self.processMessageState0();
+            return
+        if self.messageState == 1:
+            self.processMessageState1();
+            return
+        
+    def processMessageState0(self):
+        logger.debug("WSOutputProtocol.processMessageState0")
+        
+        decoder = json.JSONDecoder()
+        response = decoder.decode(self.message)
+        
+        self.inputProtocol.outputProtocol_connectionMade()
+        
+        self.message = ""
+        self.messageState = 1
+        
+    def processMessageState1(self):
+        logger.debug("WSOutputProtocol.processMessageState1")
+        
+        self.inputProtocol.outputProtocol_dataReceived(self.message)
+        
+        self.message = ""
+        
+    def inputProtocol_connectionMade(self):
+        logger.debug("WSOutputProtocol.inputProtocol_connectionMade")
+        
+    def inputProtocol_connectionLost(self, reason):
+        logger.debug("WSOutputProtocol.inputProtocol_connectionLost")
+        
+        if self.connectionState == 1:
+            self.sendClose()
+        
+    def inputProtocol_dataReceived(self, data):
+        logger.debug("WSOutputProtocol.inputProtocol_dataReceived")
+        
+        if self.connectionState == 1:
+            self.sendMessage(data, True)
+
+class WSOutputProtocolFactory(autobahn.websocket.WebSocketClientFactory):
+    def __init__(self, inputProtocol, *args, **kwargs):
+        logger.debug("WSOutputProtocolFactory.__init__")
+        
+        autobahn.websocket.WebSocketClientFactory.__init__(self, *args, **kwargs)
+        
+        self.inputProtocol = inputProtocol
+        
+    def buildProtocol(self, *args, **kwargs):
+        outputProtocol = autobahn.websocket.WebSocketClientFactory.buildProtocol(self, *args, **kwargs)
+        outputProtocol.inputProtocol = self.inputProtocol
+        outputProtocol.inputProtocol.outputProtocol = outputProtocol
+        return outputProtocol
 
 class WSInputProtocol(JAP_LOCAL.InputProtocol):
     def __init__(self):
@@ -134,10 +148,10 @@ class WSInputProtocol(JAP_LOCAL.InputProtocol):
         
         self.i = random.randrange(0, len(self.configuration["REMOTE_PROXY_SERVERS"]))
         
-        factory = WSOutputProtocolFactory(self)
-        factory.protocol = WSOutputProtocol
-        
         if self.configuration["REMOTE_PROXY_SERVERS"][self.i]["TYPE"] == "HTTPS":
+            factory = WSOutputProtocolFactory(self, "wss://" + str(self.configuration["REMOTE_PROXY_SERVERS"][self.i]["ADDRESS"]) + ":" + str(self.configuration["REMOTE_PROXY_SERVERS"][self.i]["PORT"]), debug = False)
+            factory.protocol = WSOutputProtocol
+            
             if self.configuration["REMOTE_PROXY_SERVERS"][self.i]["CERTIFICATE"]["AUTHENTICATION"]["FILE"] != "":
                 contextFactory = ClientContextFactory(self.configuration["REMOTE_PROXY_SERVERS"][self.i]["CERTIFICATE"]["AUTHENTICATION"]["FILE"])
             else:
@@ -149,6 +163,9 @@ class WSInputProtocol(JAP_LOCAL.InputProtocol):
             else:
                 reactor.connectSSL(self.configuration["REMOTE_PROXY_SERVERS"][self.i]["ADDRESS"], self.configuration["REMOTE_PROXY_SERVERS"][self.i]["PORT"], factory, contextFactory, 50, None)
         else:
+            factory = WSOutputProtocolFactory(self, "ws://" + str(self.configuration["REMOTE_PROXY_SERVERS"][self.i]["ADDRESS"]) + ":" + str(self.configuration["REMOTE_PROXY_SERVERS"][self.i]["PORT"]), debug = False)
+            factory.protocol = WSOutputProtocol
+            
             if self.configuration["PROXY_SERVER"]["ADDRESS"] != "":
                 tunnel = TUNNEL.Tunnel(self.configuration["PROXY_SERVER"]["ADDRESS"], self.configuration["PROXY_SERVER"]["PORT"], self.configuration["PROXY_SERVER"]["AUTHENTICATION"]["USERNAME"], self.configuration["PROXY_SERVER"]["AUTHENTICATION"]["PASSWORD"])
                 tunnel.connectTCP(self.configuration["REMOTE_PROXY_SERVERS"][self.i]["ADDRESS"], self.configuration["REMOTE_PROXY_SERVERS"][self.i]["PORT"], factory, 50, None)

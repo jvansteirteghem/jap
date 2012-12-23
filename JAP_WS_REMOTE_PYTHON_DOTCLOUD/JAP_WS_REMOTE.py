@@ -9,7 +9,7 @@ This program is distributed in the hope that it will be useful, but WITHOUT ANY 
 You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 """
 
-from twisted.internet import reactor
+from twisted.internet import reactor, ssl
 import json
 import os
 import logging
@@ -23,9 +23,12 @@ logging.basicConfig()
 logger = logging.getLogger("JAP")
 logger.setLevel(configuration["LOGGER"]["LEVEL"])
 
-factory = JAP.JAP_WS_REMOTE.WSInputProtocolFactory(configuration)
-factory.protocol = JAP.JAP_WS_REMOTE.WSInputProtocol
-
+if configuration["REMOTE_PROXY_SERVER"]["TYPE"] == "HTTPS":
+    factory = JAP.JAP_WS_REMOTE.WSInputProtocolFactory(configuration, str(os.environ["DOTCLOUD_WWW_HTTP_URL"].replace("http://", "wss://")), debug = False)
+    factory.protocol = JAP.JAP_WS_REMOTE.WSInputProtocol
+else:
+    factory = JAP.JAP_WS_REMOTE.WSInputProtocolFactory(configuration, str(os.environ["DOTCLOUD_WWW_HTTP_URL"].replace("http://", "ws://")), debug = False)
+    factory.protocol = JAP.JAP_WS_REMOTE.WSInputProtocol
+    
 reactor.listenTCP(int(os.environ["PORT_WWW"]), factory, 50, "")
-
 reactor.run()

@@ -1,0 +1,9 @@
+#!/bin/bash
+# The logic to stop your application should be put in this script.
+
+source "${OPENSHIFT_REPO_DIR}.openshift/action_hooks/vars"
+source "${OPENSHIFT_VIRTUALENV_DIR}/bin/activate"
+
+kill $(cat "${OPENSHIFT_CARTRIDGE_DIR}run/twistd.pid")
+exit 0
+

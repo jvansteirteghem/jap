@@ -1,6 +1,6 @@
 set SEVENZIP_HOME="C:\Program Files\7-Zip"
 set PYINSTALLER_HOME="C:\pyinstaller-2.0"
-set VERSION=1.0.0
+set VERSION=2.0.0-SNAPSHOT
 if exist MAKE rmdir MAKE /s /q
 mkdir MAKE
 cd MAKE

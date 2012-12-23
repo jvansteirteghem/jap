@@ -1,0 +1,11 @@
+#!/bin/bash
+# The logic to start up your application should be put in this
+# script. The application will work only if it binds to
+# $OPENSHIFT_INTERNAL_IP:8080
+
+source "${OPENSHIFT_REPO_DIR}.openshift/action_hooks/vars"
+source "${OPENSHIFT_VIRTUALENV_DIR}/bin/activate"
+
+cd "${OPENSHIFT_REPO_DIR}"
+twistd -l "${OPENSHIFT_DIY_LOG_DIR}twistd.log" --pidfile="${OPENSHIFT_CARTRIDGE_DIR}run/twistd.pid" -y app.tac
+

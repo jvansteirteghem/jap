@@ -1,0 +1,15 @@
+#!/bin/bash
+# This deploy hook gets executed after dependencies are resolved and the
+# build hook has been run but before the application has been started back
+# up again.  This script gets executed directly, so it could be python, php,
+# ruby, etc.
+
+source "${OPENSHIFT_REPO_DIR}.openshift/action_hooks/vars"
+export PIP_DOWNLOAD_CACHE="${OPENSHIFT_TMP_DIR}.pip/cache"
+
+if [ ! -d "${OPENSHIFT_VIRTUALENV_DIR}" ]; then
+virtualenv --system-site-packages --distribute --prompt='(env)' "${OPENSHIFT_VIRTUALENV_DIR}"
+fi
+
+source "${OPENSHIFT_VIRTUALENV_DIR}/bin/activate"
+pip install --log="${OPENSHIFT_DIY_LOG_DIR}pip.log" -r "${OPENSHIFT_REPO_DIR}requirements.txt"

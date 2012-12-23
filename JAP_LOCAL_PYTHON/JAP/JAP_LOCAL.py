@@ -35,7 +35,7 @@ class OutputProtocol(protocol.Protocol):
     def __init__(self):
         logger.debug("OutputProtocol.__init__")
         
-        self.peer = None
+        self.inputProtocol = None
         self.connectionState = 0
         
     def connectionMade(self):
@@ -43,52 +43,53 @@ class OutputProtocol(protocol.Protocol):
         
         self.connectionState = 1
         
-        self.peer.peer_connectionMade()
+        self.inputProtocol.outputProtocol_connectionMade()
         
     def connectionLost(self, reason):
         logger.debug("OutputProtocol.connectionLost")
         
         self.connectionState = 2
         
-        self.peer.peer_connectionLost(reason)
+        self.inputProtocol.outputProtocol_connectionLost(reason)
         
     def dataReceived(self, data):
         logger.debug("OutputProtocol.dataReceived")
         
-        self.peer.peer_dataReceived(data)
+        self.inputProtocol.outputProtocol_dataReceived(data)
         
-    def peer_connectionMade(self):
-        logger.debug("OutputProtocol.peer_connectionMade")
+    def inputProtocol_connectionMade(self):
+        logger.debug("OutputProtocol.inputProtocol_connectionMade")
         
-    def peer_connectionLost(self, reason):
-        logger.debug("OutputProtocol.peer_connectionLost")
+    def inputProtocol_connectionLost(self, reason):
+        logger.debug("OutputProtocol.inputProtocol_connectionLost")
         
         if self.connectionState == 1:
-            self.transport.abortConnection()
+            self.transport.loseConnection()
         
-    def peer_dataReceived(self, data):
-        logger.debug("OutputProtocol.peer_dataReceived")
+    def inputProtocol_dataReceived(self, data):
+        logger.debug("OutputProtocol.inputProtocol_dataReceived")
         
         if self.connectionState == 1:
             self.transport.write(data)
 
 class OutputProtocolFactory(protocol.ClientFactory):
-    def __init__(self, peer):
+    def __init__(self, inputProtocol):
         logger.debug("OutputProtocolFactory.__init__")
         
-        self.peer = peer
+        self.inputProtocol = inputProtocol
         
     def buildProtocol(self, *args, **kw):
-        p = protocol.ClientFactory.buildProtocol(self, *args, **kw)
-        p.peer = self.peer
-        p.peer.peer = p
-        return p
+        outputProtocol = protocol.ClientFactory.buildProtocol(self, *args, **kw)
+        outputProtocol.inputProtocol = self.inputProtocol
+        outputProtocol.inputProtocol.outputProtocol = outputProtocol
+        return outputProtocol
 
 class InputProtocol(protocol.Protocol):
     def __init__(self):
         logger.debug("InputProtocol.__init__")
         
-        self.peer = None
+        self.configuration = None
+        self.outputProtocol = None
         self.remoteAddressType = 0
         self.remoteAddress = ""
         self.remotePort = 0
@@ -106,8 +107,8 @@ class InputProtocol(protocol.Protocol):
         
         self.connectionState = 2
         
-        if self.peer is not None:
-            self.peer.peer_connectionLost(reason)
+        if self.outputProtocol is not None:
+            self.outputProtocol.inputProtocol_connectionLost(reason)
     
     def dataReceived(self, data):
         logger.debug("InputProtocol.dataReceived")
@@ -183,12 +184,12 @@ class InputProtocol(protocol.Protocol):
     def processDataState2(self):
         logger.debug("InputProtocol.processDataState2")
         
-        self.peer.peer_dataReceived(self.data)
+        self.outputProtocol.inputProtocol_dataReceived(self.data)
         
         self.data = ""
         
-    def peer_connectionMade(self):
-        logger.debug("InputProtocol.peer_connectionMade")
+    def outputProtocol_connectionMade(self):
+        logger.debug("InputProtocol.outputProtocol_connectionMade")
         
         if self.connectionState == 1:
             #IPv4
@@ -207,10 +208,10 @@ class InputProtocol(protocol.Protocol):
             self.dataState = 2
         else:
             if self.connectionState == 2:
-                self.peer.peer_connectionLost(None)
+                self.outputProtocol.inputProtocol_connectionLost(None)
         
-    def peer_connectionLost(self, reason):
-        logger.debug("InputProtocol.peer_connectionLost")
+    def outputProtocol_connectionLost(self, reason):
+        logger.debug("InputProtocol.outputProtocol_connectionLost")
         
         if self.connectionState == 1:
             if self.dataState != 2:
@@ -220,16 +221,16 @@ class InputProtocol(protocol.Protocol):
             self.transport.loseConnection()
         else:
             if self.connectionState == 2:
-                self.peer.peer_connectionLost(None)
+                self.outputProtocol.inputProtocol_connectionLost(None)
         
-    def peer_dataReceived(self, data):
-        logger.debug("InputProtocol.peer_dataReceived")
+    def outputProtocol_dataReceived(self, data):
+        logger.debug("InputProtocol.outputProtocol_dataReceived")
         
         if self.connectionState == 1:
             self.transport.write(data)
         else:
             if self.connectionState == 2:
-                self.peer.peer_connectionLost(None)
+                self.outputProtocol.inputProtocol_connectionLost(None)
         
 class InputProtocolFactory(protocol.ClientFactory):
     def __init__(self, configuration):
@@ -238,6 +239,6 @@ class InputProtocolFactory(protocol.ClientFactory):
         self.configuration = configuration
     
     def buildProtocol(self, *args, **kw):
-        p = protocol.ClientFactory.buildProtocol(self, *args, **kw)
-        p.configuration = self.configuration
-        return p
+        inputProtocol = protocol.ClientFactory.buildProtocol(self, *args, **kw)
+        inputProtocol.configuration = self.configuration
+        return inputProtocol

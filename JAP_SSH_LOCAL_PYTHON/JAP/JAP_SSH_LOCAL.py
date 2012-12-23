@@ -55,7 +55,7 @@ class SSHChannel(channel.SSHChannel):
         
         channel.SSHChannel.__init__(self, *args, **kw)
         
-        self.peer = None
+        self.inputProtocol = None
         self.connectionState = 0
         
     def channelOpen(self, specificData):
@@ -63,19 +63,19 @@ class SSHChannel(channel.SSHChannel):
         
         self.connectionState = 1
         
-        self.peer.peer_connectionMade()
+        self.inputProtocol.outputProtocol_connectionMade()
 
     def openFailed(self, reason):
         logger.debug("SSHChannel.openFailed")
         
         self.connectionState = 2
         
-        self.peer.peer_connectionLost(reason)
+        self.inputProtocol.outputProtocol_connectionLost(reason)
 
     def dataReceived(self, data):
         logger.debug("SSHChannel.dataReceived")
         
-        self.peer.peer_dataReceived(data)
+        self.inputProtocol.outputProtocol_dataReceived(data)
     
     def eofReceived(self):
         logger.debug("SSHChannel.eofReceived")
@@ -92,19 +92,19 @@ class SSHChannel(channel.SSHChannel):
         
         self.connectionState = 2
         
-        self.peer.peer_connectionLost(None)
+        self.inputProtocol.outputProtocol_connectionLost(None)
         
-    def peer_connectionMade(self):
-        logger.debug("SSHChannel.peer_connectionMade")
+    def inputProtocol_connectionMade(self):
+        logger.debug("SSHChannel.inputProtocol_connectionMade")
         
-    def peer_connectionLost(self, reason):
-        logger.debug("SSHChannel.peer_connectionLost")
+    def inputProtocol_connectionLost(self, reason):
+        logger.debug("SSHChannel.inputProtocol_connectionLost")
         
         if self.connectionState == 1:
             self.loseConnection()
         
-    def peer_dataReceived(self, data):
-        logger.debug("SSHChannel.peer_dataReceived")
+    def inputProtocol_dataReceived(self, data):
+        logger.debug("SSHChannel.inputProtocol_dataReceived")
         
         if self.connectionState == 1:
             self.write(data)
@@ -219,11 +219,11 @@ class SSHInputProtocol(JAP_LOCAL.InputProtocol):
         self.i = random.randrange(0, len(sshConnections))
         
         sshConnection = sshConnections[self.i]
-        self.peer = SSHChannel(conn = sshConnection)
-        self.peer.peer = self
+        self.outputProtocol = SSHChannel(conn = sshConnection)
+        self.outputProtocol.inputProtocol = self
         localAddress = self.transport.getHost()
         data = forwarding.packOpen_direct_tcpip((self.remoteAddress, self.remotePort), (localAddress.host, localAddress.port))
-        sshConnection.openChannel(self.peer, data)
+        sshConnection.openChannel(self.outputProtocol, data)
 
 class SSHInputProtocolFactory(JAP_LOCAL.InputProtocolFactory):
     def __init__(self, configuration):
