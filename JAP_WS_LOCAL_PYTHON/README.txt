@@ -3,6 +3,7 @@ PRE-INSTALLATION
 - install PYTHON >= 2.7.0
 - install TWISTED
 - install PYOPENSSL
+- install AUTOBAHN
 
 INSTALLATION
 ------------
