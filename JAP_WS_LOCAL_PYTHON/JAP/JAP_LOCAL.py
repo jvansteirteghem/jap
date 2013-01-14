@@ -151,7 +151,7 @@ class InputProtocol(protocol.Protocol):
                 self.data = self.data[7 + remoteAddressLength:]
             # IPv6
             else:
-                response = struct.pack('!BBBBIH', 0x05, 0x08, 0, 1, 0, 0)
+                response = struct.pack('!BBBBIH', 0x05, 0x08, 0x00, 0x01, 0, 0)
                 self.transport.write(response)
                 self.transport.loseConnection()
                 return
@@ -164,7 +164,7 @@ class InputProtocol(protocol.Protocol):
         if c == 0x01:
             self.do_CONNECT()
         else:
-            response = struct.pack('!BBBBIH', 0x05, 0x07, 0, 1, 0, 0)
+            response = struct.pack('!BBBBIH', 0x05, 0x07, 0x00, 0x01, 0, 0)
             self.transport.write(response)
             self.transport.loseConnection()
             return
@@ -192,16 +192,7 @@ class InputProtocol(protocol.Protocol):
         logger.debug("InputProtocol.outputProtocol_connectionMade")
         
         if self.connectionState == 1:
-            #IPv4
-            if self.remoteAddressType == 0x01:
-                remoteAddress = struct.unpack('!I', socket.inet_aton(self.remoteAddress))[0]
-                response = struct.pack('!BBBBIH', 0x05, 0x00, 0, 0x01, remoteAddress, self.remotePort)
-            else:
-                # DN
-                if self.remoteAddressType == 0x03:
-                    remoteAddressLength = len(self.remoteAddress)
-                    response = struct.pack('!BBBBB%dsH' % remoteAddressLength, 0x05, 0x00, 0, 0x03, remoteAddressLength, self.remoteAddress, self.remotePort)
-            
+            response = struct.pack('!BBBBIH', 0x05, 0x00, 0x00, 0x01, 0, 0)
             self.transport.write(response)
             
             self.data = ""
@@ -215,7 +206,7 @@ class InputProtocol(protocol.Protocol):
         
         if self.connectionState == 1:
             if self.dataState != 2:
-                response = struct.pack('!BBBBIH', 0x05, 0x05, 0, 1, 0, 0)
+                response = struct.pack('!BBBBIH', 0x05, 0x05, 0x00, 0x01, 0, 0)
                 self.transport.write(response)
             
             self.transport.loseConnection()
