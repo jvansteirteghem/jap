@@ -6,7 +6,9 @@ import JAP.JAP_WS_REMOTE
 
 configuration = json.load(open("JAP_WS_REMOTE.json"))
 
-logging.basicConfig()
+JAP.JAP_WS_REMOTE.setDefaultConfiguration(configuration)
+
+logging.basicConfig(filename=str(os.environ["OPENSHIFT_DIY_LOG_DIR"]) + "/jap.log")
 logger = logging.getLogger("JAP")
 logger.setLevel(configuration["LOGGER"]["LEVEL"])
 
