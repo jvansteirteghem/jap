@@ -40,7 +40,7 @@ OPENSHIFT WEBSOCKET protocol support is EXPERIMENTAL
 - WEBSOCKET protocol over HTTPS
 	- JAP_WS_REMOTE
 		- configure JAP_WS_REMOTE.json
-			- REMOTE_PROXY_SERVER/TYPE = HTTP
+			- REMOTE_PROXY_SERVER/TYPE = HTTPS
 	- JAP_WS_LOCAL
 		- download certificate (XXX.rhcloud.com)
 			- open FIREFOX
