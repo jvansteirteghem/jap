@@ -1,1 +1,2 @@
 *.sh eol=lf
+JAP_WS_REMOTE_PYTHON/JAP_WS_REMOTE_PYTHON_OPENSHIFT/.openshift/action_hooks/*  eol=lf
