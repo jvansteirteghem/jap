@@ -11,7 +11,7 @@ INSTALLATION
 - open CONSOLE
 	- cd JAP_WS_REMOTE_PYTHON_DOTCLOUD-X.X.X
 	- dotcloud create application-id
-	- dotcloud push application-id
+	- dotcloud push
 
 IMPORTANT
 ---------
