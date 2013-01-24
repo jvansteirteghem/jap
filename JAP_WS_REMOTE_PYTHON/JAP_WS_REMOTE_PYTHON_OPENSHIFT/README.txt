@@ -19,8 +19,8 @@ INSTALLATION
 	- LINUX
 		- rhc app create -a application-id -t diy-0.1
 		- cd application-id
-		- cp -r ../JAP_WS_REMOTE_PYTHON_OPENSHIFT-X.X.X/* .
-		- chmod -R +x ./.openshift/action_hooks
+		- cp -r ../JAP_WS_REMOTE_PYTHON_OPENSHIFT-X.X.X/. .
+		- chmod -R +x ./.openshift/action_hooks ./JAP
 		- git add -A
 		- git commit -m "JAP"
 		- git push

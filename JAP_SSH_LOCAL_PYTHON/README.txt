@@ -3,6 +3,8 @@ PRE-INSTALLATION
 - install PYTHON >= 2.7.0
 - install TWISTED
 - install PYOPENSSL
+- install PYCRYPTO
+- install PYASN1
 
 INSTALLATION
 ------------
