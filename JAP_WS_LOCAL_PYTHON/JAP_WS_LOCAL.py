@@ -20,7 +20,23 @@ JAP.JAP_WS_LOCAL.setDefaultConfiguration(configuration)
 
 logging.basicConfig()
 logger = logging.getLogger("JAP")
-logger.setLevel(configuration["LOGGER"]["LEVEL"])
+
+if configuration["LOGGER"]["LEVEL"] == "DEBUG":
+    logger.setLevel(logging.DEBUG)
+else:
+    if configuration["LOGGER"]["LEVEL"] == "INFO":
+        logger.setLevel(logging.INFO)
+    else:
+        if configuration["LOGGER"]["LEVEL"] == "WARNING":
+            logger.setLevel(logging.WARNING)
+        else:
+            if configuration["LOGGER"]["LEVEL"] == "ERROR":
+                logger.setLevel(logging.ERROR)
+            else:
+                if configuration["LOGGER"]["LEVEL"] == "CRITICAL":
+                    logger.setLevel(logging.CRITICAL)
+                else:
+                    logger.setLevel(logging.NOTSET)
 
 factory = JAP.JAP_WS_LOCAL.WSInputProtocolFactory(configuration)
 factory.protocol = JAP.JAP_WS_LOCAL.WSInputProtocol

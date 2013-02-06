@@ -20,7 +20,23 @@ JAP.JAP_WS_REMOTE.setDefaultConfiguration(configuration)
 
 logging.basicConfig()
 logger = logging.getLogger("JAP")
-logger.setLevel(configuration["LOGGER"]["LEVEL"])
+
+if configuration["LOGGER"]["LEVEL"] == "DEBUG":
+    logger.setLevel(logging.DEBUG)
+else:
+    if configuration["LOGGER"]["LEVEL"] == "INFO":
+        logger.setLevel(logging.INFO)
+    else:
+        if configuration["LOGGER"]["LEVEL"] == "WARNING":
+            logger.setLevel(logging.WARNING)
+        else:
+            if configuration["LOGGER"]["LEVEL"] == "ERROR":
+                logger.setLevel(logging.ERROR)
+            else:
+                if configuration["LOGGER"]["LEVEL"] == "CRITICAL":
+                    logger.setLevel(logging.CRITICAL)
+                else:
+                    logger.setLevel(logging.NOTSET)
 
 if configuration["REMOTE_PROXY_SERVER"]["TYPE"] == "HTTPS":
     factory = JAP.JAP_WS_REMOTE.WSInputProtocolFactory(configuration, "wss://" + str(configuration["REMOTE_PROXY_SERVER"]["ADDRESS"]) + ":" + str(configuration["REMOTE_PROXY_SERVER"]["PORT"]), debug = False)

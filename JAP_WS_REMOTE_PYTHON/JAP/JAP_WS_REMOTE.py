@@ -20,6 +20,8 @@ import autobahn.websocket
 logger = logging.getLogger("JAP.JAP_WS_REMOTE")
 
 def setDefaultConfiguration(configuration):
+    configuration.setdefault("LOGGER", {})
+    configuration["LOGGER"].setdefault("LEVEL", "")
     configuration.setdefault("REMOTE_PROXY_SERVER", {})
     configuration["REMOTE_PROXY_SERVER"].setdefault("TYPE", "")
     configuration["REMOTE_PROXY_SERVER"].setdefault("ADDRESS", "")

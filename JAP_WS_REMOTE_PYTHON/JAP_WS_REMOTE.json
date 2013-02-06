@@ -1,7 +1,7 @@
 {
     "LOGGER":
     {
-        "LEVEL": 10
+        "LEVEL": "DEBUG"
     },
     "REMOTE_PROXY_SERVER":
     {

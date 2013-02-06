@@ -20,7 +20,7 @@ logger = logging.getLogger("JAP.JAP_LOCAL")
 
 def setDefaultConfiguration(configuration):
     configuration.setdefault("LOGGER", {})
-    configuration["LOGGER"].setdefault("LEVEL", 10)
+    configuration["LOGGER"].setdefault("LEVEL", "")
     configuration.setdefault("LOCAL_PROXY_SERVER", {})
     configuration["LOCAL_PROXY_SERVER"].setdefault("ADDRESS", "")
     configuration["LOCAL_PROXY_SERVER"].setdefault("PORT", 0)
