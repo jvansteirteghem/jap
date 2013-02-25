@@ -4,10 +4,11 @@ PRE-INSTALLATION
 
 INSTALLATION
 ------------
-- unzip JAP_LOCAL_NODE-X.X.X.zip
-- open JAP_LOCAL_NODE-X.X.X
-- configure JAP_LOCAL_NODE.json.js
-- execute JAP_LOCAL_NODE.bat
+- unzip JAP_WS_LOCAL_NODE-X.X.X.zip
+- open JAP_WS_LOCAL_NODE-X.X.X
+- execute NM.bat
+- configure JAP_WS_LOCAL.json
+- execute JAP_WS_LOCAL.bat
 - open
 	- FIREFOX
 		- click TOOLS, OPTIONS

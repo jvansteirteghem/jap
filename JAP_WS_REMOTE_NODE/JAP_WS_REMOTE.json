@@ -1,5 +1,8 @@
-module.exports = 
 {
+	"LOGGER":
+	{
+		"LEVEL": "DEBUG"
+	},
 	"REMOTE_PROXY_SERVER":
 	{
 		"TYPE": "",

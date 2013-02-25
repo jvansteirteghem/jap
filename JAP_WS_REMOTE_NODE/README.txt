@@ -4,10 +4,11 @@ PRE-INSTALLATION
 
 INSTALLATION
 ------------
-- unzip JAP_REMOTE_NODE-X.X.X.zip
-- open JAP_REMOTE_NODE-X.X.X
-- configure JAP_REMOTE_NODE.json.js
-- execute JAP_REMOTE_NODE.bat
+- unzip JAP_WS_REMOTE_NODE-X.X.X.zip
+- open JAP_WS_REMOTE_NODE-X.X.X
+- execute NM.bat
+- configure JAP_WS_REMOTE.json
+- execute JAP_WS_REMOTE.bat
 
 IMPORTANT
 ---------

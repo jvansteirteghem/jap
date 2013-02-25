@@ -1,2 +1,0 @@
-node JAP_REMOTE_NODE.js
-pause
