@@ -1,1 +1,1 @@
-web: node JAP_REMOTE_NODE.js
+web: node JAP_WS_REMOTE.js

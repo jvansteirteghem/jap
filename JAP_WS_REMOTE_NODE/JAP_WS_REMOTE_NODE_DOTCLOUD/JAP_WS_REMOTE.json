@@ -1,9 +1,11 @@
-module.exports = 
 {
+	"LOGGER":
+	{
+		"LEVEL": "DEBUG"
+	},
 	"REMOTE_PROXY_SERVER":
 	{
-		"TYPE": "HTTP",
-		"PORT": 8080,
+		"TYPE": "HTTPS",
 		"AUTHENTICATION":
 		[
 			{

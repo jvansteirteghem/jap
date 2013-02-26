@@ -9,15 +9,13 @@ This program is distributed in the hope that it will be useful, but WITHOUT ANY 
 You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
-var jap = require("./JAP/JAP_WS_LOCAL");
+var http = require("http");
+var jap = require("./JAP/JAP_WS_REMOTE");
 
-var configuration = require("./JAP_WS_LOCAL.json");
+var configuration = require("./JAP_WS_REMOTE.json");
 configuration = jap.setDefaultConfiguration(configuration);
 
-server = jap.createServer(configuration);
+var server = http.createServer();
+server.listen(8080);
 
-if (configuration.LOCAL_PROXY_SERVER.ADDRESS === "") {
-	server.listen(configuration.LOCAL_PROXY_SERVER.PORT);
-} else {
-	server.listen(configuration.LOCAL_PROXY_SERVER.PORT, configuration.LOCAL_PROXY_SERVER.ADDRESS);
-}
+server = jap.createServer(server, configuration);

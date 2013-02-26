@@ -301,6 +301,11 @@ var createServer = function(configuration) {
 		});
 	});
 	
+	server.on("error", function(error) {
+		console.log("server.error");
+		console.log("error: " + error.toString());
+	});
+	
 	return server;
 };
 
