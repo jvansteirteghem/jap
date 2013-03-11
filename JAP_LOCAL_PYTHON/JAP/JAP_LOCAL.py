@@ -25,6 +25,7 @@ def setDefaultConfiguration(configuration):
     configuration["LOCAL_PROXY_SERVER"].setdefault("ADDRESS", "")
     configuration["LOCAL_PROXY_SERVER"].setdefault("PORT", 0)
     configuration.setdefault("PROXY_SERVER", {})
+    configuration["PROXY_SERVER"].setdefault("TYPE", "")
     configuration["PROXY_SERVER"].setdefault("ADDRESS", "")
     configuration["PROXY_SERVER"].setdefault("PORT", 0)
     configuration["PROXY_SERVER"].setdefault("AUTHENTICATION", {})
@@ -83,6 +84,11 @@ class OutputProtocolFactory(protocol.ClientFactory):
         outputProtocol.inputProtocol = self.inputProtocol
         outputProtocol.inputProtocol.outputProtocol = outputProtocol
         return outputProtocol
+    
+    def clientConnectionFailed(self, connector, reason):
+        logger.debug("OutputProtocolFactory.clientConnectionFailed")
+        
+        self.inputProtocol.outputProtocol_connectionFailed(reason)
 
 class InputProtocol(protocol.Protocol):
     def __init__(self):
@@ -96,6 +102,15 @@ class InputProtocol(protocol.Protocol):
         self.connectionState = 0
         self.data = ""
         self.dataState = 0
+    
+    def connect(self):
+        logger.debug("InputProtocol.connect")
+        
+        outputProtocolFactory = OutputProtocolFactory(self)
+        outputProtocolFactory.protocol = OutputProtocol
+        
+        tunnel = TUNNEL.Tunnel(self.configuration)
+        tunnel.connect(self.remoteAddress, self.remotePort, outputProtocolFactory)
     
     def connectionMade(self):
         logger.debug("InputProtocol.connectionMade")
@@ -162,24 +177,12 @@ class InputProtocol(protocol.Protocol):
         
         # connect
         if c == 0x01:
-            self.do_CONNECT()
+            self.connect()
         else:
             response = struct.pack('!BBBBIH', 0x05, 0x07, 0x00, 0x01, 0, 0)
             self.transport.write(response)
             self.transport.loseConnection()
             return
-            
-    def do_CONNECT(self):
-        logger.debug("InputProtocol.do_CONNECT")
-        
-        factory = OutputProtocolFactory(self)
-        factory.protocol = OutputProtocol
-        
-        if self.configuration["PROXY_SERVER"]["ADDRESS"] != "":
-            tunnel = TUNNEL.Tunnel(self.configuration["PROXY_SERVER"]["ADDRESS"], self.configuration["PROXY_SERVER"]["PORT"], self.configuration["PROXY_SERVER"]["AUTHENTICATION"]["USERNAME"], self.configuration["PROXY_SERVER"]["AUTHENTICATION"]["PASSWORD"])
-            tunnel.connectTCP(self.remoteAddress, self.remotePort, factory, 50, None)
-        else:
-            reactor.connectTCP(self.remoteAddress, self.remotePort, factory, 50, None)
         
     def processDataState2(self):
         logger.debug("InputProtocol.processDataState2")
@@ -201,14 +204,18 @@ class InputProtocol(protocol.Protocol):
             if self.connectionState == 2:
                 self.outputProtocol.inputProtocol_connectionLost(None)
         
+    def outputProtocol_connectionFailed(self, reason):
+        logger.debug("InputProtocol.outputProtocol_connectionFailed")
+        
+        if self.connectionState == 1:
+            response = struct.pack('!BBBBIH', 0x05, 0x05, 0x00, 0x01, 0, 0)
+            self.transport.write(response)
+            self.transport.loseConnection()
+        
     def outputProtocol_connectionLost(self, reason):
         logger.debug("InputProtocol.outputProtocol_connectionLost")
         
         if self.connectionState == 1:
-            if self.dataState != 2:
-                response = struct.pack('!BBBBIH', 0x05, 0x05, 0x00, 0x01, 0, 0)
-                self.transport.write(response)
-            
             self.transport.loseConnection()
         else:
             if self.connectionState == 2:
