@@ -134,6 +134,11 @@ class WSOutputProtocolFactory(autobahn.websocket.WebSocketClientFactory):
         outputProtocol.inputProtocol = self.inputProtocol
         outputProtocol.inputProtocol.outputProtocol = outputProtocol
         return outputProtocol
+        
+    def clientConnectionFailed(self, connector, reason):
+        logger.debug("WSOutputProtocolFactory.clientConnectionFailed")
+        
+        self.inputProtocol.outputProtocol_connectionFailed(reason)
 
 class WSInputProtocol(JAP_LOCAL.InputProtocol):
     def __init__(self):
@@ -143,8 +148,8 @@ class WSInputProtocol(JAP_LOCAL.InputProtocol):
         
         self.i = 0
         
-    def do_CONNECT(self):
-        logger.debug("WSInputProtocol.do_CONNECT")
+    def connect(self):
+        logger.debug("WSInputProtocol.connect")
         
         self.i = random.randrange(0, len(self.configuration["REMOTE_PROXY_SERVERS"]))
         
@@ -157,20 +162,14 @@ class WSInputProtocol(JAP_LOCAL.InputProtocol):
             else:
                 contextFactory = ssl.ClientContextFactory()
             
-            if self.configuration["PROXY_SERVER"]["ADDRESS"] != "":
-                tunnel = TUNNEL.Tunnel(self.configuration["PROXY_SERVER"]["ADDRESS"], self.configuration["PROXY_SERVER"]["PORT"], self.configuration["PROXY_SERVER"]["AUTHENTICATION"]["USERNAME"], self.configuration["PROXY_SERVER"]["AUTHENTICATION"]["PASSWORD"])
-                tunnel.connectSSL(self.configuration["REMOTE_PROXY_SERVERS"][self.i]["ADDRESS"], self.configuration["REMOTE_PROXY_SERVERS"][self.i]["PORT"], factory, contextFactory, 50, None)
-            else:
-                reactor.connectSSL(self.configuration["REMOTE_PROXY_SERVERS"][self.i]["ADDRESS"], self.configuration["REMOTE_PROXY_SERVERS"][self.i]["PORT"], factory, contextFactory, 50, None)
+            tunnel = TUNNEL.Tunnel(self.configuration)
+            tunnel.connect(self.configuration["REMOTE_PROXY_SERVERS"][self.i]["ADDRESS"], self.configuration["REMOTE_PROXY_SERVERS"][self.i]["PORT"], factory, contextFactory)
         else:
             factory = WSOutputProtocolFactory(self, "ws://" + str(self.configuration["REMOTE_PROXY_SERVERS"][self.i]["ADDRESS"]) + ":" + str(self.configuration["REMOTE_PROXY_SERVERS"][self.i]["PORT"]), debug = False)
             factory.protocol = WSOutputProtocol
             
-            if self.configuration["PROXY_SERVER"]["ADDRESS"] != "":
-                tunnel = TUNNEL.Tunnel(self.configuration["PROXY_SERVER"]["ADDRESS"], self.configuration["PROXY_SERVER"]["PORT"], self.configuration["PROXY_SERVER"]["AUTHENTICATION"]["USERNAME"], self.configuration["PROXY_SERVER"]["AUTHENTICATION"]["PASSWORD"])
-                tunnel.connectTCP(self.configuration["REMOTE_PROXY_SERVERS"][self.i]["ADDRESS"], self.configuration["REMOTE_PROXY_SERVERS"][self.i]["PORT"], factory, 50, None)
-            else:
-                reactor.connectTCP(self.configuration["REMOTE_PROXY_SERVERS"][self.i]["ADDRESS"], self.configuration["REMOTE_PROXY_SERVERS"][self.i]["PORT"], factory, 50, None)
+            tunnel = TUNNEL.Tunnel(self.configuration)
+            tunnel.connect(self.configuration["REMOTE_PROXY_SERVERS"][self.i]["ADDRESS"], self.configuration["REMOTE_PROXY_SERVERS"][self.i]["PORT"], factory)
 
 class ClientContextFactory(ssl.ClientContextFactory):
     def __init__(self, verify_locations):

@@ -43,6 +43,7 @@
     ],
     "PROXY_SERVER":
     {
+        "TYPE": "",
         "ADDRESS": "",
         "PORT": 0,
         "AUTHENTICATION":

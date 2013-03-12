@@ -75,6 +75,9 @@ class TunnelProtocol(protocol.Protocol):
         
         self.tunnelOutputProtocol = None
         
+        if self.factory.contextFactory is not None:
+            self.transport.startTLS(self.factory.contextFactory)
+        
         self.outputProtocol = self.factory.outputProtocolFactory.buildProtocol(self.transport.getPeer())
         self.outputProtocol.makeConnection(self.transport)
 
@@ -245,12 +248,13 @@ class SOCKS5TunnelOutputProtocol(protocol.Protocol):
         request = struct.pack("!BBB", 0x05, 0x01, 0x00)
         
         if addressType == 0x01:
-            address = socket.inet_aton(self.factory.address)
+            address = struct.unpack("!I", socket.inet_aton(self.factory.address))[0]
             request = request + struct.pack("!BI", 0x01, address)
         else:
             if addressType == 0x03:
-                addressLength = len(self.factory.address)
-                request = request + struct.pack("!BB%ds" % addressLength, 0x03, addressLength, self.factory.address)
+                address = str(self.factory.address)
+                addressLength = len(address)
+                request = request + struct.pack("!BB%ds" % addressLength, 0x03, addressLength, address)
             else:
                 self.transport.loseConnection()
                 return

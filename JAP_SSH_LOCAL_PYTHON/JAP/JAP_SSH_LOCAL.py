@@ -70,7 +70,7 @@ class SSHChannel(channel.SSHChannel):
         
         self.connectionState = 2
         
-        self.inputProtocol.outputProtocol_connectionLost(reason)
+        self.inputProtocol.outputProtocol_connectionFailed(reason)
 
     def dataReceived(self, data):
         logger.debug("SSHChannel.dataReceived")
@@ -209,8 +209,8 @@ class SSHInputProtocol(JAP_LOCAL.InputProtocol):
         
         self.i = 0
         
-    def do_CONNECT(self):
-        logger.debug("SSHInputProtocol.do_CONNECT")
+    def connect(self):
+        logger.debug("SSHInputProtocol.connect")
         
         if len(sshConnections) == 0:
             self.transport.loseConnection()
@@ -243,11 +243,9 @@ class SSHInputProtocolFactory(JAP_LOCAL.InputProtocolFactory):
             factory.configuration = self.configuration
             factory.i = i
             
-            if self.configuration["PROXY_SERVER"]["ADDRESS"] != "":
-                tunnel = TUNNEL.Tunnel(self.configuration["PROXY_SERVER"]["ADDRESS"], self.configuration["PROXY_SERVER"]["PORT"], self.configuration["PROXY_SERVER"]["AUTHENTICATION"]["USERNAME"], self.configuration["PROXY_SERVER"]["AUTHENTICATION"]["PASSWORD"])
-                tunnel.connectTCP(self.configuration["REMOTE_PROXY_SERVERS"][i]["ADDRESS"], self.configuration["REMOTE_PROXY_SERVERS"][i]["PORT"], factory, 50, None)
-            else:
-                reactor.connectTCP(self.configuration["REMOTE_PROXY_SERVERS"][i]["ADDRESS"], self.configuration["REMOTE_PROXY_SERVERS"][i]["PORT"], factory, 50, None)
+            tunnel = TUNNEL.Tunnel(self.configuration)
+            tunnel.connect(self.configuration["REMOTE_PROXY_SERVERS"][i]["ADDRESS"], self.configuration["REMOTE_PROXY_SERVERS"][i]["PORT"], factory)
+            
             i = i + 1
             
     def stopFactory(self):

@@ -9,11 +9,8 @@ This program is distributed in the hope that it will be useful, but WITHOUT ANY 
 You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 """
 
-from twisted.internet import reactor, protocol, ssl
-import struct
+from twisted.internet import reactor, protocol
 import json
-import base64
-import socket
 import logging
 import autobahn.websocket
 
@@ -116,7 +113,7 @@ class WSInputProtocol(autobahn.websocket.WebSocketServerProtocol):
         self.message = ""
         
     def outputProtocol_connectionMade(self):
-        logger.debug("InputProtocol.outputProtocol_connectionMade")
+        logger.debug("WSInputProtocol.outputProtocol_connectionMade")
         
         if self.connectionState == 1:
             response = {}
@@ -134,8 +131,14 @@ class WSInputProtocol(autobahn.websocket.WebSocketServerProtocol):
             if self.connectionState == 2:
                 self.outputProtocol.inputProtocol_connectionLost(None)
         
+    def outputProtocol_connectionFailed(self, reason):
+        logger.debug("WSInputProtocol.outputProtocol_connectionFailed")
+        
+        if self.connectionState == 1:
+            self.sendClose()
+        
     def outputProtocol_connectionLost(self, reason):
-        logger.debug("InputProtocol.outputProtocol_connectionLost")
+        logger.debug("WSInputProtocol.outputProtocol_connectionLost")
         
         if self.connectionState == 1:
             self.sendClose()
@@ -144,7 +147,7 @@ class WSInputProtocol(autobahn.websocket.WebSocketServerProtocol):
                 self.outputProtocol.inputProtocol_connectionLost(None)
         
     def outputProtocol_dataReceived(self, data):
-        logger.debug("InputProtocol.outputProtocol_dataReceived")
+        logger.debug("WSInputProtocol.outputProtocol_dataReceived")
         
         if self.connectionState == 1:
             self.sendMessage(data, True)
@@ -218,3 +221,8 @@ class WSOutputProtocolFactory(protocol.ClientFactory):
         outputProtocol.inputProtocol = self.inputProtocol
         outputProtocol.inputProtocol.outputProtocol = outputProtocol
         return outputProtocol
+    
+    def clientConnectionFailed(self, connector, reason):
+        logger.debug("WSOutputProtocolFactory.clientConnectionFailed")
+        
+        self.inputProtocol.outputProtocol_connectionFailed(reason)
