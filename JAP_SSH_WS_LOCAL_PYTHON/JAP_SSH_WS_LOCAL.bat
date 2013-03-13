@@ -1,0 +1,2 @@
+python JAP_SSH_WS_LOCAL.py
+pause
