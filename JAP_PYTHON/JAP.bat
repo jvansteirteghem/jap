@@ -1,0 +1,2 @@
+python JAP.py
+pause
