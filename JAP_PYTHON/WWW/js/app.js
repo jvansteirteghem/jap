@@ -158,7 +158,7 @@ function LOCAL_SSH_ViewModel(parent) {
     }
     
     self.action_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_UPDATE = function(selectedData, data) {
-        ko.mapping.fromJS(ko.mapping.toJS(data), selectedData);
+        ko.mapping.fromJS(ko.mapping.toJS(data), {}, selectedData);
     }
     
     self.action_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_REMOVE = function(selectedData) {
@@ -174,7 +174,7 @@ function LOCAL_SSH_ViewModel(parent) {
     }
     
     self.action_LOCAL_SSH_REMOTE_PROXY_SERVERS_UPDATE = function(selectedData, data) {
-        ko.mapping.fromJS(ko.mapping.toJS(data), selectedData);
+        ko.mapping.fromJS(ko.mapping.toJS(data), {}, selectedData);
     }
     
     self.action_LOCAL_SSH_REMOTE_PROXY_SERVERS_REMOVE = function(selectedData) {
@@ -291,7 +291,7 @@ function LOCAL_SSH_REMOTE_PROXY_SERVERS_ADD_ViewModel(parent) {
             "USERNAME": "",
             "PASSWORD": ""
         },
-        "CERTIFICATE": 
+        "KEY": 
         {
             "AUTHENTICATION": 
             {
@@ -403,7 +403,7 @@ function LOCAL_WS_ViewModel(parent) {
     }
     
     self.action_LOCAL_WS_REMOTE_PROXY_SERVERS_UPDATE = function(selectedData, data) {
-        ko.mapping.fromJS(ko.mapping.toJS(data), selectedData);
+        ko.mapping.fromJS(ko.mapping.toJS(data), {}, selectedData);
     }
     
     self.action_LOCAL_WS_REMOTE_PROXY_SERVERS_REMOVE = function(selectedData) {
@@ -557,7 +557,7 @@ function REMOTE_WS_ViewModel(parent) {
     }
     
     self.action_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE = function(selectedData, data) {
-        ko.mapping.fromJS(ko.mapping.toJS(data), selectedData);
+        ko.mapping.fromJS(ko.mapping.toJS(data), {}, selectedData);
     }
     
     self.action_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_REMOVE = function(selectedData) {

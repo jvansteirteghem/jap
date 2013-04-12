@@ -161,13 +161,13 @@ class WSInputProtocol(JAP_LOCAL.InputProtocol):
             else:
                 contextFactory = ssl.ClientContextFactory()
             
-            tunnel = TUNNEL.Tunnel(self.configuration)
+            tunnel = JAP_LOCAL.Tunnel(self.configuration)
             tunnel.connect(self.configuration["REMOTE_PROXY_SERVERS"][self.i]["ADDRESS"], self.configuration["REMOTE_PROXY_SERVERS"][self.i]["PORT"], factory, contextFactory)
         else:
             factory = WSOutputProtocolFactory(self, "ws://" + str(self.configuration["REMOTE_PROXY_SERVERS"][self.i]["ADDRESS"]) + ":" + str(self.configuration["REMOTE_PROXY_SERVERS"][self.i]["PORT"]), debug = False)
             factory.protocol = WSOutputProtocol
             
-            tunnel = TUNNEL.Tunnel(self.configuration)
+            tunnel = JAP_LOCAL.Tunnel(self.configuration)
             tunnel.connect(self.configuration["REMOTE_PROXY_SERVERS"][self.i]["ADDRESS"], self.configuration["REMOTE_PROXY_SERVERS"][self.i]["PORT"], factory)
 
 class ClientContextFactory(ssl.ClientContextFactory):

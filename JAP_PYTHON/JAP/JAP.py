@@ -9,7 +9,7 @@ This program is distributed in the hope that it will be useful, but WITHOUT ANY 
 You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 """
 
-from twisted.internet import reactor, tcp
+from twisted.internet import reactor, ssl, tcp
 from twisted.web.resource import Resource
 from twisted.web.static import File
 import json
@@ -350,11 +350,20 @@ class API(Resource):
             else:
                 logger.setLevel(logging.NOTSET)
             
-            factory = REMOTE_WS.JAP_REMOTE_WS.WSInputProtocolFactory(configuration)
-            factory.protocol = REMOTE_WS.JAP_REMOTE_WS.WSInputProtocol
-            
-            self.port_REMOTE_WS = tcp.Port(configuration["REMOTE_PROXY_SERVER"]["PORT"], factory, 50, configuration["REMOTE_PROXY_SERVER"]["ADDRESS"], reactor)
-            self.port_REMOTE_WS.startListening()
+            if configuration["REMOTE_PROXY_SERVER"]["TYPE"] == "HTTPS":
+                factory = REMOTE_WS.JAP_REMOTE_WS.WSInputProtocolFactory(configuration, "wss://" + str(configuration["REMOTE_PROXY_SERVER"]["ADDRESS"]) + ":" + str(configuration["REMOTE_PROXY_SERVER"]["PORT"]), debug = False)
+                factory.protocol = REMOTE_WS.JAP_REMOTE_WS.WSInputProtocol
+                
+                contextFactory = ssl.DefaultOpenSSLContextFactory(configuration["REMOTE_PROXY_SERVER"]["CERTIFICATE"]["KEY"]["FILE"], configuration["REMOTE_PROXY_SERVER"]["CERTIFICATE"]["FILE"])
+                
+                self.port_REMOTE_WS = ssl.Port(configuration["REMOTE_PROXY_SERVER"]["PORT"], factory, contextFactory, 50, configuration["REMOTE_PROXY_SERVER"]["ADDRESS"], reactor)
+                self.port_REMOTE_WS.startListening()
+            else:
+                factory = REMOTE_WS.JAP_REMOTE_WS.WSInputProtocolFactory(configuration, "ws://" + str(configuration["REMOTE_PROXY_SERVER"]["ADDRESS"]) + ":" + str(configuration["REMOTE_PROXY_SERVER"]["PORT"]), debug = False)
+                factory.protocol = REMOTE_WS.JAP_REMOTE_WS.WSInputProtocol
+                
+                self.port_REMOTE_WS = tcp.Port(configuration["REMOTE_PROXY_SERVER"]["PORT"], factory, 50, configuration["REMOTE_PROXY_SERVER"]["ADDRESS"], reactor)
+                self.port_REMOTE_WS.startListening()
             
             return ""
     

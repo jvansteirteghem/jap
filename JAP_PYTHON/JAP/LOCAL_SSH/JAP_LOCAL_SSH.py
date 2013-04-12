@@ -20,6 +20,7 @@ import JAP_LOCAL
 logger = logging.getLogger(__name__)
 
 sshConnections = []
+sshClientTransportFactories = []
 
 def setDefaultConfiguration(configuration):
     JAP_LOCAL.setDefaultConfiguration(configuration)
@@ -140,7 +141,7 @@ class SSHClientTransportFactory(protocol.ReconnectingClientFactory):
         
         self.configuration = None
         self.i = 0
-   
+        
     def buildProtocol(self, address):
         logger.debug("SSHClientTransportFactory.buildProtocol")
         
@@ -148,6 +149,19 @@ class SSHClientTransportFactory(protocol.ReconnectingClientFactory):
         p.configuration = self.configuration
         p.i = self.i
         return p
+        
+    def startFactory(self):
+        logger.debug("SSHClientTransportFactory.startFactory")
+        
+    def stopFactory(self):
+        logger.debug("SSHClientTransportFactory.stopFactory")
+        
+    def stopTrying(self):
+        logger.debug("SSHClientTransportFactory.stopTrying")
+        
+        protocol.ReconnectingClientFactory.stopTrying(self)
+        
+        sshConnections[self.i].transport.loseConnection()
         
 class SSHUserAuthClient(userauth.SSHUserAuthClient):
     def __init__(self, configuration, i, instance):
@@ -242,8 +256,10 @@ class SSHInputProtocolFactory(JAP_LOCAL.InputProtocolFactory):
             factory.configuration = self.configuration
             factory.i = i
             
-            tunnel = TUNNEL.Tunnel(self.configuration)
+            tunnel = JAP_LOCAL.Tunnel(self.configuration)
             tunnel.connect(self.configuration["REMOTE_PROXY_SERVERS"][i]["ADDRESS"], self.configuration["REMOTE_PROXY_SERVERS"][i]["PORT"], factory)
+            
+            sshClientTransportFactories.append(factory)
             
             i = i + 1
             
@@ -251,3 +267,12 @@ class SSHInputProtocolFactory(JAP_LOCAL.InputProtocolFactory):
         logger.debug("SSHInputProtocolFactory.stopFactory")
         
         JAP_LOCAL.InputProtocolFactory.stopFactory(self)
+        
+        i = 0
+        while i < len(sshClientTransportFactories):
+            factory = sshClientTransportFactories[i]
+            factory.stopTrying()
+            
+            sshClientTransportFactories.remove(factory)
+            
+            i = i + 1
