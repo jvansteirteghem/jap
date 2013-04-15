@@ -129,7 +129,9 @@ class API(Resource):
         return ""
     
     def action_LOCAL_START(self, request):
-        if self.port_LOCAL == None:
+        port = self.port_LOCAL
+        
+        if port == None:
             file = open("./JAP_LOCAL.json", "r")
             data = file.read()
             file.close()
@@ -155,14 +157,19 @@ class API(Resource):
             factory = LOCAL.JAP_LOCAL.InputProtocolFactory(configuration)
             factory.protocol = LOCAL.JAP_LOCAL.InputProtocol
             
-            self.port_LOCAL = tcp.Port(configuration["LOCAL_PROXY_SERVER"]["PORT"], factory, 50, configuration["LOCAL_PROXY_SERVER"]["ADDRESS"], reactor)
-            self.port_LOCAL.startListening()
+            port = tcp.Port(configuration["LOCAL_PROXY_SERVER"]["PORT"], factory, 50, configuration["LOCAL_PROXY_SERVER"]["ADDRESS"], reactor)
+            port.startListening()
+            
+            self.port_LOCAL = port
             
             return ""
     
     def action_LOCAL_STOP(self, request):
-        if self.port_LOCAL != None:
-            self.port_LOCAL.stopListening()
+        port = self.port_LOCAL
+        
+        if port != None:
+            port.stopListening()
+            
             self.port_LOCAL = None
             
             return ""
@@ -195,7 +202,9 @@ class API(Resource):
         return ""
     
     def action_LOCAL_SSH_START(self, request):
-        if self.port_LOCAL_SSH == None:
+        port = self.port_LOCAL_SSH
+        
+        if port == None:
             file = open("./JAP_LOCAL_SSH.json", "r")
             data = file.read()
             file.close()
@@ -221,14 +230,19 @@ class API(Resource):
             factory = LOCAL_SSH.JAP_LOCAL_SSH.SSHInputProtocolFactory(configuration)
             factory.protocol = LOCAL_SSH.JAP_LOCAL_SSH.SSHInputProtocol
             
-            self.port_LOCAL_SSH = tcp.Port(configuration["LOCAL_PROXY_SERVER"]["PORT"], factory, 50, configuration["LOCAL_PROXY_SERVER"]["ADDRESS"], reactor)
-            self.port_LOCAL_SSH.startListening()
+            port = tcp.Port(configuration["LOCAL_PROXY_SERVER"]["PORT"], factory, 50, configuration["LOCAL_PROXY_SERVER"]["ADDRESS"], reactor)
+            port.startListening()
+            
+            self.port_LOCAL_SSH = port
             
             return ""
     
     def action_LOCAL_SSH_STOP(self, request):
-        if self.port_LOCAL_SSH != None:
-            self.port_LOCAL_SSH.stopListening()
+        port = self.port_LOCAL_SSH
+        
+        if port != None:
+            port.stopListening()
+            
             self.port_LOCAL_SSH = None
             
             return ""
@@ -261,7 +275,9 @@ class API(Resource):
         return ""
     
     def action_LOCAL_WS_START(self, request):
-        if self.port_LOCAL_WS == None:
+        port = self.port_LOCAL_WS
+        
+        if port == None:
             file = open("./JAP_LOCAL_WS.json", "r")
             data = file.read()
             file.close()
@@ -287,14 +303,19 @@ class API(Resource):
             factory = LOCAL_WS.JAP_LOCAL_WS.WSInputProtocolFactory(configuration)
             factory.protocol = LOCAL_WS.JAP_LOCAL_WS.WSInputProtocol
             
-            self.port_LOCAL_WS = tcp.Port(configuration["LOCAL_PROXY_SERVER"]["PORT"], factory, 50, configuration["LOCAL_PROXY_SERVER"]["ADDRESS"], reactor)
-            self.port_LOCAL_WS.startListening()
+            port = tcp.Port(configuration["LOCAL_PROXY_SERVER"]["PORT"], factory, 50, configuration["LOCAL_PROXY_SERVER"]["ADDRESS"], reactor)
+            port.startListening()
+            
+            self.port_LOCAL_WS = port
             
             return ""
     
     def action_LOCAL_WS_STOP(self, request):
-        if self.port_LOCAL_WS != None:
-            self.port_LOCAL_WS.stopListening()
+        port = self.port_LOCAL_WS
+        
+        if port != None:
+            port.stopListening()
+            
             self.port_LOCAL_WS = None
             
             return ""
@@ -327,7 +348,9 @@ class API(Resource):
         return ""
     
     def action_REMOTE_WS_START(self, request):
-        if self.port_REMOTE_WS == None:
+        port = self.port_REMOTE_WS
+        
+        if port == None:
             file = open("./JAP_REMOTE_WS.json", "r")
             data = file.read()
             file.close()
@@ -356,20 +379,27 @@ class API(Resource):
                 
                 contextFactory = ssl.DefaultOpenSSLContextFactory(configuration["REMOTE_PROXY_SERVER"]["CERTIFICATE"]["KEY"]["FILE"], configuration["REMOTE_PROXY_SERVER"]["CERTIFICATE"]["FILE"])
                 
-                self.port_REMOTE_WS = ssl.Port(configuration["REMOTE_PROXY_SERVER"]["PORT"], factory, contextFactory, 50, configuration["REMOTE_PROXY_SERVER"]["ADDRESS"], reactor)
-                self.port_REMOTE_WS.startListening()
+                port = ssl.Port(configuration["REMOTE_PROXY_SERVER"]["PORT"], factory, contextFactory, 50, configuration["REMOTE_PROXY_SERVER"]["ADDRESS"], reactor)
+                port.startListening()
+                
+                self.port_REMOTE_WS = port
             else:
                 factory = REMOTE_WS.JAP_REMOTE_WS.WSInputProtocolFactory(configuration, "ws://" + str(configuration["REMOTE_PROXY_SERVER"]["ADDRESS"]) + ":" + str(configuration["REMOTE_PROXY_SERVER"]["PORT"]), debug = False)
                 factory.protocol = REMOTE_WS.JAP_REMOTE_WS.WSInputProtocol
                 
-                self.port_REMOTE_WS = tcp.Port(configuration["REMOTE_PROXY_SERVER"]["PORT"], factory, 50, configuration["REMOTE_PROXY_SERVER"]["ADDRESS"], reactor)
-                self.port_REMOTE_WS.startListening()
+                port = tcp.Port(configuration["REMOTE_PROXY_SERVER"]["PORT"], factory, 50, configuration["REMOTE_PROXY_SERVER"]["ADDRESS"], reactor)
+                port.startListening()
+                
+                self.port_REMOTE_WS = port
             
             return ""
     
     def action_REMOTE_WS_STOP(self, request):
-        if self.port_REMOTE_WS != None:
-            self.port_REMOTE_WS.stopListening()
+        port = self.port_REMOTE_WS
+        
+        if port != None:
+            port.stopListening()
+            
             self.port_REMOTE_WS = None
             
             return ""
