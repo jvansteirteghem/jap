@@ -208,8 +208,8 @@
                         <thead>
                             <tr>
                                 <th>#</th>
-                                <th>PUBLIC</th>
-                                <th>PRIVATE</th>
+                                <th style="width: 50%;">PUBLIC</th>
+                                <th style="width: 50%;">PRIVATE</th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -219,10 +219,8 @@
                                 <td data-bind="text: PUBLIC.FILE"></td>
                                 <td data-bind="text: PRIVATE.FILE"></td>
                                 <td>
-                                    <div class="pull-right">
-                                        <button type="button" class="btn input-medium" data-bind="click: $parent.load_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_UPDATE">UPDATE</button>
-                                        <button type="button" class="btn input-medium" data-bind="click: $parent.action_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_REMOVE">REMOVE</button>
-                                    </div>
+                                    <button type="button" class="btn input-medium" data-bind="click: $parent.load_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_UPDATE">UPDATE</button>
+                                    <button type="button" class="btn input-medium" data-bind="click: $parent.action_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_REMOVE">REMOVE</button>
                                 </td>
                             </tr>
                         </tbody>
@@ -281,8 +279,8 @@
                         <thead>
                             <tr>
                                 <th>#</th>
-                                <th>ADDRESS</th>
-                                <th>PORT</th>
+                                <th style="width: 50%;">ADDRESS</th>
+                                <th style="width: 50%;">PORT</th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -292,10 +290,8 @@
                                 <td data-bind="text: ADDRESS"></td>
                                 <td data-bind="text: PORT"></td>
                                 <td>
-                                    <div class="pull-right">
-                                        <button type="button" class="btn input-medium" data-bind="click: $parent.load_LOCAL_SSH_REMOTE_PROXY_SERVERS_UPDATE">UPDATE</button>
-                                        <button type="button" class="btn input-medium" data-bind="click: $parent.action_LOCAL_SSH_REMOTE_PROXY_SERVERS_REMOVE">REMOVE</button>
-                                    </div>
+                                    <button type="button" class="btn input-medium" data-bind="click: $parent.load_LOCAL_SSH_REMOTE_PROXY_SERVERS_UPDATE">UPDATE</button>
+                                    <button type="button" class="btn input-medium" data-bind="click: $parent.action_LOCAL_SSH_REMOTE_PROXY_SERVERS_REMOVE">REMOVE</button>
                                 </td>
                             </tr>
                         </tbody>
@@ -414,8 +410,8 @@
                         <thead>
                             <tr>
                                 <th>#</th>
-                                <th>ADDRESS</th>
-                                <th>PORT</th>
+                                <th style="width: 50%;">ADDRESS</th>
+                                <th style="width: 50%;">PORT</th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -425,10 +421,8 @@
                                 <td data-bind="text: ADDRESS"></td>
                                 <td data-bind="text: PORT"></td>
                                 <td>
-                                    <div class="pull-right">
-                                        <button type="button" class="btn input-medium" data-bind="click: $parent.load_LOCAL_WS_REMOTE_PROXY_SERVERS_UPDATE">UPDATE</button>
-                                        <button type="button" class="btn input-medium" data-bind="click: $parent.action_LOCAL_WS_REMOTE_PROXY_SERVERS_REMOVE">REMOVE</button>
-                                    </div>
+                                    <button type="button" class="btn input-medium" data-bind="click: $parent.load_LOCAL_WS_REMOTE_PROXY_SERVERS_UPDATE">UPDATE</button>
+                                    <button type="button" class="btn input-medium" data-bind="click: $parent.action_LOCAL_WS_REMOTE_PROXY_SERVERS_REMOVE">REMOVE</button>
                                 </td>
                             </tr>
                         </tbody>
@@ -530,6 +524,26 @@
                     <label>FILE</label>
                     <input type="text" class="input-xlarge" data-bind="value: data.REMOTE_PROXY_SERVER.CERTIFICATE.KEY.FILE">
                 </p>
+                <h3>3 PROXY SERVER</h3>
+                <p>
+                    <label>TYPE</label>
+                    <select data-bind="value: data.PROXY_SERVER.TYPE">
+                        <option></option>
+                        <option>HTTP</option>
+                        <option>SOCKS5</option>
+                    </select>
+                    <label>ADDRESS</label>
+                    <input type="text" class="input-xlarge" data-bind="value: data.PROXY_SERVER.ADDRESS">
+                    <label>PORT</label>
+                    <input type="text" class="input-xlarge" data-bind="value: data.PROXY_SERVER.PORT">
+                </p>
+                <h3>3.1 AUTHENTICATION</h3>
+                <p>
+                    <label>USERNAME</label>
+                    <input type="text" class="input-xlarge" data-bind="value: data.PROXY_SERVER.AUTHENTICATION.USERNAME">
+                    <label>PASSWORD</label>
+                    <input type="password" class="input-xlarge" data-bind="value: data.PROXY_SERVER.AUTHENTICATION.PASSWORD">
+                </p>
             </p>
             <p>
                 <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_WS_UPDATE">UPDATE</button>
@@ -549,7 +563,7 @@
                         <thead>
                             <tr>
                                 <th>#</th>
-                                <th>USERNAME</th>
+                                <th style="width: 100%;">USERNAME</th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -558,10 +572,8 @@
                                 <td data-bind="text: $index() + 1"></td>
                                 <td data-bind="text: USERNAME"></td>
                                 <td>
-                                    <div class="pull-right">
-                                        <button type="button" class="btn input-medium" data-bind="click: $parent.load_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE">UPDATE</button>
-                                        <button type="button" class="btn input-medium" data-bind="click: $parent.action_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_REMOVE">REMOVE</button>
-                                    </div>
+                                    <button type="button" class="btn input-medium" data-bind="click: $parent.load_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE">UPDATE</button>
+                                    <button type="button" class="btn input-medium" data-bind="click: $parent.action_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_REMOVE">REMOVE</button>
                                 </td>
                             </tr>
                         </tbody>

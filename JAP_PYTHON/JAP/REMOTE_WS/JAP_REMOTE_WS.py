@@ -13,6 +13,7 @@ from twisted.internet import reactor, protocol
 import json
 import logging
 import autobahn.websocket
+import JAP_LOCAL
 
 logger = logging.getLogger(__name__)
 
@@ -33,7 +34,14 @@ def setDefaultConfiguration(configuration):
     configuration["REMOTE_PROXY_SERVER"]["CERTIFICATE"].setdefault("KEY", {})
     configuration["REMOTE_PROXY_SERVER"]["CERTIFICATE"]["KEY"].setdefault("FILE", "")
     configuration["REMOTE_PROXY_SERVER"]["CERTIFICATE"].setdefault("FILE", "")
-        
+    configuration.setdefault("PROXY_SERVER", {})
+    configuration["PROXY_SERVER"].setdefault("TYPE", "")
+    configuration["PROXY_SERVER"].setdefault("ADDRESS", "")
+    configuration["PROXY_SERVER"].setdefault("PORT", 0)
+    configuration["PROXY_SERVER"].setdefault("AUTHENTICATION", {})
+    configuration["PROXY_SERVER"]["AUTHENTICATION"].setdefault("USERNAME", "")
+    configuration["PROXY_SERVER"]["AUTHENTICATION"].setdefault("PASSWORD", "")
+    
 class WSInputProtocol(autobahn.websocket.WebSocketServerProtocol):
     def __init__(self):
         logger.debug("WSInputProtocol.__init__")
@@ -101,9 +109,11 @@ class WSInputProtocol(autobahn.websocket.WebSocketServerProtocol):
         logger.debug("WSInputProtocol.remoteAddress: " + self.remoteAddress)
         logger.debug("WSInputProtocol.remotePort: " + str(self.remotePort))
         
-        factory = WSOutputProtocolFactory(self)
-        factory.protocol = WSOutputProtocol
-        reactor.connectTCP(self.remoteAddress, self.remotePort, factory)
+        outputProtocolFactory = WSOutputProtocolFactory(self)
+        outputProtocolFactory.protocol = WSOutputProtocol
+        
+        tunnel = JAP_LOCAL.Tunnel(self.configuration)
+        tunnel.connect(self.remoteAddress, self.remotePort, outputProtocolFactory)
     
     def processMessageState1(self):
         logger.debug("WSInputProtocol.processMessageState1")
@@ -168,61 +178,8 @@ class WSInputProtocolFactory(autobahn.websocket.WebSocketServerFactory):
         inputProtocol.configuration = self.configuration
         return inputProtocol
 
-class WSOutputProtocol(protocol.Protocol):
-    def __init__(self):
-        logger.debug("WSOutputProtocol.__init__")
-        
-        self.inputProtocol = None
-        self.connectionState = 0
-    
-    def connectionMade(self):
-        logger.debug("WSOutputProtocol.connectionMade")
-        
-        self.connectionState = 1
-        
-        self.inputProtocol.outputProtocol_connectionMade()
+class WSOutputProtocol(JAP_LOCAL.OutputProtocol):
+    pass
 
-    def connectionLost(self, reason):
-        logger.debug("WSOutputProtocol.connectionLost")
-        
-        self.connectionState = 2
-        
-        self.inputProtocol.outputProtocol_connectionLost(reason)
-        
-    def dataReceived(self, data):
-        logger.debug("WSOutputProtocol.dataReceived")
-        
-        self.inputProtocol.outputProtocol_dataReceived(data)
-        
-    def inputProtocol_connectionMade(self):
-        logger.debug("WSOutputProtocol.inputProtocol_connectionMade")
-        
-    def inputProtocol_connectionLost(self, reason):
-        logger.debug("WSOutputProtocol.inputProtocol_connectionLost")
-        
-        if self.connectionState == 1:
-            self.transport.loseConnection()
-        
-    def inputProtocol_dataReceived(self, data):
-        logger.debug("WSOutputProtocol.inputProtocol_dataReceived")
-        
-        if self.connectionState == 1:
-            self.transport.write(data)
-
-
-class WSOutputProtocolFactory(protocol.ClientFactory):
-    def __init__(self, inputProtocol):
-        logger.debug("WSOutputProtocolFactory.__init__")
-        
-        self.inputProtocol = inputProtocol
-    
-    def buildProtocol(self, *args, **kw):
-        outputProtocol = protocol.ClientFactory.buildProtocol(self, *args, **kw)
-        outputProtocol.inputProtocol = self.inputProtocol
-        outputProtocol.inputProtocol.outputProtocol = outputProtocol
-        return outputProtocol
-    
-    def clientConnectionFailed(self, connector, reason):
-        logger.debug("WSOutputProtocolFactory.clientConnectionFailed")
-        
-        self.inputProtocol.outputProtocol_connectionFailed(reason)
+class WSOutputProtocolFactory(JAP_LOCAL.OutputProtocolFactory):
+    pass

@@ -521,6 +521,17 @@ function REMOTE_WS_ViewModel(parent) {
                 },
                 "FILE": ""
             }
+        },
+        "PROXY_SERVER":
+        {
+            "TYPE": "",
+            "ADDRESS": "",
+            "PORT": 0,
+            "AUTHENTICATION":
+            {
+                "USERNAME": "",
+                "PASSWORD": ""
+            }
         }
     }
     self.data = ko.mapping.fromJS(self.defaultData);
@@ -532,6 +543,12 @@ function REMOTE_WS_ViewModel(parent) {
             data.REMOTE_PROXY_SERVER.PORT = Number(data.REMOTE_PROXY_SERVER.PORT);
         } else {
             data.REMOTE_PROXY_SERVER.PORT = 0;
+        }
+        
+        if($.isNumeric(data.PROXY_SERVER.PORT)) {
+            data.PROXY_SERVER.PORT = Number(data.PROXY_SERVER.PORT);
+        } else {
+            data.PROXY_SERVER.PORT = 0;
         }
         
         $.ajax({
