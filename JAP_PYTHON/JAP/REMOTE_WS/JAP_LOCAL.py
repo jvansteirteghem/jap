@@ -48,19 +48,11 @@ class TunnelProtocol(protocol.Protocol):
     def connectionLost(self, reason):
         logger.debug("TunnelProtocol.connectionLost")
         
-        connector = tcp.Connector(self.factory.address, self.factory.port, self.factory, self.factory.timeout, self.factory.bindAddress, reactor)
-        
         if self.tunnelOutputProtocol is not None:
             self.tunnelOutputProtocol.connectionLost(reason)
-            
-            self.factory.outputProtocolFactory.clientConnectionFailed(connector, reason)
         else:
             if self.outputProtocol is not None:
                 self.outputProtocol.connectionLost(reason)
-                
-                self.factory.outputProtocolFactory.clientConnectionLost(connector, reason)
-            else:
-                self.factory.outputProtocolFactory.clientConnectionFailed(connector, reason)
     
     def dataReceived(self, data):
         logger.debug("TunnelProtocol.dataReceived")
@@ -71,7 +63,7 @@ class TunnelProtocol(protocol.Protocol):
             if self.outputProtocol is not None:
                 self.outputProtocol.dataReceived(data)
     
-    def tunnelOutputProtocol_connectionMade(self):
+    def tunnelOutputProtocol_connectionMade(self, data):
         logger.debug("TunnelProtocol.tunnelOutputProtocol_connectionMade")
         
         self.tunnelOutputProtocol = None
@@ -81,6 +73,9 @@ class TunnelProtocol(protocol.Protocol):
         
         self.outputProtocol = self.factory.outputProtocolFactory.buildProtocol(self.transport.getPeer())
         self.outputProtocol.makeConnection(self.transport)
+        
+        if len(data) > 0:
+            self.outputProtocol.dataReceived(data)
 
 class TunnelProtocolFactory(protocol.ClientFactory):
     def __init__(self, configuration, address, port, outputProtocolFactory, contextFactory=None, timeout=30, bindAddress=None):
@@ -107,7 +102,7 @@ class TunnelProtocolFactory(protocol.ClientFactory):
     def clientConnectionLost(self, connector, reason):
         logger.debug("TunnelProtocolFactory.clientConnectionLost")
         
-        #self.outputProtocolFactory.clientConnectionLost(connector, reason)
+        self.outputProtocolFactory.clientConnectionLost(connector, reason)
 
 class Tunnel(object):
     def __init__(self, configuration):
@@ -180,7 +175,7 @@ class HTTPTunnelOutputProtocol(protocol.Protocol):
             self.transport.loseConnection()
             return
         
-        self.factory.tunnelProtocol.tunnelOutputProtocol_connectionMade()
+        self.factory.tunnelProtocol.tunnelOutputProtocol_connectionMade(self.data[4:])
         
         self.data = ""
         self.dataState = 1
@@ -281,7 +276,7 @@ class SOCKS5TunnelOutputProtocol(protocol.Protocol):
             self.transport.loseConnection()
             return
         
-        self.factory.tunnelProtocol.tunnelOutputProtocol_connectionMade()
+        self.factory.tunnelProtocol.tunnelOutputProtocol_connectionMade(self.data[10:])
         
         self.data = ""
         self.dataState = 2
