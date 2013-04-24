@@ -20,7 +20,6 @@ import JAP_LOCAL
 logger = logging.getLogger(__name__)
 
 sshConnections = []
-sshClientTransportFactories = []
 
 def setDefaultConfiguration(configuration):
     JAP_LOCAL.setDefaultConfiguration(configuration)
@@ -132,8 +131,7 @@ class SSHClientTransport(transport.SSHClientTransport):
     def connectionSecure(self):
         logger.debug("SSHClientTransport.connectionSecure")
         
-        sshConnection = SSHConnection()
-        self.requestService(SSHUserAuthClient(self.configuration, self.i, sshConnection))
+        self.requestService(SSHUserAuthClient(self.configuration, self.i))
                 
 class SSHClientTransportFactory(protocol.ReconnectingClientFactory):
     def __init__(self):
@@ -141,6 +139,7 @@ class SSHClientTransportFactory(protocol.ReconnectingClientFactory):
         
         self.configuration = None
         self.i = 0
+        self.connectors = []
         
     def buildProtocol(self, address):
         logger.debug("SSHClientTransportFactory.buildProtocol")
@@ -156,22 +155,54 @@ class SSHClientTransportFactory(protocol.ReconnectingClientFactory):
     def stopFactory(self):
         logger.debug("SSHClientTransportFactory.stopFactory")
         
-    def stopTrying(self):
-        logger.debug("SSHClientTransportFactory.stopTrying")
+    def connect(self):
+        logger.debug("SSHClientTransportFactory.connect")
         
-        protocol.ReconnectingClientFactory.stopTrying(self)
+        tunnel = JAP_LOCAL.Tunnel(self.configuration)
+        tunnel.connect(self.configuration["REMOTE_PROXY_SERVERS"][self.i]["ADDRESS"], self.configuration["REMOTE_PROXY_SERVERS"][self.i]["PORT"], self)
         
-        sshConnections[self.i].transport.loseConnection()
+    def disconnect(self):
+        logger.debug("SSHClientTransportFactory.disconnect")
+        
+        self.stopTrying()
+        
+        i = 0
+        while i < len(self.connectors):
+            connector = self.connectors[i]
+            connector.disconnect()
+            
+            i = i + 1
+        
+    def startedConnecting(self, connector):
+        logger.debug("SSHClientTransportFactory.startedConnecting")
+        
+        self.connectors.append(connector)
+        
+        protocol.ReconnectingClientFactory.startedConnecting(self, connector)
+        
+    def clientConnectionFailed(self, connector, reason):
+        logger.debug("SSHClientTransportFactory.clientConnectionFailed")
+        
+        self.connectors.remove(connector)
+        
+        protocol.ReconnectingClientFactory.clientConnectionFailed(self, connector, reason)
+        
+    def clientConnectionLost(self, connector, reason):
+        logger.debug("SSHClientTransportFactory.clientConnectionLost")
+        
+        self.connectors.remove(connector)
+        
+        protocol.ReconnectingClientFactory.clientConnectionLost(self, connector, reason)
         
 class SSHUserAuthClient(userauth.SSHUserAuthClient):
-    def __init__(self, configuration, i, instance):
+    def __init__(self, configuration, i):
         logger.debug("SSHUserAuthClient.__init__")
         
         self.configuration = configuration
         self.i = i
         self.j = -1
         
-        userauth.SSHUserAuthClient.__init__(self, str(self.configuration["REMOTE_PROXY_SERVERS"][self.i]["AUTHENTICATION"]["USERNAME"]), instance)
+        userauth.SSHUserAuthClient.__init__(self, str(self.configuration["REMOTE_PROXY_SERVERS"][self.i]["AUTHENTICATION"]["USERNAME"]), SSHConnection())
         
     def getPassword(self):
         logger.debug("SSHUserAuthClient.getPassword")
@@ -243,36 +274,40 @@ class SSHInputProtocolFactory(JAP_LOCAL.InputProtocolFactory):
         logger.debug("SSHInputProtocolFactory.__init__")
         
         JAP_LOCAL.InputProtocolFactory.__init__(self, configuration)
-    
+        
+        self.sshClientTransportFactories = []
+        
+        i = 0
+        while i < len(self.configuration["REMOTE_PROXY_SERVERS"]):
+            sshClientTransportFactory = SSHClientTransportFactory()
+            sshClientTransportFactory.protocol = SSHClientTransport
+            sshClientTransportFactory.configuration = self.configuration
+            sshClientTransportFactory.i = i
+            
+            self.sshClientTransportFactories.append(sshClientTransportFactory)
+            
+            i = i + 1
+        
     def startFactory(self):
         logger.debug("SSHInputProtocolFactory.startFactory")
         
         JAP_LOCAL.InputProtocolFactory.startFactory(self)
         
         i = 0
-        while i < len(self.configuration["REMOTE_PROXY_SERVERS"]):
-            factory = SSHClientTransportFactory()
-            factory.protocol = SSHClientTransport
-            factory.configuration = self.configuration
-            factory.i = i
-            
-            tunnel = JAP_LOCAL.Tunnel(self.configuration)
-            tunnel.connect(self.configuration["REMOTE_PROXY_SERVERS"][i]["ADDRESS"], self.configuration["REMOTE_PROXY_SERVERS"][i]["PORT"], factory)
-            
-            sshClientTransportFactories.append(factory)
+        while i < len(self.sshClientTransportFactories):
+            sshClientTransportFactory = self.sshClientTransportFactories[i]
+            sshClientTransportFactory.connect()
             
             i = i + 1
-            
+        
     def stopFactory(self):
         logger.debug("SSHInputProtocolFactory.stopFactory")
         
         JAP_LOCAL.InputProtocolFactory.stopFactory(self)
         
         i = 0
-        while i < len(sshClientTransportFactories):
-            factory = sshClientTransportFactories[i]
-            factory.stopTrying()
-            
-            sshClientTransportFactories.remove(factory)
+        while i < len(self.sshClientTransportFactories):
+            sshClientTransportFactory = self.sshClientTransportFactories[i]
+            sshClientTransportFactory.disconnect()
             
             i = i + 1
