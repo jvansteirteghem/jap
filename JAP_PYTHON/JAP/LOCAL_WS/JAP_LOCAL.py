@@ -157,13 +157,14 @@ class HTTPTunnelOutputProtocol(protocol.Protocol):
     def processDataState0(self):
         logger.debug("HTTPTunnelOutputProtocol.processDataState0")
         
-        if len(self.data) < 4:
-            return
+        i = self.data.find("\r\n\r\n")
         
-        if self.data[-4:] != "\r\n\r\n":
+        if i == -1:
             return
+            
+        i = i + 4
         
-        dataLines = self.data.split("\r\n")
+        dataLines = self.data[:i].split("\r\n")
         dataLine0 = dataLines[0]
         dataLine0Values = dataLine0.split(" ", 2)
         
@@ -175,7 +176,7 @@ class HTTPTunnelOutputProtocol(protocol.Protocol):
             self.transport.loseConnection()
             return
         
-        self.factory.tunnelProtocol.tunnelOutputProtocol_connectionMade(self.data[4:])
+        self.factory.tunnelProtocol.tunnelOutputProtocol_connectionMade(self.data[i:])
         
         self.data = ""
         self.dataState = 1
