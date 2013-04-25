@@ -54,6 +54,7 @@ cd ..
 mkdir REMOTE_WS
 cd REMOTE_WS
 copy ..\..\..\..\JAP\REMOTE_WS\__init__.py __init__.py
+copy ..\..\..\..\JAP\REMOTE_WS\JAP_LOCAL.py JAP_LOCAL.py
 copy ..\..\..\..\JAP\REMOTE_WS\JAP_REMOTE_WS.py JAP_REMOTE_WS.py
 cd ..
 cd ..
