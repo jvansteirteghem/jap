@@ -1,0 +1,6 @@
+www:
+  type: python-worker
+  ports:
+    www: http
+  processes:
+    app: python JAP_REMOTE_WS.py

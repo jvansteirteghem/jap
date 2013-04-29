@@ -9,17 +9,18 @@ This program is distributed in the hope that it will be useful, but WITHOUT ANY 
 You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 """
 
-from twisted.internet import reactor
+from twisted.internet import reactor, ssl
 import json
+import os
 import logging
-import JAP.LOCAL.JAP_LOCAL
+import JAP.REMOTE_WS.JAP_REMOTE_WS
 
-configuration = json.load(open("JAP_LOCAL.json"))
+configuration = json.load(open("JAP_REMOTE_WS.json"))
 
-JAP.LOCAL.JAP_LOCAL.setDefaultConfiguration(configuration)
+JAP.REMOTE_WS.JAP_REMOTE_WS.setDefaultConfiguration(configuration)
 
 logging.basicConfig()
-logger = logging.getLogger("JAP.LOCAL")
+logger = logging.getLogger("JAP.REMOTE_WS")
 
 if configuration["LOGGER"]["LEVEL"] == "DEBUG":
     logger.setLevel(logging.DEBUG)
@@ -38,7 +39,12 @@ else:
                 else:
                     logger.setLevel(logging.NOTSET)
 
-factory = JAP.LOCAL.JAP_LOCAL.InputProtocolFactory(configuration)
-factory.protocol = JAP.LOCAL.JAP_LOCAL.InputProtocol
-reactor.listenTCP(configuration["LOCAL_PROXY_SERVER"]["PORT"], factory, 50, configuration["LOCAL_PROXY_SERVER"]["ADDRESS"])
+if configuration["REMOTE_PROXY_SERVER"]["TYPE"] == "HTTPS":
+    factory = JAP.REMOTE_WS.JAP_REMOTE_WS.WSInputProtocolFactory(configuration, str(os.environ["DOTCLOUD_WWW_HTTP_URL"].replace("http://", "wss://")), debug = False)
+    factory.protocol = JAP.REMOTE_WS.JAP_REMOTE_WS.WSInputProtocol
+else:
+    factory = JAP.REMOTE_WS.JAP_REMOTE_WS.WSInputProtocolFactory(configuration, str(os.environ["DOTCLOUD_WWW_HTTP_URL"].replace("http://", "ws://")), debug = False)
+    factory.protocol = JAP.REMOTE_WS.JAP_REMOTE_WS.WSInputProtocol
+    
+reactor.listenTCP(int(os.environ["PORT_WWW"]), factory, 50, "")
 reactor.run()

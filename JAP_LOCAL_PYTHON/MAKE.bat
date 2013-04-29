@@ -1,7 +1,7 @@
 set SEVENZIP_HOME="C:\Program Files\7-Zip"
 set PYINSTALLER_HOME="C:\pyinstaller-2.0"
-set JAP_LOCAL_PYTHON_VERSION=2.0.0-SNAPSHOT-3
-set JAP_LOCAL_PYTHON_WINDOWS_VERSION=2.0.0-SNAPSHOT-3
+set JAP_LOCAL_PYTHON_VERSION=2.0.0
+set JAP_LOCAL_PYTHON_WINDOWS_VERSION=2.0.0
 if exist MAKE rmdir MAKE /s /q
 mkdir MAKE
 cd MAKE
@@ -15,8 +15,11 @@ copy ..\..\README.txt README.txt
 mkdir JAP
 cd JAP
 copy ..\..\..\JAP\__init__.py __init__.py
-copy ..\..\..\JAP\JAP_LOCAL.py JAP_LOCAL.py
-copy ..\..\..\JAP\TUNNEL.py TUNNEL.py
+mkdir LOCAL
+cd LOCAL
+copy ..\..\..\..\JAP\LOCAL\__init__.py __init__.py
+copy ..\..\..\..\JAP\LOCAL\JAP_LOCAL.py JAP_LOCAL.py
+cd ..
 cd ..
 cd ..
 %SEVENZIP_HOME%\7z.exe a -tzip JAP_LOCAL_PYTHON-%JAP_LOCAL_PYTHON_VERSION%.zip JAP_LOCAL_PYTHON-%JAP_LOCAL_PYTHON_VERSION%

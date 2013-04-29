@@ -1,0 +1,37 @@
+PRE-INSTALLATION
+----------------
+- install PYTHON >= 2.7.0
+- install TWISTED
+- install PYOPENSSL
+- install PYCRYPTO
+- install PYASN1
+
+INSTALLATION
+------------
+- unzip JAP_LOCAL_SSH_PYTHON-X.X.X.zip
+- open JAP_LOCAL_SSH_PYTHON-X.X.X
+- configure JAP_LOCAL_SSH.json
+- execute JAP_LOCAL_SSH.bat
+- open
+	- FIREFOX
+		- click TOOLS, OPTIONS
+		- click ADVANCED, NETWORK, SETTINGS
+		- check MANUAL PROXY CONFIGURATION
+		- in SOCKS write 127.0.0.1 and LOCAL_PROXY_SERVER.PORT
+		- check SOCKS v5
+		- click OK
+		- click OK
+	- INTERNET EXPLORER
+		- click TOOLS, INTERNET OPTIONS
+		- click CONNECTIONS, LAN SETTINGS
+		- uncheck AUTOMATICALLY DETECT PROXY SETTINGS
+		- uncheck USE A PROXY AUTOMATIC CONFIGURATION SCRIPT
+		- check USE A PROXY SERVER FOR YOUR LAN (THESE SETTINGS WILL NOT APPLY TO DAIL-UP OR VPN CONNECTIONS)
+		- click ADVANCED
+		- in SOCKS write 127.0.0.1 and LOCAL_PROXY_SERVER.PORT
+		- click OK
+		- click OK
+		- click OK
+
+IMPORTANT
+---------

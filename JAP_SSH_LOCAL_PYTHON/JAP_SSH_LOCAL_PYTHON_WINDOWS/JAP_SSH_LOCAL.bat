@@ -1,2 +1,0 @@
-JAP_SSH_LOCAL.exe
-pause

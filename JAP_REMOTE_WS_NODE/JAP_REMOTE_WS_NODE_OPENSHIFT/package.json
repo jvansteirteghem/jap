@@ -1,0 +1,12 @@
+{
+  "name": "JAP_REMOTE_WS_NODE_OPENSHIFT",
+  "version": "2.0.0",
+  "engines": {
+    "node": ">= 0.6.0",
+    "npm": ">= 1.0.0"
+  },
+  "dependencies": {
+    "websocket": "git+https://github.com/jvansteirteghem/WebSocket-Node.git"
+  },
+  "main": "server.js"
+}
