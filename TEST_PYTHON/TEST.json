@@ -1,0 +1,19 @@
+{
+    "LOGGER":
+    {
+        "LEVEL": "DEBUG"
+    },
+    "PROXY_SERVERS": 
+    [
+        {
+            "TYPE": "",
+            "ADDRESS": "",
+            "PORT": 0,
+            "AUTHENTICATION":
+            {
+                "USERNAME": "",
+                "PASSWORD": ""
+            }
+        }
+    ]
+}
