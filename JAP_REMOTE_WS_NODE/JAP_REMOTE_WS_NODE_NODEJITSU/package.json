@@ -8,5 +8,8 @@
   "dependencies": {
     "websocket": "git+https://github.com/jvansteirteghem/WebSocket-Node.git"
   },
-  "main": "server.js"
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  }
 }
