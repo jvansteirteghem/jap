@@ -10,7 +10,6 @@ You should have received a copy of the GNU General Public License along with thi
 """
 
 from twisted.internet import reactor
-from twisted.web.server import Site
 import json
 import logging
 import JAP.JAP
@@ -40,6 +39,6 @@ elif configuration["LOGGER"]["LEVEL"] == "CRITICAL":
 else:
     logger.setLevel(logging.NOTSET)
 
-factory = Site(JAP.JAP.WWW)
-reactor.listenTCP(configuration["LOCAL_SERVER"]["PORT"], factory, 50, configuration["LOCAL_SERVER"]["ADDRESS"])
+site = JAP.JAP.createSite(configuration)
+reactor.listenTCP(configuration["LOCAL_SERVER"]["PORT"], site, 50, configuration["LOCAL_SERVER"]["ADDRESS"])
 reactor.run()

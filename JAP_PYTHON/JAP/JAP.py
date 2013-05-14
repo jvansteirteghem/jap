@@ -9,9 +9,10 @@ This program is distributed in the hope that it will be useful, but WITHOUT ANY 
 You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 """
 
-from twisted.internet import reactor, ssl, tcp
-from twisted.web.resource import Resource
-from twisted.web.static import File
+from zope.interface import implements
+from twisted.cred import portal, checkers, credentials, error
+from twisted.internet import defer, reactor, ssl, tcp
+from twisted.web import server, static, resource, guard
 import json
 import logging
 import LOCAL.JAP_LOCAL
@@ -25,8 +26,11 @@ def setDefaultConfiguration(configuration):
     configuration.setdefault("LOCAL_SERVER", {})
     configuration["LOCAL_SERVER"].setdefault("ADDRESS", "")
     configuration["LOCAL_SERVER"].setdefault("PORT", 0)
+    configuration["LOCAL_SERVER"].setdefault("AUTHENTICATION", {})
+    configuration["LOCAL_SERVER"]["AUTHENTICATION"].setdefault("USERNAME", "")
+    configuration["LOCAL_SERVER"]["AUTHENTICATION"].setdefault("PASSWORD", "")
 
-class API(Resource):
+class API(resource.Resource):
     def __init__(self):
         self.port_LOCAL = None
         self.port_LOCAL_SSH = None
@@ -404,5 +408,49 @@ class API(Resource):
             
             return ""
 
-WWW = File("./WWW")
-WWW.putChild("API", API())
+class CredentialsChecker:
+    implements(checkers.ICredentialsChecker)
+    credentialInterfaces = (credentials.IUsernamePassword, )
+     
+    def __init__(self, configuration):
+        self.configuration = configuration
+     
+    def requestAvatarId(self, credentials):
+        if credentials.username == self.configuration["LOCAL_SERVER"]["AUTHENTICATION"]["USERNAME"]:
+            if credentials.password == self.configuration["LOCAL_SERVER"]["AUTHENTICATION"]["PASSWORD"]:
+                return defer.succeed(credentials.username)
+            else:
+                return defer.fail(error.UnauthorizedLogin("PASSWORD NOT OK"))
+        else:
+            return defer.fail(error.UnauthorizedLogin("USERNAME NOT OK"))
+ 
+class Realm(object):
+    implements(portal.IRealm)
+     
+    def __init__(self, WWW):
+        self.WWW = WWW
+    
+    def requestAvatar(self, user, mind, *interfaces):
+        if resource.IResource in interfaces:
+            return (resource.IResource, self.WWW, lambda: None)
+        
+        raise NotImplementedError()
+
+def createSite(configuration):
+    WWW = static.File("./WWW")
+    WWW.putChild("API", API())
+    
+    if configuration["LOCAL_SERVER"]["AUTHENTICATION"]["USERNAME"] != "":
+        realm = Realm(WWW)
+        
+        credentialsChecker = CredentialsChecker(configuration)
+        checkers = [credentialsChecker]
+        
+        basicCredentialFactory = guard.BasicCredentialFactory("JAP")
+        credentialFactories = [basicCredentialFactory]
+        
+        WWW = guard.HTTPAuthSessionWrapper(portal.Portal(realm, checkers), credentialFactories)
+    
+    site = server.Site(WWW)
+    
+    return site
