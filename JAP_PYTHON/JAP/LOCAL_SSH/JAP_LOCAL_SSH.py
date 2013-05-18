@@ -29,6 +29,7 @@ def setDefaultConfiguration(configuration):
     while i < len(configuration["LOCAL_PROXY_SERVER"]["KEYS"]):
         configuration["LOCAL_PROXY_SERVER"]["KEYS"][i].setdefault("PUBLIC", {})
         configuration["LOCAL_PROXY_SERVER"]["KEYS"][i]["PUBLIC"].setdefault("FILE", "")
+        configuration["LOCAL_PROXY_SERVER"]["KEYS"][i]["PUBLIC"].setdefault("PASSPHRASE", "")
         configuration["LOCAL_PROXY_SERVER"]["KEYS"][i].setdefault("PRIVATE", {})
         configuration["LOCAL_PROXY_SERVER"]["KEYS"][i]["PRIVATE"].setdefault("FILE", "")
         configuration["LOCAL_PROXY_SERVER"]["KEYS"][i]["PRIVATE"].setdefault("PASSPHRASE", "")
@@ -219,7 +220,7 @@ class SSHUserAuthClient(userauth.SSHUserAuthClient):
         if self.j == len(self.configuration["LOCAL_PROXY_SERVER"]["KEYS"]):
             return None
         
-        return keys.Key.fromFile(self.configuration["LOCAL_PROXY_SERVER"]["KEYS"][self.j]["PUBLIC"]["FILE"]).blob()
+        return keys.Key.fromFile(self.configuration["LOCAL_PROXY_SERVER"]["KEYS"][self.j]["PUBLIC"]["FILE"], passphrase=str(self.configuration["LOCAL_PROXY_SERVER"]["KEYS"][self.j]["PUBLIC"]["PASSPHRASE"])).blob()
 
     def getPrivateKey(self):
         logger.debug("SSHUserAuthClient.getPrivateKey")

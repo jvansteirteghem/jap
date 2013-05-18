@@ -18,6 +18,7 @@ import logging
 import LOCAL.JAP_LOCAL
 import LOCAL_SSH.JAP_LOCAL_SSH
 import LOCAL_WS.JAP_LOCAL_WS
+import REMOTE_SSH.JAP_REMOTE_SSH
 import REMOTE_WS.JAP_REMOTE_WS
 
 def setDefaultConfiguration(configuration):
@@ -35,6 +36,7 @@ class API(resource.Resource):
         self.port_LOCAL = None
         self.port_LOCAL_SSH = None
         self.port_LOCAL_WS = None
+        self.port_REMOTE_SSH = None
         self.port_REMOTE_WS = None
     
     def render_GET(self, request):
@@ -46,6 +48,8 @@ class API(resource.Resource):
             return self.action_LOCAL_SSH(request)
         elif action == "LOCAL_WS":
             return self.action_LOCAL_WS(request)
+        elif action == "REMOTE_SSH":
+            return self.action_REMOTE_SSH(request)
         elif action == "REMOTE_WS":
             return self.action_REMOTE_WS(request)
     
@@ -65,6 +69,13 @@ class API(resource.Resource):
     
     def action_LOCAL_WS(self, request):
         file = open("./JAP_LOCAL_WS.json", "r")
+        data = file.read()
+        file.close()
+        
+        return data
+    
+    def action_REMOTE_SSH(self, request):
+        file = open("./JAP_REMOTE_SSH.json", "r")
         data = file.read()
         file.close()
         
@@ -98,6 +109,12 @@ class API(resource.Resource):
             return self.action_LOCAL_WS_START(request)
         elif action == "LOCAL_WS_STOP":
             return self.action_LOCAL_WS_STOP(request)
+        elif action == "REMOTE_SSH_UPDATE":
+            return self.action_REMOTE_SSH_UPDATE(request)
+        elif action == "REMOTE_SSH_START":
+            return self.action_REMOTE_SSH_START(request)
+        elif action == "REMOTE_SSH_STOP":
+            return self.action_REMOTE_SSH_STOP(request)
         elif action == "REMOTE_WS_UPDATE":
             return self.action_REMOTE_WS_UPDATE(request)
         elif action == "REMOTE_WS_START":
@@ -324,6 +341,78 @@ class API(resource.Resource):
             
             return ""
     
+    def action_REMOTE_SSH_UPDATE(self, request):
+        data = request.args["data"][0]
+        
+        file = open("./JAP_REMOTE_SSH.json", "w")
+        file.write(data)
+        file.close()
+        
+        decoder = json.JSONDecoder()
+        configuration = decoder.decode(data)
+        
+        logger = logging.getLogger("JAP.REMOTE_SSH")
+        
+        if configuration["LOGGER"]["LEVEL"] == "DEBUG":
+            logger.setLevel(logging.DEBUG)
+        elif configuration["LOGGER"]["LEVEL"] == "INFO":
+            logger.setLevel(logging.INFO)
+        elif configuration["LOGGER"]["LEVEL"] == "WARNING":
+            logger.setLevel(logging.WARNING)
+        elif configuration["LOGGER"]["LEVEL"] == "ERROR":
+            logger.setLevel(logging.ERROR)
+        elif configuration["LOGGER"]["LEVEL"] == "CRITICAL":
+            logger.setLevel(logging.CRITICAL)
+        else:
+            logger.setLevel(logging.NOTSET)
+        
+        return ""
+    
+    def action_REMOTE_SSH_START(self, request):
+        port = self.port_REMOTE_SSH
+        
+        if port == None:
+            file = open("./JAP_REMOTE_SSH.json", "r")
+            data = file.read()
+            file.close()
+            
+            decoder = json.JSONDecoder()
+            configuration = decoder.decode(data)
+            
+            logger = logging.getLogger("JAP.REMOTE_SSH")
+            
+            if configuration["LOGGER"]["LEVEL"] == "DEBUG":
+                logger.setLevel(logging.DEBUG)
+            elif configuration["LOGGER"]["LEVEL"] == "INFO":
+                logger.setLevel(logging.INFO)
+            elif configuration["LOGGER"]["LEVEL"] == "WARNING":
+                logger.setLevel(logging.WARNING)
+            elif configuration["LOGGER"]["LEVEL"] == "ERROR":
+                logger.setLevel(logging.ERROR)
+            elif configuration["LOGGER"]["LEVEL"] == "CRITICAL":
+                logger.setLevel(logging.CRITICAL)
+            else:
+                logger.setLevel(logging.NOTSET)
+            
+            factory = REMOTE_SSH.JAP_REMOTE_SSH.SSHFactory(configuration)
+            
+            port = tcp.Port(configuration["REMOTE_PROXY_SERVER"]["PORT"], factory, 50, configuration["REMOTE_PROXY_SERVER"]["ADDRESS"], reactor)
+            port.startListening()
+            
+            self.port_REMOTE_SSH = port
+            
+            return ""
+    
+    def action_REMOTE_SSH_STOP(self, request):
+        port = self.port_REMOTE_SSH
+        
+        if port != None:
+            port.stopListening()
+            
+            self.port_REMOTE_SSH = None
+            
+            return ""
+    
     def action_REMOTE_WS_UPDATE(self, request):
         data = request.args["data"][0]
         
@@ -408,7 +497,7 @@ class API(resource.Resource):
             
             return ""
 
-class CredentialsChecker:
+class HTTPCredentialsChecker:
     implements(checkers.ICredentialsChecker)
     credentialInterfaces = (credentials.IUsernamePassword, )
      
@@ -416,41 +505,39 @@ class CredentialsChecker:
         self.configuration = configuration
      
     def requestAvatarId(self, credentials):
-        if credentials.username == self.configuration["LOCAL_SERVER"]["AUTHENTICATION"]["USERNAME"]:
-            if credentials.password == self.configuration["LOCAL_SERVER"]["AUTHENTICATION"]["PASSWORD"]:
-                return defer.succeed(credentials.username)
-            else:
-                return defer.fail(error.UnauthorizedLogin("PASSWORD NOT OK"))
-        else:
-            return defer.fail(error.UnauthorizedLogin("USERNAME NOT OK"))
+        authorized = False;
+        
+        if self.configuration["LOCAL_SERVER"]["AUTHENTICATION"]["USERNAME"] == credentials.username and self.configuration["LOCAL_SERVER"]["AUTHENTICATION"]["PASSWORD"] == credentials.password:
+            authorized = True
+        
+        if authorized == False:
+            return defer.fail(error.UnauthorizedLogin())
+        
+        return defer.succeed(credentials.username)
  
-class Realm(object):
+class HTTPRealm(object):
     implements(portal.IRealm)
      
-    def __init__(self, WWW):
-        self.WWW = WWW
+    def __init__(self, resource):
+        self.resource = resource
     
-    def requestAvatar(self, user, mind, *interfaces):
-        if resource.IResource in interfaces:
-            return (resource.IResource, self.WWW, lambda: None)
-        
-        raise NotImplementedError()
+    def requestAvatar(self, avatarId, mind, *avatarInterfaces):
+        return (resource.IResource, self.resource, lambda: None)
 
 def createSite(configuration):
-    WWW = static.File("./WWW")
-    WWW.putChild("API", API())
+    resource = static.File("./WWW")
+    resource.putChild("API", API())
     
-    if configuration["LOCAL_SERVER"]["AUTHENTICATION"]["USERNAME"] != "":
-        realm = Realm(WWW)
-        
-        credentialsChecker = CredentialsChecker(configuration)
-        checkers = [credentialsChecker]
-        
-        basicCredentialFactory = guard.BasicCredentialFactory("JAP")
-        credentialFactories = [basicCredentialFactory]
-        
-        WWW = guard.HTTPAuthSessionWrapper(portal.Portal(realm, checkers), credentialFactories)
+    realm = HTTPRealm(resource)
     
-    site = server.Site(WWW)
+    credentialsChecker = HTTPCredentialsChecker(configuration)
+    checkers = [credentialsChecker]
+    
+    basicCredentialFactory = guard.BasicCredentialFactory("JAP")
+    credentialFactories = [basicCredentialFactory]
+    
+    resource = guard.HTTPAuthSessionWrapper(portal.Portal(realm, checkers), credentialFactories)
+    
+    site = server.Site(resource)
     
     return site

@@ -37,6 +37,9 @@
                         <a href="#TAB_LOCAL_WS" data-toggle="tab">LOCAL WS</a>
                     </li>
                     <li>
+                        <a href="#TAB_REMOTE_SSH" data-toggle="tab">REMOTE SSH</a>
+                    </li>
+                    <li>
                         <a href="#TAB_REMOTE_WS" data-toggle="tab">REMOTE WS</a>
                     </li>
                 </ul>
@@ -69,6 +72,16 @@
                         </p>
                         <hr>
                         <div data-bind="template: {name: template_LOCAL_WS().name(), data: template_LOCAL_WS().data()}">
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="TAB_REMOTE_SSH">
+                        <h2>REMOTE SSH</h2>
+                        <p>
+                            <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_SSH_START">START</button>
+                            <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_SSH_STOP">STOP</button>
+                        </p>
+                        <hr>
+                        <div data-bind="template: {name: template_REMOTE_SSH().name(), data: template_REMOTE_SSH().data()}">
                         </div>
                     </div>
                     <div class="tab-pane" id="TAB_REMOTE_WS">
@@ -247,6 +260,8 @@
             <p>
                 <label>FILE</label>
                 <input type="text" class="input-xlarge" data-bind="value: data.PUBLIC.FILE">
+                <label>PASSPHRASE</label>
+                <input type="password" class="input-xlarge" data-bind="value: data.PUBLIC.PASSPHRASE">
             </p>
             <h3>2.1.2 PRIVATE</h3>
             <p>
@@ -476,6 +491,137 @@
                 <!-- /ko -->
                 <!-- ko if: action == "LOCAL_WS_REMOTE_PROXY_SERVERS_UPDATE" -->
                     <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_WS_REMOTE_PROXY_SERVERS_UPDATE">UPDATE</button>
+                <!-- /ko -->
+                <button type="button" class="btn input-medium" data-bind="click: cancel">CANCEL</button>
+            </p>
+        </script>
+        
+        <script type="text/html" id="TEMPLATE_REMOTE_SSH">
+            <p>
+                <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_SSH_UPDATE">UPDATE</button>
+            </p>
+            <p>
+                <h3>1 LOGGER</h3>
+                <p>
+                    <label>LEVEL</label>
+                    <select data-bind="value: data.LOGGER.LEVEL">
+                        <option></option>
+                        <option>DEBUG</option>
+                        <option>INFO</option>
+                        <option>WARNING</option>
+                        <option>ERROR</option>
+                        <option>CRITICAL</option>
+                    </select>
+                </p>
+                <h3>2 REMOTE PROXY SERVER</h3>
+                <p>
+                    <label>ADDRESS</label>
+                    <input type="text" class="input-xlarge" data-bind="value: data.REMOTE_PROXY_SERVER.ADDRESS">
+                    <label>PORT</label>
+                    <input type="text" class="input-xlarge" data-bind="value: data.REMOTE_PROXY_SERVER.PORT">
+                </p>
+                <h3>2.1 AUTHENTICATION</h3>
+                <div data-bind="template: {name: template_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS().name(), data: template_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS().data()}">
+                </div>
+                <h3>2.2 KEY</h3>
+                <h3>2.2.1 PUBLIC</h3>
+                <p>
+                    <label>FILE</label>
+                    <input type="text" class="input-xlarge" data-bind="value: data.REMOTE_PROXY_SERVER.KEY.PUBLIC.FILE">
+                    <label>PASSPHRASE</label>
+                    <input type="text" class="input-xlarge" data-bind="value: data.REMOTE_PROXY_SERVER.KEY.PUBLIC.PASSPHRASE">
+                </p>
+                <h3>2.2.1 PRIVATE</h3>
+                <p>
+                    <label>FILE</label>
+                    <input type="text" class="input-xlarge" data-bind="value: data.REMOTE_PROXY_SERVER.KEY.PRIVATE.FILE">
+                    <label>PASSPHRASE</label>
+                    <input type="text" class="input-xlarge" data-bind="value: data.REMOTE_PROXY_SERVER.KEY.PRIVATE.PASSPHRASE">
+                </p>
+                <h3>3 PROXY SERVER</h3>
+                <p>
+                    <label>TYPE</label>
+                    <select data-bind="value: data.PROXY_SERVER.TYPE">
+                        <option></option>
+                        <option>HTTP</option>
+                        <option>SOCKS5</option>
+                    </select>
+                    <label>ADDRESS</label>
+                    <input type="text" class="input-xlarge" data-bind="value: data.PROXY_SERVER.ADDRESS">
+                    <label>PORT</label>
+                    <input type="text" class="input-xlarge" data-bind="value: data.PROXY_SERVER.PORT">
+                </p>
+                <h3>3.1 AUTHENTICATION</h3>
+                <p>
+                    <label>USERNAME</label>
+                    <input type="text" class="input-xlarge" data-bind="value: data.PROXY_SERVER.AUTHENTICATION.USERNAME">
+                    <label>PASSWORD</label>
+                    <input type="password" class="input-xlarge" data-bind="value: data.PROXY_SERVER.AUTHENTICATION.PASSWORD">
+                </p>
+            </p>
+            <p>
+                <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_SSH_UPDATE">UPDATE</button>
+            </p>
+        </script>
+        
+        <script type="text/html" id="TEMPLATE_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS">
+            <p>
+                <button type="button" class="btn input-medium" data-bind="click: load_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD">ADD</button>
+                <!-- ko if: data.REMOTE_PROXY_SERVER.AUTHENTICATION().length > 0 -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_REMOVE_ALL">REMOVE ALL</button>
+                <!-- /ko -->
+            </p>
+            <!-- ko if: data.REMOTE_PROXY_SERVER.AUTHENTICATION().length > 0 -->
+                <p>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th style="width: 100%;">USERNAME</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody data-bind="foreach: data.REMOTE_PROXY_SERVER.AUTHENTICATION">
+                            <tr>
+                                <td data-bind="text: $index() + 1"></td>
+                                <td data-bind="text: USERNAME"></td>
+                                <td>
+                                    <button type="button" class="btn input-medium" data-bind="click: $parent.load_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE">UPDATE</button>
+                                    <button type="button" class="btn input-medium" data-bind="click: $parent.action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_REMOVE">REMOVE</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </p>
+                <p>
+                    <button type="button" class="btn input-medium" data-bind="click: load_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD">ADD</button>
+                    <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_REMOVE_ALL">REMOVE ALL</button>
+                </p>
+            <!-- /ko -->
+        </script>
+        
+        <script type="text/html" id="TEMPLATE_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION">
+            <p>
+                <!-- ko if: action == "REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD">ADD</button>
+                <!-- /ko -->
+                <!-- ko if: action == "REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE">UPDATE</button>
+                <!-- /ko -->
+                <button type="button" class="btn input-medium" data-bind="click: cancel">CANCEL</button>
+            </p>
+            <p>
+                <label>USERNAME</label>
+                <input type="text" class="input-xlarge" data-bind="value: data.USERNAME">
+                <label>PASSWORD</label>
+                <input type="password" class="input-xlarge" data-bind="value: data.PASSWORD">
+            </p>
+            <p>
+                <!-- ko if: action == "REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD">ADD</button>
+                <!-- /ko -->
+                <!-- ko if: action == "REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE">UPDATE</button>
                 <!-- /ko -->
                 <button type="button" class="btn input-medium" data-bind="click: cancel">CANCEL</button>
             </p>

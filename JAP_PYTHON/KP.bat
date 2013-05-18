@@ -1,2 +1,2 @@
-ssh-keygen -t rsa -f KP
+openssl genrsa -out KP.pem 4096
 pause

@@ -242,7 +242,8 @@ function LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_ADD_ViewModel(parent) {
     self.defaultData = {
         "PUBLIC": 
         {
-            "FILE": ""
+            "FILE": "",
+            "PASSPHRASE": ""
         },
         "PRIVATE": 
         {
@@ -496,6 +497,168 @@ function LOCAL_WS_REMOTE_PROXY_SERVERS_UPDATE_ViewModel(parent, data) {
     
     self.cancel = function() {
         self.parent.load_LOCAL_WS_REMOTE_PROXY_SERVERS();
+    }
+}
+
+function REMOTE_SSH_ViewModel(parent) {
+    var self = this;
+    self.parent = parent;
+    self.defaultData = {
+        "LOGGER":
+        {
+            "LEVEL": "DEBUG"
+        },
+        "REMOTE_PROXY_SERVER":
+        {
+            "ADDRESS": "",
+            "PORT": 0,
+            "AUTHENTICATION": [],
+            "KEY":
+            {
+                "PUBLIC":
+                {
+                    "FILE": "",
+                    "PASSPHRASE": ""
+                },
+                "PRIVATE":
+                {
+                    "FILE": "",
+                    "PASSPHRASE": ""
+                }
+            }
+        },
+        "PROXY_SERVER":
+        {
+            "TYPE": "",
+            "ADDRESS": "",
+            "PORT": 0,
+            "AUTHENTICATION":
+            {
+                "USERNAME": "",
+                "PASSWORD": ""
+            }
+        }
+    }
+    self.data = ko.mapping.fromJS(self.defaultData);
+    
+    self.action_REMOTE_SSH_UPDATE = function() {
+        var data = ko.mapping.toJS(self.data);
+        
+        if($.isNumeric(data.REMOTE_PROXY_SERVER.PORT)) {
+            data.REMOTE_PROXY_SERVER.PORT = Number(data.REMOTE_PROXY_SERVER.PORT);
+        } else {
+            data.REMOTE_PROXY_SERVER.PORT = 0;
+        }
+        
+        if($.isNumeric(data.PROXY_SERVER.PORT)) {
+            data.PROXY_SERVER.PORT = Number(data.PROXY_SERVER.PORT);
+        } else {
+            data.PROXY_SERVER.PORT = 0;
+        }
+        
+        $.ajax({
+            "type": "POST",
+            "url": "/API",
+            "dataType": "",
+            "data": {
+                "action": "REMOTE_SSH_UPDATE",
+                "data": ko.toJSON(data)
+            }
+        }).then(
+            function(data, textStatus, jqXHR) {
+                Alertify.log.success("REMOTE SSH - UPDATE OK");
+            }, 
+            function(jqXHR, textStatus, errorThrown) {
+                Alertify.log.error("REMOTE SSH - UPDATE NOT OK");
+            }
+        )
+    }
+    
+    self.action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD = function(data) {
+        self.data.REMOTE_PROXY_SERVER.AUTHENTICATION.push(data);
+    }
+    
+    self.action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE = function(selectedData, data) {
+        ko.mapping.fromJS(ko.mapping.toJS(data), {}, selectedData);
+    }
+    
+    self.action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_REMOVE = function(selectedData) {
+        self.data.REMOTE_PROXY_SERVER.AUTHENTICATION.remove(selectedData);
+    }
+    
+    self.action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_REMOVE_ALL = function() {
+        self.data.REMOTE_PROXY_SERVER.AUTHENTICATION.removeAll();
+    }
+    
+    self.load_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD = function() {
+        self.template_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS(new Template("TEMPLATE_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION", new REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD_ViewModel(self)));
+    }
+    
+    self.load_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE = function(data) {
+        self.template_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS(new Template("TEMPLATE_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION", new REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE_ViewModel(self, data)));
+    }
+    
+    self.template_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS = ko.observable();
+    
+    self.load_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS = function() {
+        self.template_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS(new Template("TEMPLATE_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS", self));
+    }
+    
+    self.load_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS();
+    
+    $.ajax({
+        "type": "GET",
+        "url": "/API",
+        "dataType": "JSON",
+        "data": {
+            "action": "REMOTE_SSH"
+        }
+    }).then(
+        function(data, textStatus, jqXHR) {
+            Alertify.log.success("REMOTE SSH - OK");
+            
+            ko.mapping.fromJS(data, self.data);
+        }, 
+        function(jqXHR, textStatus, errorThrown) {
+            Alertify.log.error("REMOTE SSH - NOT OK");
+        }
+    );
+}
+
+function REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD_ViewModel(parent) {
+    var self = this;
+    self.parent = parent;
+    self.defaultData = {
+        "USERNAME": "",
+        "PASSWORD": ""
+    }
+    self.data = ko.mapping.fromJS(self.defaultData);
+    self.action = "REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD";
+    
+    self.action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD = function() {
+        self.parent.action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD(self.data);
+        self.parent.load_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS();
+    }
+    
+    self.cancel = function() {
+        self.parent.load_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS();
+    }
+}
+
+function REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE_ViewModel(parent, data) {
+    var self = this;
+    self.parent = parent;
+    self.selectedData = data;
+    self.data = ko.mapping.fromJS(ko.mapping.toJS(self.selectedData));
+    self.action = "REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE";
+    
+    self.action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE = function() {
+        self.parent.action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE(self.selectedData, self.data);
+        self.parent.load_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS();
+    }
+    
+    self.cancel = function() {
+        self.parent.load_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS();
     }
 }
 
@@ -768,6 +931,42 @@ function ViewModel() {
         )
     }
     
+    self.action_REMOTE_SSH_START = function() {
+        $.ajax({
+            "type": "POST",
+            "url": "/API",
+            "dataType": "",
+            "data": {
+                "action": "REMOTE_SSH_START"
+            }
+        }).then(
+            function(data, textStatus, jqXHR) {
+                Alertify.log.success("REMOTE SSH - START OK");
+            }, 
+            function(jqXHR, textStatus, errorThrown) {
+                Alertify.log.error("REMOTE SSH - START NOT OK");
+            }
+        )
+    }
+    
+    self.action_REMOTE_SSH_STOP = function() {
+        $.ajax({
+            "type": "POST",
+            "url": "/API",
+            "dataType": "",
+            "data": {
+                "action": "REMOTE_SSH_STOP"
+            }
+        }).then(
+            function(data, textStatus, jqXHR) {
+                Alertify.log.success("REMOTE SSH - STOP OK");
+            }, 
+            function(jqXHR, textStatus, errorThrown) {
+                Alertify.log.error("REMOTE SSH - STOP NOT OK");
+            }
+        )
+    }
+    
     self.action_REMOTE_WS_START = function() {
         $.ajax({
             "type": "POST",
@@ -827,6 +1026,14 @@ function ViewModel() {
     }
     
     self.load_LOCAL_WS();
+    
+    self.template_REMOTE_SSH = ko.observable();
+    
+    self.load_REMOTE_SSH = function() {
+        self.template_REMOTE_SSH(new Template("TEMPLATE_REMOTE_SSH", new REMOTE_SSH_ViewModel(self)));
+    }
+    
+    self.load_REMOTE_SSH();
     
     self.template_REMOTE_WS = ko.observable();
     

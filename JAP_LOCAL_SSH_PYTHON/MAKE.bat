@@ -11,9 +11,8 @@ cd JAP_LOCAL_SSH_PYTHON-%JAP_LOCAL_SSH_PYTHON_VERSION%
 copy ..\..\JAP_LOCAL_SSH.bat JAP_LOCAL_SSH.bat
 copy ..\..\JAP_LOCAL_SSH.json JAP_LOCAL_SSH.json
 copy ..\..\JAP_LOCAL_SSH.py JAP_LOCAL_SSH.py
-copy ..\..\KP KP
 copy ..\..\KP.bat KP.bat
-copy ..\..\KP.pub KP.pub
+copy ..\..\KP.pem KP.pem
 copy ..\..\README.txt README.txt
 mkdir JAP
 cd JAP
@@ -38,9 +37,8 @@ copy ..\PYINSTALLER\dist\JAP_LOCAL_SSH.exe JAP_LOCAL_SSH.exe
 copy ..\..\JAP_LOCAL_SSH_PYTHON_WINDOWS\JAP_LOCAL_SSH.bat JAP_LOCAL_SSH.bat
 copy ..\..\JAP_LOCAL_SSH_PYTHON_WINDOWS\README.txt README.txt
 copy ..\..\JAP_LOCAL_SSH.json JAP_LOCAL_SSH.json
-copy ..\..\KP KP
 copy ..\..\KP.bat KP.bat
-copy ..\..\KP.pub KP.pub
+copy ..\..\KP.pem KP.pem
 cd ..
 %SEVENZIP_HOME%\7z.exe a -tzip JAP_LOCAL_SSH_PYTHON_WINDOWS-%JAP_LOCAL_SSH_PYTHON_WINDOWS_VERSION%.zip JAP_LOCAL_SSH_PYTHON_WINDOWS-%JAP_LOCAL_SSH_PYTHON_WINDOWS_VERSION%
 cd ..

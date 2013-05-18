@@ -1,0 +1,2 @@
+python JAP_REMOTE_SSH.py
+pause

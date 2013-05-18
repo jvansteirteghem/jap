@@ -1,0 +1,42 @@
+{
+    "LOGGER":
+    {
+        "LEVEL": "DEBUG"
+    },
+    "REMOTE_PROXY_SERVER":
+    {
+        "ADDRESS": "127.0.0.1",
+        "PORT": 2222,
+        "AUTHENTICATION":
+        [
+            {
+                "USERNAME": "",
+                "PASSWORD": ""
+            }
+        ],
+        "KEY":
+        {
+            "PUBLIC":
+            {
+                "FILE": "",
+                "PASSPHRASE": ""
+            },
+            "PRIVATE":
+            {
+                "FILE": "",
+                "PASSPHRASE": ""
+            }
+        }
+    },
+    "PROXY_SERVER":
+    {
+        "TYPE": "",
+        "ADDRESS": "",
+        "PORT": 0,
+        "AUTHENTICATION":
+        {
+            "USERNAME": "",
+            "PASSWORD": ""
+        }
+    }
+}

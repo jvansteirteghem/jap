@@ -12,7 +12,8 @@
             {
                 "PUBLIC": 
                 {
-                    "FILE": ""
+                    "FILE": "",
+                    "PASSPHRASE": ""
                 },
                 "PRIVATE": 
                 {

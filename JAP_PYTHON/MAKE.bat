@@ -15,6 +15,7 @@ copy ..\..\JAP.py JAP.py
 copy ..\..\JAP_LOCAL.json JAP_LOCAL.json
 copy ..\..\JAP_LOCAL_SSH.json JAP_LOCAL_SSH.json
 copy ..\..\JAP_LOCAL_WS.json JAP_LOCAL_WS.json
+copy ..\..\JAP_REMOTE_SSH.json JAP_REMOTE_SSH.json
 copy ..\..\JAP_REMOTE_WS.json JAP_REMOTE_WS.json
 copy ..\..\C.bat C.bat
 copy ..\..\C.ini C.ini
@@ -26,9 +27,8 @@ copy ..\..\CA.srl CA.srl
 copy ..\..\CAK.pem CAK.pem
 copy ..\..\CK.pem CK.pem
 copy ..\..\CR.pem CR.pem
-copy ..\..\KP KP
 copy ..\..\KP.bat KP.bat
-copy ..\..\KP.pub KP.pub
+copy ..\..\KP.pem KP.pem
 copy ..\..\README.txt README.txt
 mkdir JAP
 cd JAP
@@ -50,6 +50,12 @@ cd LOCAL_WS
 copy ..\..\..\..\JAP\LOCAL_WS\__init__.py __init__.py
 copy ..\..\..\..\JAP\LOCAL_WS\JAP_LOCAL.py JAP_LOCAL.py
 copy ..\..\..\..\JAP\LOCAL_WS\JAP_LOCAL_WS.py JAP_LOCAL_WS.py
+cd ..
+mkdir REMOTE_SSH
+cd REMOTE_SSH
+copy ..\..\..\..\JAP\REMOTE_SSH\__init__.py __init__.py
+copy ..\..\..\..\JAP\REMOTE_SSH\JAP_LOCAL.py JAP_LOCAL.py
+copy ..\..\..\..\JAP\REMOTE_SSH\JAP_REMOTE_SSH.py JAP_REMOTE_SSH.py
 cd ..
 mkdir REMOTE_WS
 cd REMOTE_WS
@@ -75,6 +81,7 @@ copy ..\..\JAP.json JAP.json
 copy ..\..\JAP_LOCAL.json JAP_LOCAL.json
 copy ..\..\JAP_LOCAL_SSH.json JAP_LOCAL_SSH.json
 copy ..\..\JAP_LOCAL_WS.json JAP_LOCAL_WS.json
+copy ..\..\JAP_REMOTE_SSH.json JAP_REMOTE_SSH.json
 copy ..\..\JAP_REMOTE_WS.json JAP_REMOTE_WS.json
 copy ..\..\C.bat C.bat
 copy ..\..\C.ini C.ini
@@ -86,9 +93,8 @@ copy ..\..\CA.srl CA.srl
 copy ..\..\CAK.pem CAK.pem
 copy ..\..\CK.pem CK.pem
 copy ..\..\CR.pem CR.pem
-copy ..\..\KP KP
 copy ..\..\KP.bat KP.bat
-copy ..\..\KP.pub KP.pub
+copy ..\..\KP.pem KP.pem
 cd ..
 %SEVENZIP_HOME%\7z.exe a -tzip JAP_PYTHON_WINDOWS-%JAP_PYTHON_WINDOWS_VERSION%.zip JAP_PYTHON_WINDOWS-%JAP_PYTHON_WINDOWS_VERSION%
 cd ..
