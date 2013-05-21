@@ -21,4 +21,5 @@ IMPORTANT
     - chmod +w JAP_LOCAL.json
     - chmod +w JAP_LOCAL_SSH.json
     - chmod +w JAP_LOCAL_WS.json
+    - chmod +w JAP_REMOTE_SSH.json
     - chmod +w JAP_REMOTE_WS.json
