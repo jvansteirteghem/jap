@@ -506,7 +506,7 @@ function REMOTE_SSH_ViewModel(parent) {
     self.defaultData = {
         "LOGGER":
         {
-            "LEVEL": "DEBUG"
+            "LEVEL": ""
         },
         "REMOTE_PROXY_SERVER":
         {
@@ -630,7 +630,8 @@ function REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD_ViewModel(parent) {
     self.parent = parent;
     self.defaultData = {
         "USERNAME": "",
-        "PASSWORD": ""
+        "PASSWORD": "",
+        "KEYS": []
     }
     self.data = ko.mapping.fromJS(self.defaultData);
     self.action = "REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD";
@@ -643,6 +644,38 @@ function REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD_ViewModel(parent) {
     self.cancel = function() {
         self.parent.load_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS();
     }
+    
+    self.action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_ADD = function(data) {
+        self.data.KEYS.push(data);
+    }
+    
+    self.action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_UPDATE = function(selectedData, data) {
+        ko.mapping.fromJS(ko.mapping.toJS(data), {}, selectedData);
+    }
+    
+    self.action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_REMOVE = function(selectedData) {
+        self.data.KEYS.remove(selectedData);
+    }
+    
+    self.action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_REMOVE_ALL = function() {
+        self.data.KEYS.removeAll();
+    }
+    
+    self.load_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_ADD = function() {
+        self.template_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS(new Template("TEMPLATE_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEY", new REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_ADD_ViewModel(self)));
+    }
+    
+    self.load_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_UPDATE = function(data) {
+        self.template_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS(new Template("TEMPLATE_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEY", new REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_UPDATE_ViewModel(self, data)));
+    }
+    
+    self.template_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS = ko.observable();
+    
+    self.load_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS = function() {
+        self.template_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS(new Template("TEMPLATE_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS", self));
+    }
+    
+    self.load_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS();
 }
 
 function REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE_ViewModel(parent, data) {
@@ -659,6 +692,78 @@ function REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE_ViewModel(parent,
     
     self.cancel = function() {
         self.parent.load_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS();
+    }
+    
+    self.action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_ADD = function(data) {
+        self.data.KEYS.push(data);
+    }
+    
+    self.action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_UPDATE = function(selectedData, data) {
+        ko.mapping.fromJS(ko.mapping.toJS(data), {}, selectedData);
+    }
+    
+    self.action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_REMOVE = function(selectedData) {
+        self.data.KEYS.remove(selectedData);
+    }
+    
+    self.action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_REMOVE_ALL = function() {
+        self.data.KEYS.removeAll();
+    }
+    
+    self.load_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_ADD = function() {
+        self.template_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS(new Template("TEMPLATE_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEY", new REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_ADD_ViewModel(self)));
+    }
+    
+    self.load_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_UPDATE = function(data) {
+        self.template_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS(new Template("TEMPLATE_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEY", new REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_UPDATE_ViewModel(self, data)));
+    }
+    
+    self.template_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS = ko.observable();
+    
+    self.load_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS = function() {
+        self.template_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS(new Template("TEMPLATE_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS", self));
+    }
+    
+    self.load_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS();
+}
+
+function REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_ADD_ViewModel(parent) {
+    var self = this;
+    self.parent = parent;
+    self.defaultData = {
+        "PUBLIC":
+        {
+            "FILE": "",
+            "PASSPHRASE": ""
+        }
+    }
+    self.data = ko.mapping.fromJS(self.defaultData);
+    self.action = "REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_ADD";
+    
+    self.action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_ADD = function() {
+        self.parent.action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_ADD(self.data);
+        self.parent.load_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS();
+    }
+    
+    self.cancel = function() {
+        self.parent.load_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS();
+    }
+}
+
+function REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_UPDATE_ViewModel(parent, data) {
+    var self = this;
+    self.parent = parent;
+    self.selectedData = data;
+    self.data = ko.mapping.fromJS(ko.mapping.toJS(self.selectedData));
+    self.action = "REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_UPDATE";
+    
+    self.action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_UPDATE = function() {
+        self.parent.action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_UPDATE(self.selectedData, self.data);
+        self.parent.load_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS();
+    }
+    
+    self.cancel = function() {
+        self.parent.load_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS();
     }
 }
 

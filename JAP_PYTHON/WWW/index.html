@@ -616,12 +616,79 @@
                 <label>PASSWORD</label>
                 <input type="password" class="input-xlarge" data-bind="value: data.PASSWORD">
             </p>
+            <h3>2.1.1 KEYS</h3>
+            <div data-bind="template: {name: template_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS().name(), data: template_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS().data()}">
+            </div>
             <p>
                 <!-- ko if: action == "REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD" -->
                     <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD">ADD</button>
                 <!-- /ko -->
                 <!-- ko if: action == "REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE" -->
                     <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE">UPDATE</button>
+                <!-- /ko -->
+                <button type="button" class="btn input-medium" data-bind="click: cancel">CANCEL</button>
+            </p>
+        </script>
+        
+        <script type="text/html" id="TEMPLATE_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS">
+            <p>
+                <button type="button" class="btn input-medium" data-bind="click: load_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_ADD">ADD</button>
+                <!-- ko if: data.KEYS().length > 0 -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_REMOVE_ALL">REMOVE ALL</button>
+                <!-- /ko -->
+            </p>
+            <!-- ko if: data.KEYS().length > 0 -->
+                <p>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th style="width: 100%;">PUBLIC</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody data-bind="foreach: data.KEYS">
+                            <tr>
+                                <td data-bind="text: $index() + 1"></td>
+                                <td data-bind="text: PUBLIC.FILE"></td>
+                                <td>
+                                    <button type="button" class="btn input-medium" data-bind="click: $parent.load_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_UPDATE">UPDATE</button>
+                                    <button type="button" class="btn input-medium" data-bind="click: $parent.action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_REMOVE">REMOVE</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </p>
+                <p>
+                    <button type="button" class="btn input-medium" data-bind="click: load_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_ADD">ADD</button>
+                    <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_REMOVE_ALL">REMOVE ALL</button>
+                </p>
+            <!-- /ko -->
+        </script>
+        
+        <script type="text/html" id="TEMPLATE_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEY">
+            <p>
+                <!-- ko if: action == "REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_ADD" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_ADD">ADD</button>
+                <!-- /ko -->
+                <!-- ko if: action == "REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_UPDATE" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_UPDATE">UPDATE</button>
+                <!-- /ko -->
+                <button type="button" class="btn input-medium" data-bind="click: cancel">CANCEL</button>
+            </p>
+            <h3>2.1.1.1 PUBLIC</h3>
+            <p>
+                <label>FILE</label>
+                <input type="text" class="input-xlarge" data-bind="value: data.PUBLIC.FILE">
+                <label>PASSPHRASE</label>
+                <input type="password" class="input-xlarge" data-bind="value: data.PUBLIC.PASSPHRASE">
+            </p>
+            <p>
+                <!-- ko if: action == "REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_ADD" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_ADD">ADD</button>
+                <!-- /ko -->
+                <!-- ko if: action == "REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_UPDATE" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_UPDATE">UPDATE</button>
                 <!-- /ko -->
                 <button type="button" class="btn input-medium" data-bind="click: cancel">CANCEL</button>
             </p>

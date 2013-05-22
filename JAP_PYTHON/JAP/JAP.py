@@ -10,7 +10,8 @@ You should have received a copy of the GNU General Public License along with thi
 """
 
 from zope.interface import implements
-from twisted.cred import portal, checkers, credentials, error
+from twisted.cred import portal, checkers, credentials
+from twisted.cred.error import UnauthorizedLogin
 from twisted.internet import defer, reactor, ssl, tcp
 from twisted.web import server, static, resource, guard
 import json
@@ -497,7 +498,7 @@ class API(resource.Resource):
             
             return ""
 
-class HTTPCredentialsChecker:
+class HTTPUsernamePasswordCredentialsChecker:
     implements(checkers.ICredentialsChecker)
     credentialInterfaces = (credentials.IUsernamePassword, )
      
@@ -507,11 +508,16 @@ class HTTPCredentialsChecker:
     def requestAvatarId(self, credentials):
         authorized = False;
         
-        if self.configuration["LOCAL_SERVER"]["AUTHENTICATION"]["USERNAME"] == credentials.username and self.configuration["LOCAL_SERVER"]["AUTHENTICATION"]["PASSWORD"] == credentials.password:
-            authorized = True
+        if self.configuration["LOCAL_SERVER"]["AUTHENTICATION"]["USERNAME"] == credentials.username:
+            if self.configuration["LOCAL_SERVER"]["AUTHENTICATION"]["PASSWORD"] != "":
+                if self.configuration["LOCAL_SERVER"]["AUTHENTICATION"]["PASSWORD"] == credentials.password:
+                    authorized = True
+            
+            if authorized == False:
+                return defer.fail(UnauthorizedLogin("ERROR_CREDENTIALS_PASSWORD"))
         
         if authorized == False:
-            return defer.fail(error.UnauthorizedLogin())
+            return defer.fail(UnauthorizedLogin("ERROR_CREDENTIALS_USERNAME"))
         
         return defer.succeed(credentials.username)
  
@@ -530,11 +536,14 @@ def createSite(configuration):
     
     realm = HTTPRealm(resource)
     
-    credentialsChecker = HTTPCredentialsChecker(configuration)
-    checkers = [credentialsChecker]
+    checkers = [
+        HTTPUsernamePasswordCredentialsChecker(configuration)
+    ]
     
-    basicCredentialFactory = guard.BasicCredentialFactory("JAP")
-    credentialFactories = [basicCredentialFactory]
+    credentialFactories = [
+        guard.BasicCredentialFactory("JAP"),
+        guard.DigestCredentialFactory("md5", "JAP")
+    ]
     
     resource = guard.HTTPAuthSessionWrapper(portal.Portal(realm, checkers), credentialFactories)
     

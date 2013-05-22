@@ -5,13 +5,23 @@
     },
     "REMOTE_PROXY_SERVER":
     {
-        "ADDRESS": "127.0.0.1",
-        "PORT": 2222,
+        "ADDRESS": "",
+        "PORT": 0,
         "AUTHENTICATION":
         [
             {
                 "USERNAME": "",
-                "PASSWORD": ""
+                "PASSWORD": "",
+                "KEYS": 
+                [
+                    {
+                        "PUBLIC": 
+                        {
+                            "FILE": "",
+                            "PASSPHRASE": ""
+                        }
+                    }
+                ]
             }
         ],
         "KEY":

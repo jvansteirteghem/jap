@@ -12,8 +12,10 @@ You should have received a copy of the GNU General Public License along with thi
 from zope.interface import implements
 from twisted.internet import defer
 from twisted.conch import avatar, interfaces
+from twisted.conch.error import ValidPublicKey
 from twisted.conch.ssh import channel, factory, forwarding, keys
-from twisted.cred import portal, checkers, credentials, error
+from twisted.cred import portal, checkers, credentials
+from twisted.cred.error import UnauthorizedLogin
 import logging
 import JAP_LOCAL
 
@@ -30,6 +32,13 @@ def setDefaultConfiguration(configuration):
     while i < len(configuration["REMOTE_PROXY_SERVER"]["AUTHENTICATION"]):
         configuration["REMOTE_PROXY_SERVER"]["AUTHENTICATION"][i].setdefault("USERNAME", "")
         configuration["REMOTE_PROXY_SERVER"]["AUTHENTICATION"][i].setdefault("PASSWORD", "")
+        configuration["REMOTE_PROXY_SERVER"]["AUTHENTICATION"][i].setdefault("KEYS", [])
+        j = 0
+        while j < len(configuration["REMOTE_PROXY_SERVER"]["AUTHENTICATION"][i]["KEYS"]):
+            configuration["REMOTE_PROXY_SERVER"]["AUTHENTICATION"][i]["KEYS"][j].setdefault("PUBLIC", {})
+            configuration["REMOTE_PROXY_SERVER"]["AUTHENTICATION"][i]["KEYS"][j]["PUBLIC"].setdefault("FILE", "")
+            configuration["REMOTE_PROXY_SERVER"]["AUTHENTICATION"][i]["KEYS"][j]["PUBLIC"].setdefault("PASSPHRASE", "")
+            j = j + 1
         i = i + 1
     configuration["REMOTE_PROXY_SERVER"]["KEY"].setdefault("PUBLIC", {})
     configuration["REMOTE_PROXY_SERVER"]["KEY"]["PUBLIC"].setdefault("FILE", "")
@@ -162,33 +171,91 @@ class SSHConchUser(avatar.ConchUser):
         
         self.channelLookup["direct-tcpip"] = openSSHChannel
 
-class SSHCredentialsChecker(object):
+class SSHUsernamePasswordCredentialsChecker(object):
     implements(checkers.ICredentialsChecker)
     credentialInterfaces = (credentials.IUsernamePassword, )
     
     def __init__(self, configuration):
-        logger.debug("SSHCredentialsChecker.__init__")
+        logger.debug("SSHUsernamePasswordCredentialsChecker.__init__")
         
         self.configuration = configuration
     
     def requestAvatarId(self, credentials):
-        logger.debug("SSHCredentialsChecker.requestAvatarId")
+        logger.debug("SSHUsernamePasswordCredentialsChecker.requestAvatarId")
+        
+        authorized = False
         
         if len(self.configuration["REMOTE_PROXY_SERVER"]["AUTHENTICATION"]) == 0:
-            return defer.succeed(checkers.ANONYMOUS)
-        
-        authorized = False;
-        
-        i = 0
-        while i < len(self.configuration["REMOTE_PROXY_SERVER"]["AUTHENTICATION"]):
-            if self.configuration["REMOTE_PROXY_SERVER"]["AUTHENTICATION"][i]["USERNAME"] == credentials.username and self.configuration["REMOTE_PROXY_SERVER"]["AUTHENTICATION"][i]["PASSWORD"] == credentials.password:
-                authorized = True
-                break
-            
-            i = i + 1
+            authorized = True
         
         if authorized == False:
-            return defer.fail(error.UnauthorizedLogin())
+            i = 0
+            while i < len(self.configuration["REMOTE_PROXY_SERVER"]["AUTHENTICATION"]):
+                if self.configuration["REMOTE_PROXY_SERVER"]["AUTHENTICATION"][i]["USERNAME"] == credentials.username:
+                    if self.configuration["REMOTE_PROXY_SERVER"]["AUTHENTICATION"][i]["PASSWORD"] != "":
+                        if self.configuration["REMOTE_PROXY_SERVER"]["AUTHENTICATION"][i]["PASSWORD"] == credentials.password:
+                            authorized = True
+                    
+                    if authorized == False:
+                        return defer.fail(UnauthorizedLogin("ERROR_CREDENTIALS_PASSWORD"))
+                    
+                    break
+                i = i + 1
+            
+            if authorized == False:
+                return defer.fail(UnauthorizedLogin("ERROR_CREDENTIALS_USERNAME"))
+        
+        return defer.succeed(credentials.username)
+
+class SSHPrivateKeyCredentialsChecker(object):
+    implements(checkers.ICredentialsChecker)
+    credentialInterfaces = (credentials.ISSHPrivateKey, )
+    
+    def __init__(self, configuration):
+        logger.debug("SSHPrivateKeyCredentialsChecker.__init__")
+        
+        self.configuration = configuration
+    
+    def requestAvatarId(self, credentials):
+        logger.debug("SSHPrivateKeyCredentialsChecker.requestAvatarId")
+        
+        authorized = False
+        
+        if len(self.configuration["REMOTE_PROXY_SERVER"]["AUTHENTICATION"]) == 0:
+            authorized = True
+        
+        if authorized == False:
+            i = 0
+            while i < len(self.configuration["REMOTE_PROXY_SERVER"]["AUTHENTICATION"]):
+                if self.configuration["REMOTE_PROXY_SERVER"]["AUTHENTICATION"][i]["USERNAME"] == credentials.username:
+                    j = 0
+                    while j < len(self.configuration["REMOTE_PROXY_SERVER"]["AUTHENTICATION"][i]["KEYS"]):
+                        if self.configuration["REMOTE_PROXY_SERVER"]["AUTHENTICATION"][i]["KEYS"][j]["PUBLIC"]["FILE"] != "":
+                            key = keys.Key.fromFile(self.configuration["REMOTE_PROXY_SERVER"]["AUTHENTICATION"][i]["KEYS"][j]["PUBLIC"]["FILE"], passphrase=str(self.configuration["REMOTE_PROXY_SERVER"]["AUTHENTICATION"][i]["KEYS"][j]["PUBLIC"]["PASSPHRASE"]))
+                            
+                            if key.blob() == credentials.blob:
+                                if credentials.signature is None:
+                                    return defer.fail(ValidPublicKey("ERROR_CREDENTIALS_SIGNATURE"))
+                                
+                                if key.verify(credentials.signature, credentials.sigData):
+                                    authorized = True
+                                
+                                if authorized == False:
+                                    return defer.fail(UnauthorizedLogin("ERROR_CREDENTIALS_SIGNATURE"))
+                                
+                                break
+                        
+                        j = j + 1
+                    
+                    if authorized == False:
+                        return defer.fail(UnauthorizedLogin("ERROR_CREDENTIALS_BLOB"))
+                    
+                    break
+                
+                i = i + 1
+            
+            if authorized == False:
+                return defer.fail(UnauthorizedLogin("ERROR_CREDENTIALS_USERNAME"))
         
         return defer.succeed(credentials.username)
 
@@ -213,8 +280,10 @@ class SSHFactory(factory.SSHFactory):
         
         realm = SSHRealm(self.configuration)
         
-        credentialsChecker = SSHCredentialsChecker(configuration)
-        checkers = [credentialsChecker]
+        checkers = [
+            SSHUsernamePasswordCredentialsChecker(configuration),
+            SSHPrivateKeyCredentialsChecker(configuration)
+        ]
         
         self.portal = portal.Portal(realm, checkers)
         
@@ -222,6 +291,8 @@ class SSHFactory(factory.SSHFactory):
         self.publicKeys = {
             key.sshType(): key
         }
+        
+        logger.debug("SSHFactory.__init__: fingerprint=" + str(key.fingerprint()))
         
         key = keys.Key.fromFile(self.configuration["REMOTE_PROXY_SERVER"]["KEY"]["PRIVATE"]["FILE"], passphrase=str(self.configuration["REMOTE_PROXY_SERVER"]["KEY"]["PRIVATE"]["PASSPHRASE"]))
         self.privateKeys = {
