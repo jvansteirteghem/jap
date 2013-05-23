@@ -541,8 +541,7 @@ def createSite(configuration):
     ]
     
     credentialFactories = [
-        guard.BasicCredentialFactory("JAP"),
-        guard.DigestCredentialFactory("md5", "JAP")
+        guard.BasicCredentialFactory("JAP")
     ]
     
     resource = guard.HTTPAuthSessionWrapper(portal.Portal(realm, checkers), credentialFactories)

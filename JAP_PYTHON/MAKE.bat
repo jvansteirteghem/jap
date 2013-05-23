@@ -1,7 +1,7 @@
 set SEVENZIP_HOME="C:\Program Files\7-Zip"
 set PYINSTALLER_HOME="C:\pyinstaller-2.0"
-set JAP_PYTHON_VERSION=2.1.0
-set JAP_PYTHON_WINDOWS_VERSION=2.1.0
+set JAP_PYTHON_VERSION=2.1.1
+set JAP_PYTHON_WINDOWS_VERSION=2.1.1
 if exist MAKE rmdir MAKE /s /q
 mkdir MAKE
 cd MAKE
