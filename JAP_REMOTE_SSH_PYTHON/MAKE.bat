@@ -1,7 +1,7 @@
 set SEVENZIP_HOME="C:\Program Files\7-Zip"
 set PYINSTALLER_HOME="C:\pyinstaller-2.0"
-set JAP_REMOTE_SSH_PYTHON_VERSION=2.1.0
-set JAP_REMOTE_SSH_PYTHON_WINDOWS_VERSION=2.1.0
+set JAP_REMOTE_SSH_PYTHON_VERSION=2.1.1
+set JAP_REMOTE_SSH_PYTHON_WINDOWS_VERSION=2.1.1
 if exist MAKE rmdir MAKE /s /q
 mkdir MAKE
 cd MAKE
@@ -11,8 +11,8 @@ cd JAP_REMOTE_SSH_PYTHON-%JAP_REMOTE_SSH_PYTHON_VERSION%
 copy ..\..\JAP_REMOTE_SSH.bat JAP_REMOTE_SSH.bat
 copy ..\..\JAP_REMOTE_SSH.json JAP_REMOTE_SSH.json
 copy ..\..\JAP_REMOTE_SSH.py JAP_REMOTE_SSH.py
-copy ..\..\PK.bat PK.bat
-copy ..\..\PK.pem PK.pem
+copy ..\..\KP.bat KP.bat
+copy ..\..\KP.pem KP.pem
 copy ..\..\README.txt README.txt
 mkdir JAP
 cd JAP
@@ -37,8 +37,8 @@ copy ..\PYINSTALLER\dist\JAP_REMOTE_SSH.exe JAP_REMOTE_SSH.exe
 copy ..\..\JAP_REMOTE_SSH_PYTHON_WINDOWS\JAP_REMOTE_SSH.bat JAP_REMOTE_SSH.bat
 copy ..\..\JAP_REMOTE_SSH_PYTHON_WINDOWS\README.txt README.txt
 copy ..\..\JAP_REMOTE_SSH.json JAP_REMOTE_SSH.json
-copy ..\..\PK.bat PK.bat
-copy ..\..\PK.pem PK.pem
+copy ..\..\KP.bat KP.bat
+copy ..\..\KP.pem KP.pem
 cd ..
 %SEVENZIP_HOME%\7z.exe a -tzip JAP_REMOTE_SSH_PYTHON_WINDOWS-%JAP_REMOTE_SSH_PYTHON_WINDOWS_VERSION%.zip JAP_REMOTE_SSH_PYTHON_WINDOWS-%JAP_REMOTE_SSH_PYTHON_WINDOWS_VERSION%
 cd ..
