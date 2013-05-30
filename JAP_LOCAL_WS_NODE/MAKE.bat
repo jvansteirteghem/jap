@@ -11,6 +11,7 @@ copy ..\..\JAP_LOCAL_WS.bat JAP_LOCAL_WS.bat
 copy ..\..\JAP_LOCAL_WS.js JAP_LOCAL_WS.js
 copy ..\..\JAP_LOCAL_WS.json JAP_LOCAL_WS.json
 copy ..\..\CA.pem CA.pem
+copy ..\..\CA_DEFAULT.pem CA_DEFAULT.pem
 copy ..\..\NM.bat NM.bat
 copy ..\..\README.txt README.txt
 mkdir JAP

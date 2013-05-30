@@ -236,10 +236,32 @@ var createServer = function(configuration) {
 					requestUrl = "ws://" + requestUrl;
 				} else {
 					if(configuration.REMOTE_PROXY_SERVERS[i].CERTIFICATE.AUTHENTICATION.FILE !== "") {
-						requestOptions.ca = fs.readFileSync(configuration.REMOTE_PROXY_SERVERS[i].CERTIFICATE.AUTHENTICATION.FILE);
+						certificates = [];
+						
+						certificatesData = fs.readFileSync(configuration.REMOTE_PROXY_SERVERS[i].CERTIFICATE.AUTHENTICATION.FILE, "utf8");
+						certificatesData = certificatesData.split("\n");
+						
+						certificateData = [];
+						
+						for(j = 0; j < certificatesData.length; j = j + 1) {
+							data = certificatesData[j];
+							
+							if(data.length !== 0) {
+								certificateData.push(data);
+								
+								if(data.match(/-END CERTIFICATE-/)) {
+									certificates.push(certificateData.join("\n"));
+									
+									certificateData = [];
+								}
+							}
+						}
+						
+						requestOptions.ca = certificates;
+						requestOptions.rejectUnauthorized = true;
+					} else {
+						requestOptions.rejectUnauthorized = false;
 					}
-					
-					//requestOptions.rejectUnauthorized = true;
 					
 					if(configuration.PROXY_SERVER.ADDRESS === "") {
 						requestOptions.agent = https.globalAgent;

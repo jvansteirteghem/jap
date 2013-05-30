@@ -24,6 +24,7 @@ copy ..\..\CA.bat CA.bat
 copy ..\..\CA.ini CA.ini
 copy ..\..\CA.pem CA.pem
 copy ..\..\CA.srl CA.srl
+copy ..\..\CA_DEFAULT.pem CA_DEFAULT.pem
 copy ..\..\CAK.pem CAK.pem
 copy ..\..\CK.pem CK.pem
 copy ..\..\CR.pem CR.pem
@@ -90,6 +91,7 @@ copy ..\..\CA.bat CA.bat
 copy ..\..\CA.ini CA.ini
 copy ..\..\CA.pem CA.pem
 copy ..\..\CA.srl CA.srl
+copy ..\..\CA_DEFAULT.pem CA_DEFAULT.pem
 copy ..\..\CAK.pem CAK.pem
 copy ..\..\CK.pem CK.pem
 copy ..\..\CR.pem CR.pem

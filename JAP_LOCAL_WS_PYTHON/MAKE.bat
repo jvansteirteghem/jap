@@ -12,6 +12,7 @@ copy ..\..\JAP_LOCAL_WS.bat JAP_LOCAL_WS.bat
 copy ..\..\JAP_LOCAL_WS.json JAP_LOCAL_WS.json
 copy ..\..\JAP_LOCAL_WS.py JAP_LOCAL_WS.py
 copy ..\..\CA.pem CA.pem
+copy ..\..\CA_DEFAULT.pem CA_DEFAULT.pem
 copy ..\..\README.txt README.txt
 mkdir JAP
 cd JAP
@@ -37,6 +38,7 @@ copy ..\..\JAP_LOCAL_WS_PYTHON_WINDOWS\JAP_LOCAL_WS.bat JAP_LOCAL_WS.bat
 copy ..\..\JAP_LOCAL_WS_PYTHON_WINDOWS\README.txt README.txt
 copy ..\..\JAP_LOCAL_WS.json JAP_LOCAL_WS.json
 copy ..\..\CA.pem CA.pem
+copy ..\..\CA_DEFAULT.pem CA_DEFAULT.pem
 cd ..
 %SEVENZIP_HOME%\7z.exe a -tzip JAP_LOCAL_WS_PYTHON_WINDOWS-%JAP_LOCAL_WS_PYTHON_WINDOWS_VERSION%.zip JAP_LOCAL_WS_PYTHON_WINDOWS-%JAP_LOCAL_WS_PYTHON_WINDOWS_VERSION%
 cd ..
