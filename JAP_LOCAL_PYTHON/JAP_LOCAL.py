@@ -10,12 +10,14 @@ You should have received a copy of the GNU General Public License along with thi
 """
 
 from twisted.internet import reactor
-import json
 import logging
 import JAP.LOCAL.JAP_LOCAL
 
-configuration = json.load(open("JAP_LOCAL.json"))
+file = open("./JAP_LOCAL.json", "r")
+data = file.read()
+file.close()
 
+configuration = JAP.LOCAL.JAP_LOCAL.decodeJSON(data)
 JAP.LOCAL.JAP_LOCAL.setDefaultConfiguration(configuration)
 
 logging.basicConfig()
@@ -23,20 +25,16 @@ logger = logging.getLogger("JAP.LOCAL")
 
 if configuration["LOGGER"]["LEVEL"] == "DEBUG":
     logger.setLevel(logging.DEBUG)
+elif configuration["LOGGER"]["LEVEL"] == "INFO":
+    logger.setLevel(logging.INFO)
+elif configuration["LOGGER"]["LEVEL"] == "WARNING":
+    logger.setLevel(logging.WARNING)
+elif configuration["LOGGER"]["LEVEL"] == "ERROR":
+    logger.setLevel(logging.ERROR)
+elif configuration["LOGGER"]["LEVEL"] == "CRITICAL":
+    logger.setLevel(logging.CRITICAL)
 else:
-    if configuration["LOGGER"]["LEVEL"] == "INFO":
-        logger.setLevel(logging.INFO)
-    else:
-        if configuration["LOGGER"]["LEVEL"] == "WARNING":
-            logger.setLevel(logging.WARNING)
-        else:
-            if configuration["LOGGER"]["LEVEL"] == "ERROR":
-                logger.setLevel(logging.ERROR)
-            else:
-                if configuration["LOGGER"]["LEVEL"] == "CRITICAL":
-                    logger.setLevel(logging.CRITICAL)
-                else:
-                    logger.setLevel(logging.NOTSET)
+    logger.setLevel(logging.NOTSET)
 
 factory = JAP.LOCAL.JAP_LOCAL.InputProtocolFactory(configuration)
 factory.protocol = JAP.LOCAL.JAP_LOCAL.InputProtocol

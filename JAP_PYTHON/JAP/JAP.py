@@ -16,11 +16,26 @@ from twisted.internet import defer, reactor, ssl, tcp
 from twisted.web import server, static, resource, guard
 import json
 import logging
+import re
 import LOCAL.JAP_LOCAL
+import LOCAL_SSH.JAP_LOCAL
 import LOCAL_SSH.JAP_LOCAL_SSH
+import LOCAL_WS.JAP_LOCAL
 import LOCAL_WS.JAP_LOCAL_WS
+import REMOTE_SSH.JAP_LOCAL
 import REMOTE_SSH.JAP_REMOTE_SSH
+import REMOTE_WS.JAP_LOCAL
 import REMOTE_WS.JAP_REMOTE_WS
+
+def encodeJSON(data):
+    encoder = json.JSONEncoder()
+    return encoder.encode(data)
+
+def decodeJSON(data):
+    data = re.sub(re.compile("/\*.*?\*/", re.DOTALL), "", data)
+    
+    decoder = json.JSONDecoder()
+    return decoder.decode(data)
 
 def setDefaultConfiguration(configuration):
     configuration.setdefault("LOGGER", {})
@@ -130,8 +145,8 @@ class API(resource.Resource):
         file.write(data)
         file.close()
         
-        decoder = json.JSONDecoder()
-        configuration = decoder.decode(data)
+        configuration = LOCAL.JAP_LOCAL.decodeJSON(data)
+        LOCAL.JAP_LOCAL.setDefaultConfiguration(configuration)
         
         logger = logging.getLogger("JAP.LOCAL")
         
@@ -158,8 +173,8 @@ class API(resource.Resource):
             data = file.read()
             file.close()
             
-            decoder = json.JSONDecoder()
-            configuration = decoder.decode(data)
+            configuration = LOCAL.JAP_LOCAL.decodeJSON(data)
+            LOCAL.JAP_LOCAL.setDefaultConfiguration(configuration)
             
             logger = logging.getLogger("JAP.LOCAL")
             
@@ -203,8 +218,8 @@ class API(resource.Resource):
         file.write(data)
         file.close()
         
-        decoder = json.JSONDecoder()
-        configuration = decoder.decode(data)
+        configuration = LOCAL_SSH.JAP_LOCAL.decodeJSON(data)
+        LOCAL_SSH.JAP_LOCAL_SSH.setDefaultConfiguration(configuration)
         
         logger = logging.getLogger("JAP.LOCAL_SSH")
         
@@ -231,8 +246,8 @@ class API(resource.Resource):
             data = file.read()
             file.close()
             
-            decoder = json.JSONDecoder()
-            configuration = decoder.decode(data)
+            configuration = LOCAL_SSH.JAP_LOCAL.decodeJSON(data)
+            LOCAL_SSH.JAP_LOCAL_SSH.setDefaultConfiguration(configuration)
             
             logger = logging.getLogger("JAP.LOCAL_SSH")
             
@@ -276,8 +291,8 @@ class API(resource.Resource):
         file.write(data)
         file.close()
         
-        decoder = json.JSONDecoder()
-        configuration = decoder.decode(data)
+        configuration = LOCAL_WS.JAP_LOCAL.decodeJSON(data)
+        LOCAL_WS.JAP_LOCAL_WS.setDefaultConfiguration(configuration)
         
         logger = logging.getLogger("JAP.LOCAL_WS")
         
@@ -304,8 +319,8 @@ class API(resource.Resource):
             data = file.read()
             file.close()
             
-            decoder = json.JSONDecoder()
-            configuration = decoder.decode(data)
+            configuration = LOCAL_WS.JAP_LOCAL.decodeJSON(data)
+            LOCAL_WS.JAP_LOCAL_WS.setDefaultConfiguration(configuration)
             
             logger = logging.getLogger("JAP.LOCAL_WS")
             
@@ -349,8 +364,8 @@ class API(resource.Resource):
         file.write(data)
         file.close()
         
-        decoder = json.JSONDecoder()
-        configuration = decoder.decode(data)
+        configuration = REMOTE_SSH.JAP_LOCAL.decodeJSON(data)
+        REMOTE_SSH.JAP_REMOTE_SSH.setDefaultConfiguration(configuration)
         
         logger = logging.getLogger("JAP.REMOTE_SSH")
         
@@ -377,8 +392,8 @@ class API(resource.Resource):
             data = file.read()
             file.close()
             
-            decoder = json.JSONDecoder()
-            configuration = decoder.decode(data)
+            configuration = REMOTE_SSH.JAP_LOCAL.decodeJSON(data)
+            REMOTE_SSH.JAP_REMOTE_SSH.setDefaultConfiguration(configuration)
             
             logger = logging.getLogger("JAP.REMOTE_SSH")
             
@@ -421,8 +436,8 @@ class API(resource.Resource):
         file.write(data)
         file.close()
         
-        decoder = json.JSONDecoder()
-        configuration = decoder.decode(data)
+        configuration = REMOTE_WS.JAP_LOCAL.decodeJSON(data)
+        REMOTE_WS.JAP_REMOTE_WS.setDefaultConfiguration(configuration)
         
         logger = logging.getLogger("JAP.REMOTE_WS")
         
@@ -449,8 +464,8 @@ class API(resource.Resource):
             data = file.read()
             file.close()
             
-            decoder = json.JSONDecoder()
-            configuration = decoder.decode(data)
+            configuration = REMOTE_WS.JAP_LOCAL.decodeJSON(data)
+            REMOTE_WS.JAP_REMOTE_WS.setDefaultConfiguration(configuration)
             
             logger = logging.getLogger("JAP.REMOTE_WS")
             

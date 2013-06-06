@@ -14,6 +14,14 @@
             .tab-content {
                 padding: 5px;
             }
+            .block1 {
+                border-left: 5px solid #EEEEEE;
+                margin: 20px 0px 20px 0px;
+                padding: 0px 0px 0px 20px;
+            }
+            .block2 {
+                padding: 0px 0px 0px 20px;
+            }
         </style>
         <script type="text/javascript" src="js/jquery-1.9.1.js"></script>
         <script type="text/javascript" src="js/bootstrap-2.3.1.js"></script>
@@ -103,109 +111,175 @@
         </div>
         
         <script type="text/html" id="TEMPLATE_LOCAL">
-            <p>
+            <div>
                 <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_UPDATE">UPDATE</button>
-            </p>
-            <p>
+            </div>
+            <div class="block1">
                 <h3>1 LOGGER</h3>
-                <p>
-                    <label>LEVEL</label>
-                    <select data-bind="value: data.LOGGER.LEVEL">
-                        <option></option>
-                        <option>DEBUG</option>
-                        <option>INFO</option>
-                        <option>WARNING</option>
-                        <option>ERROR</option>
-                        <option>CRITICAL</option>
-                    </select>
-                </p>
+                <div class="block2">
+                    <p>
+                        <label>LEVEL</label>
+                        <select data-bind="value: data.LOGGER.LEVEL">
+                            <option></option>
+                            <option>DEBUG</option>
+                            <option>INFO</option>
+                            <option>WARNING</option>
+                            <option>ERROR</option>
+                            <option>CRITICAL</option>
+                        </select>
+                    </p>
+                </div>
                 <h3>2 LOCAL PROXY SERVER</h3>
-                <p>
-                    <label>ADDRESS</label>
-                    <input type="text" class="input-xlarge" data-bind="value: data.LOCAL_PROXY_SERVER.ADDRESS">
-                    <label>PORT</label>
-                    <input type="text" class="input-xlarge" data-bind="value: data.LOCAL_PROXY_SERVER.PORT">
-                </p>
-                <h3>3 PROXY SERVER</h3>
-                <p>
-                    <label>TYPE</label>
-                    <select data-bind="value: data.PROXY_SERVER.TYPE">
-                        <option></option>
-                        <option>HTTP</option>
-                        <option>SOCKS5</option>
-                    </select>
-                    <label>ADDRESS</label>
-                    <input type="text" class="input-xlarge" data-bind="value: data.PROXY_SERVER.ADDRESS">
-                    <label>PORT</label>
-                    <input type="text" class="input-xlarge" data-bind="value: data.PROXY_SERVER.PORT">
-                </p>
-                <h3>3.1 AUTHENTICATION</h3>
-                <p>
-                    <label>USERNAME</label>
-                    <input type="text" class="input-xlarge" data-bind="value: data.PROXY_SERVER.AUTHENTICATION.USERNAME">
-                    <label>PASSWORD</label>
-                    <input type="password" class="input-xlarge" data-bind="value: data.PROXY_SERVER.AUTHENTICATION.PASSWORD">
-                </p>
-            </p>
-            <p>
+                <div class="block2">
+                    <p>
+                        <label>ADDRESS</label>
+                        <input type="text" class="input-xlarge" data-bind="value: data.LOCAL_PROXY_SERVER.ADDRESS">
+                        <label>PORT</label>
+                        <input type="text" class="input-xlarge" data-bind="value: data.LOCAL_PROXY_SERVER.PORT">
+                    </p>
+                </div>
+                <h3>3 PROXY SERVERS</h3>
+                <div class="block2">
+                    <div data-bind="template: {name: template_LOCAL_PROXY_SERVERS().name(), data: template_LOCAL_PROXY_SERVERS().data()}">
+                    </div>
+                </div>
+            </div>
+            <div>
                 <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_UPDATE">UPDATE</button>
+            </div>
+        </script>
+        
+        <script type="text/html" id="TEMPLATE_LOCAL_PROXY_SERVERS">
+            <p>
+                <button type="button" class="btn input-medium" data-bind="click: load_LOCAL_PROXY_SERVERS_ADD">ADD</button>
+                <!-- ko if: data.PROXY_SERVERS().length > 0 -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_PROXY_SERVERS_REMOVE_ALL">REMOVE ALL</button>
+                <!-- /ko -->
             </p>
+            <!-- ko if: data.PROXY_SERVERS().length > 0 -->
+                <p>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th style="width: 50%;">ADDRESS</th>
+                                <th style="width: 50%;">PORT</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody data-bind="foreach: data.PROXY_SERVERS">
+                            <tr>
+                                <td data-bind="text: $index() + 1"></td>
+                                <td data-bind="text: ADDRESS"></td>
+                                <td data-bind="text: PORT"></td>
+                                <td>
+                                    <button type="button" class="btn input-medium" data-bind="click: $parent.load_LOCAL_PROXY_SERVERS_UPDATE">UPDATE</button>
+                                    <button type="button" class="btn input-medium" data-bind="click: $parent.action_LOCAL_PROXY_SERVERS_REMOVE">REMOVE</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </p>
+                <p>
+                    <button type="button" class="btn input-medium" data-bind="click: load_LOCAL_PROXY_SERVERS_ADD">ADD</button>
+                    <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_PROXY_SERVERS_REMOVE_ALL">REMOVE ALL</button>
+                </p>
+            <!-- /ko -->
+        </script>
+        
+        <script type="text/html" id="TEMPLATE_LOCAL_PROXY_SERVER">
+            <div>
+                <!-- ko if: action == "LOCAL_PROXY_SERVERS_ADD" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_PROXY_SERVERS_ADD">ADD</button>
+                <!-- /ko -->
+                <!-- ko if: action == "LOCAL_PROXY_SERVERS_UPDATE" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_PROXY_SERVERS_UPDATE">UPDATE</button>
+                <!-- /ko -->
+                <button type="button" class="btn input-medium" data-bind="click: cancel">CANCEL</button>
+            </div>
+            <div class="block1">
+                <div class="block2">
+                    <p>
+                        <label>TYPE</label>
+                        <select data-bind="value: data.TYPE">
+                            <option></option>
+                            <option>HTTP</option>
+                            <option>SOCKS5</option>
+                        </select>
+                        <label>ADDRESS</label>
+                        <input type="text" class="input-xlarge" data-bind="value: data.ADDRESS">
+                        <label>PORT</label>
+                        <input type="text" class="input-xlarge" data-bind="value: data.PORT">
+                    </p>
+                    <h3>3.1 AUTHENTICATION</h3>
+                    <div class="block2">
+                        <p>
+                            <label>USERNAME</label>
+                            <input type="text" class="input-xlarge" data-bind="value: data.AUTHENTICATION.USERNAME">
+                            <label>PASSWORD</label>
+                            <input type="password" class="input-xlarge" data-bind="value: data.AUTHENTICATION.PASSWORD">
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <!-- ko if: action == "LOCAL_PROXY_SERVERS_ADD" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_PROXY_SERVERS_ADD">ADD</button>
+                <!-- /ko -->
+                <!-- ko if: action == "LOCAL_PROXY_SERVERS_UPDATE" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_PROXY_SERVERS_UPDATE">UPDATE</button>
+                <!-- /ko -->
+                <button type="button" class="btn input-medium" data-bind="click: cancel">CANCEL</button>
+            </div>
         </script>
         
         <script type="text/html" id="TEMPLATE_LOCAL_SSH">
-            <p>
+            <div>
                 <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_SSH_UPDATE">UPDATE</button>
-            </p>
-            <p>
+            </div>
+            <div class="block1">
                 <h3>1 LOGGER</h3>
-                <p>
-                    <label>LEVEL</label>
-                    <select data-bind="value: data.LOGGER.LEVEL">
-                        <option></option>
-                        <option>DEBUG</option>
-                        <option>INFO</option>
-                        <option>WARNING</option>
-                        <option>ERROR</option>
-                        <option>CRITICAL</option>
-                    </select>
-                </p>
+                <div class="block2">
+                    <p>
+                        <label>LEVEL</label>
+                        <select data-bind="value: data.LOGGER.LEVEL">
+                            <option></option>
+                            <option>DEBUG</option>
+                            <option>INFO</option>
+                            <option>WARNING</option>
+                            <option>ERROR</option>
+                            <option>CRITICAL</option>
+                        </select>
+                    </p>
+                </div>
                 <h3>2 LOCAL PROXY SERVER</h3>
-                <p>
-                    <label>ADDRESS</label>
-                    <input type="text" class="input-xlarge" data-bind="value: data.LOCAL_PROXY_SERVER.ADDRESS">
-                    <label>PORT</label>
-                    <input type="text" class="input-xlarge" data-bind="value: data.LOCAL_PROXY_SERVER.PORT">
-                </p>
-                <h3>2.1 KEYS</h3>
-                <div data-bind="template: {name: template_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS().name(), data: template_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS().data()}">
+                <div class="block2">
+                    <p>
+                        <label>ADDRESS</label>
+                        <input type="text" class="input-xlarge" data-bind="value: data.LOCAL_PROXY_SERVER.ADDRESS">
+                        <label>PORT</label>
+                        <input type="text" class="input-xlarge" data-bind="value: data.LOCAL_PROXY_SERVER.PORT">
+                    </p>
+                    <h3>2.1 KEYS</h3>
+                    <div class="block2">
+                        <div data-bind="template: {name: template_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS().name(), data: template_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS().data()}">
+                        </div>
+                    </div>
                 </div>
                 <h3>3 REMOTE PROXY SERVERS</h3>
-                <div data-bind="template: {name: template_LOCAL_SSH_REMOTE_PROXY_SERVERS().name(), data: template_LOCAL_SSH_REMOTE_PROXY_SERVERS().data()}">
+                <div class="block2">
+                    <div data-bind="template: {name: template_LOCAL_SSH_REMOTE_PROXY_SERVERS().name(), data: template_LOCAL_SSH_REMOTE_PROXY_SERVERS().data()}">
+                    </div>
                 </div>
-                <h3>4 PROXY SERVER</h3>
-                <p>
-                    <label>TYPE</label>
-                    <select data-bind="value: data.PROXY_SERVER.TYPE">
-                        <option></option>
-                        <option>HTTP</option>
-                        <option>SOCKS5</option>
-                    </select>
-                    <label>ADDRESS</label>
-                    <input type="text" class="input-xlarge" data-bind="value: data.PROXY_SERVER.ADDRESS">
-                    <label>PORT</label>
-                    <input type="text" class="input-xlarge" data-bind="value: data.PROXY_SERVER.PORT">
-                </p>
-                <h3>4.1 AUTHENTICATION</h3>
-                <p>
-                    <label>USERNAME</label>
-                    <input type="text" class="input-xlarge" data-bind="value: data.PROXY_SERVER.AUTHENTICATION.USERNAME">
-                    <label>PASSWORD</label>
-                    <input type="password" class="input-xlarge" data-bind="value: data.PROXY_SERVER.AUTHENTICATION.PASSWORD">
-                <p>
-            </p>
-            <p>
+                <h3>4 PROXY SERVERS</h3>
+                <div class="block2">
+                    <div data-bind="template: {name: template_LOCAL_SSH_PROXY_SERVERS().name(), data: template_LOCAL_SSH_PROXY_SERVERS().data()}">
+                    </div>
+                </div>
+            </div>
+            <div>
                 <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_SSH_UPDATE">UPDATE</button>
-            </p>
+            </div>
         </script>
         
         <script type="text/html" id="TEMPLATE_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS">
@@ -247,7 +321,7 @@
         </script>
         
         <script type="text/html" id="TEMPLATE_LOCAL_SSH_LOCAL_PROXY_SERVER_KEY">
-            <p>
+            <div>
                 <!-- ko if: action == "LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_ADD" -->
                     <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_ADD">ADD</button>
                 <!-- /ko -->
@@ -255,22 +329,30 @@
                     <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_UPDATE">UPDATE</button>
                 <!-- /ko -->
                 <button type="button" class="btn input-medium" data-bind="click: cancel">CANCEL</button>
-            </p>
-            <h3>2.1.1 PUBLIC</h3>
-            <p>
-                <label>FILE</label>
-                <input type="text" class="input-xlarge" data-bind="value: data.PUBLIC.FILE">
-                <label>PASSPHRASE</label>
-                <input type="password" class="input-xlarge" data-bind="value: data.PUBLIC.PASSPHRASE">
-            </p>
-            <h3>2.1.2 PRIVATE</h3>
-            <p>
-                <label>FILE</label>
-                <input type="text" class="input-xlarge" data-bind="value: data.PRIVATE.FILE">
-                <label>PASSPHRASE</label>
-                <input type="password" class="input-xlarge" data-bind="value: data.PRIVATE.PASSPHRASE">
-            </p>
-            <p>
+            </div>
+            <div class="block1">
+                <div class="block2">
+                    <h3>2.1.1 PUBLIC</h3>
+                    <div class="block2">
+                        <p>
+                            <label>FILE</label>
+                            <input type="text" class="input-xlarge" data-bind="value: data.PUBLIC.FILE">
+                            <label>PASSPHRASE</label>
+                            <input type="password" class="input-xlarge" data-bind="value: data.PUBLIC.PASSPHRASE">
+                        </p>
+                    </div>
+                    <h3>2.1.2 PRIVATE</h3>
+                    <div class="block2">
+                        <p>
+                            <label>FILE</label>
+                            <input type="text" class="input-xlarge" data-bind="value: data.PRIVATE.FILE">
+                            <label>PASSPHRASE</label>
+                            <input type="password" class="input-xlarge" data-bind="value: data.PRIVATE.PASSPHRASE">
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div>
                 <!-- ko if: action == "LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_ADD" -->
                     <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_ADD">ADD</button>
                 <!-- /ko -->
@@ -278,7 +360,7 @@
                     <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_UPDATE">UPDATE</button>
                 <!-- /ko -->
                 <button type="button" class="btn input-medium" data-bind="click: cancel">CANCEL</button>
-            </p>
+            </div>
         </script>
         
         <script type="text/html" id="TEMPLATE_LOCAL_SSH_REMOTE_PROXY_SERVERS">
@@ -320,7 +402,7 @@
         </script>
         
         <script type="text/html" id="TEMPLATE_LOCAL_SSH_REMOTE_PROXY_SERVER">
-            <p>
+            <div>
                 <!-- ko if: action == "LOCAL_SSH_REMOTE_PROXY_SERVERS_ADD" -->
                     <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_SSH_REMOTE_PROXY_SERVERS_ADD">ADD</button>
                 <!-- /ko -->
@@ -328,27 +410,37 @@
                     <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_SSH_REMOTE_PROXY_SERVERS_UPDATE">UPDATE</button>
                 <!-- /ko -->
                 <button type="button" class="btn input-medium" data-bind="click: cancel">CANCEL</button>
-            </p>
-            <p>
-                <label>ADDRESS</label>
-                <input type="text" class="input-xlarge" data-bind="value: data.ADDRESS">
-                <label>PORT</label>
-                <input type="text" class="input-xlarge" data-bind="value: data.PORT">
-            </p>
-            <h3>3.1 AUTHENTICATION</h3>
-            <p>
-                <label>USERNAME</label>
-                <input type="text" class="input-xlarge" data-bind="value: data.AUTHENTICATION.USERNAME">
-                <label>PASSWORD</label>
-                <input type="password" class="input-xlarge" data-bind="value: data.AUTHENTICATION.PASSWORD">
-            </p>
-            <h3>3.2 KEY</h3>
-            <h3>3.2.1 AUTHENTICATION</h3>
-            <p>
-                <label>FINGERPRINT</label>
-                <input type="text" class="input-xlarge" data-bind="value: data.KEY.AUTHENTICATION.FINGERPRINT">
-            </p>
-            <p>
+            </div>
+            <div class="block1">
+                <div class="block2">
+                    <p>
+                        <label>ADDRESS</label>
+                        <input type="text" class="input-xlarge" data-bind="value: data.ADDRESS">
+                        <label>PORT</label>
+                        <input type="text" class="input-xlarge" data-bind="value: data.PORT">
+                    </p>
+                    <h3>3.1 AUTHENTICATION</h3>
+                    <div class="block2">
+                        <p>
+                            <label>USERNAME</label>
+                            <input type="text" class="input-xlarge" data-bind="value: data.AUTHENTICATION.USERNAME">
+                            <label>PASSWORD</label>
+                            <input type="password" class="input-xlarge" data-bind="value: data.AUTHENTICATION.PASSWORD">
+                        </p>
+                    </div>
+                    <h3>3.2 KEY</h3>
+                    <div class="block2">
+                        <h3>3.2.1 AUTHENTICATION</h3>
+                        <div class="block2">
+                            <p>
+                                <label>FINGERPRINT</label>
+                                <input type="text" class="input-xlarge" data-bind="value: data.KEY.AUTHENTICATION.FINGERPRINT">
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div>
                 <!-- ko if: action == "LOCAL_SSH_REMOTE_PROXY_SERVERS_ADD" -->
                     <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_SSH_REMOTE_PROXY_SERVERS_ADD">ADD</button>
                 <!-- /ko -->
@@ -356,60 +448,135 @@
                     <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_SSH_REMOTE_PROXY_SERVERS_UPDATE">UPDATE</button>
                 <!-- /ko -->
                 <button type="button" class="btn input-medium" data-bind="click: cancel">CANCEL</button>
+            </div>
+        </script>
+        
+        <script type="text/html" id="TEMPLATE_LOCAL_SSH_PROXY_SERVERS">
+            <p>
+                <button type="button" class="btn input-medium" data-bind="click: load_LOCAL_SSH_PROXY_SERVERS_ADD">ADD</button>
+                <!-- ko if: data.PROXY_SERVERS().length > 0 -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_SSH_PROXY_SERVERS_REMOVE_ALL">REMOVE ALL</button>
+                <!-- /ko -->
             </p>
+            <!-- ko if: data.PROXY_SERVERS().length > 0 -->
+                <p>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th style="width: 50%;">ADDRESS</th>
+                                <th style="width: 50%;">PORT</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody data-bind="foreach: data.PROXY_SERVERS">
+                            <tr>
+                                <td data-bind="text: $index() + 1"></td>
+                                <td data-bind="text: ADDRESS"></td>
+                                <td data-bind="text: PORT"></td>
+                                <td>
+                                    <button type="button" class="btn input-medium" data-bind="click: $parent.load_LOCAL_SSH_PROXY_SERVERS_UPDATE">UPDATE</button>
+                                    <button type="button" class="btn input-medium" data-bind="click: $parent.action_LOCAL_SSH_PROXY_SERVERS_REMOVE">REMOVE</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </p>
+                <p>
+                    <button type="button" class="btn input-medium" data-bind="click: load_LOCAL_SSH_PROXY_SERVERS_ADD">ADD</button>
+                    <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_SSH_PROXY_SERVERS_REMOVE_ALL">REMOVE ALL</button>
+                </p>
+            <!-- /ko -->
+        </script>
+        
+        <script type="text/html" id="TEMPLATE_LOCAL_SSH_PROXY_SERVER">
+            <div>
+                <!-- ko if: action == "LOCAL_SSH_PROXY_SERVERS_ADD" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_SSH_PROXY_SERVERS_ADD">ADD</button>
+                <!-- /ko -->
+                <!-- ko if: action == "LOCAL_SSH_PROXY_SERVERS_UPDATE" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_SSH_PROXY_SERVERS_UPDATE">UPDATE</button>
+                <!-- /ko -->
+                <button type="button" class="btn input-medium" data-bind="click: cancel">CANCEL</button>
+            </div>
+            <div class="block1">
+                <div class="block2">
+                    <p>
+                        <label>TYPE</label>
+                        <select data-bind="value: data.TYPE">
+                            <option></option>
+                            <option>HTTP</option>
+                            <option>SOCKS5</option>
+                        </select>
+                        <label>ADDRESS</label>
+                        <input type="text" class="input-xlarge" data-bind="value: data.ADDRESS">
+                        <label>PORT</label>
+                        <input type="text" class="input-xlarge" data-bind="value: data.PORT">
+                    </p>
+                    <h3>4.1 AUTHENTICATION</h3>
+                    <div class="block2">
+                        <p>
+                            <label>USERNAME</label>
+                            <input type="text" class="input-xlarge" data-bind="value: data.AUTHENTICATION.USERNAME">
+                            <label>PASSWORD</label>
+                            <input type="password" class="input-xlarge" data-bind="value: data.AUTHENTICATION.PASSWORD">
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <!-- ko if: action == "LOCAL_SSH_PROXY_SERVERS_ADD" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_SSH_PROXY_SERVERS_ADD">ADD</button>
+                <!-- /ko -->
+                <!-- ko if: action == "LOCAL_SSH_PROXY_SERVERS_UPDATE" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_SSH_PROXY_SERVERS_UPDATE">UPDATE</button>
+                <!-- /ko -->
+                <button type="button" class="btn input-medium" data-bind="click: cancel">CANCEL</button>
+            </div>
         </script>
         
         <script type="text/html" id="TEMPLATE_LOCAL_WS">
-            <p>
+            <div>
                 <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_WS_UPDATE">UPDATE</button>
-            </p>
-            <p>
+            </div>
+            <div class="block1">
                 <h3>1 LOGGER</h3>
-                <p>
-                    <label>LEVEL</label>
-                    <select data-bind="value: data.LOGGER.LEVEL">
-                        <option></option>
-                        <option>DEBUG</option>
-                        <option>INFO</option>
-                        <option>WARNING</option>
-                        <option>ERROR</option>
-                        <option>CRITICAL</option>
-                    </select>
-                </p>
-                <h3>2 LOCAL PROXY SERVER</h3>
-                <p>
-                    <label>ADDRESS</label>
-                    <input type="text" class="input-xlarge" data-bind="value: data.LOCAL_PROXY_SERVER.ADDRESS">
-                    <label>PORT</label>
-                    <input type="text" class="input-xlarge" data-bind="value: data.LOCAL_PROXY_SERVER.PORT">
-                </p>
-                <h3>3 REMOTE PROXY SERVERS</h3>
-                <div data-bind="template: {name: template_LOCAL_WS_REMOTE_PROXY_SERVERS().name(), data: template_LOCAL_WS_REMOTE_PROXY_SERVERS().data()}">
+                <div class="block2">
+                    <p>
+                        <label>LEVEL</label>
+                        <select data-bind="value: data.LOGGER.LEVEL">
+                            <option></option>
+                            <option>DEBUG</option>
+                            <option>INFO</option>
+                            <option>WARNING</option>
+                            <option>ERROR</option>
+                            <option>CRITICAL</option>
+                        </select>
+                    </p>
                 </div>
-                <h3>4 PROXY SERVER</h3>
-                <p>
-                    <label>TYPE</label>
-                    <select data-bind="value: data.PROXY_SERVER.TYPE">
-                        <option></option>
-                        <option>HTTP</option>
-                        <option>SOCKS5</option>
-                    </select>
-                    <label>ADDRESS</label>
-                    <input type="text" class="input-xlarge" data-bind="value: data.PROXY_SERVER.ADDRESS">
-                    <label>PORT</label>
-                    <input type="text" class="input-xlarge" data-bind="value: data.PROXY_SERVER.PORT">
-                </p>
-                <h3>4.1 AUTHENTICATION</h3>
-                <p>
-                    <label>USERNAME</label>
-                    <input type="text" class="input-xlarge" data-bind="value: data.PROXY_SERVER.AUTHENTICATION.USERNAME">
-                    <label>PASSWORD</label>
-                    <input type="password" class="input-xlarge" data-bind="value: data.PROXY_SERVER.AUTHENTICATION.PASSWORD">
-                </p>
-            </p>
-            <p>
+                <h3>2 LOCAL PROXY SERVER</h3>
+                <div class="block2">
+                    <p>
+                        <label>ADDRESS</label>
+                        <input type="text" class="input-xlarge" data-bind="value: data.LOCAL_PROXY_SERVER.ADDRESS">
+                        <label>PORT</label>
+                        <input type="text" class="input-xlarge" data-bind="value: data.LOCAL_PROXY_SERVER.PORT">
+                    </p>
+                </div>
+                <h3>3 REMOTE PROXY SERVERS</h3>
+                <div class="block2">
+                    <div data-bind="template: {name: template_LOCAL_WS_REMOTE_PROXY_SERVERS().name(), data: template_LOCAL_WS_REMOTE_PROXY_SERVERS().data()}">
+                    </div>
+                </div>
+                <h3>4 PROXY SERVERS</h3>
+                <div class="block2">
+                    <div data-bind="template: {name: template_LOCAL_WS_PROXY_SERVERS().name(), data: template_LOCAL_WS_PROXY_SERVERS().data()}">
+                    </div>
+                </div>
+            </div>
+            <div>
                 <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_WS_UPDATE">UPDATE</button>
-            </p>
+            </div>
         </script>
         
         <script type="text/html" id="TEMPLATE_LOCAL_WS_REMOTE_PROXY_SERVERS">
@@ -451,7 +618,7 @@
         </script>
         
         <script type="text/html" id="TEMPLATE_LOCAL_WS_REMOTE_PROXY_SERVER">
-            <p>
+            <div>
                 <!-- ko if: action == "LOCAL_WS_REMOTE_PROXY_SERVERS_ADD" -->
                     <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_WS_REMOTE_PROXY_SERVERS_ADD">ADD</button>
                 <!-- /ko -->
@@ -459,33 +626,43 @@
                     <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_WS_REMOTE_PROXY_SERVERS_UPDATE">UPDATE</button>
                 <!-- /ko -->
                 <button type="button" class="btn input-medium" data-bind="click: cancel">CANCEL</button>
-            </p>
-            <p>
-                <label>TYPE</label>
-                <select data-bind="value: data.TYPE">
-                    <option></option>
-                    <option>HTTP</option>
-                    <option>HTTPS</option>
-                </select>
-                <label>ADDRESS</label>
-                <input type="text" class="input-xlarge" data-bind="value: data.ADDRESS">
-                <label>PORT</label>
-                <input type="text" class="input-xlarge" data-bind="value: data.PORT">
-            </p>
-            <h3>3.1 AUTHENTICATION</h3>
-            <p>
-                <label>USERNAME</label>
-                <input type="text" class="input-xlarge" data-bind="value: data.AUTHENTICATION.USERNAME">
-                <label>PASSWORD</label>
-                <input type="password" class="input-xlarge" data-bind="value: data.AUTHENTICATION.PASSWORD">
-            </p>
-            <h3>3.2 CERTIFICATE</h3>
-            <h3>3.2.1 AUTHENTICATION</h3>
-            <p>
-                <label>FILE</label>
-                <input type="text" class="input-xlarge" data-bind="value: data.CERTIFICATE.AUTHENTICATION.FILE">
-            </p>
-            <p>
+            </div>
+            <div class="block1">
+                <div class="block2">
+                    <p>
+                        <label>TYPE</label>
+                        <select data-bind="value: data.TYPE">
+                            <option></option>
+                            <option>HTTP</option>
+                            <option>HTTPS</option>
+                        </select>
+                        <label>ADDRESS</label>
+                        <input type="text" class="input-xlarge" data-bind="value: data.ADDRESS">
+                        <label>PORT</label>
+                        <input type="text" class="input-xlarge" data-bind="value: data.PORT">
+                    </p>
+                    <h3>3.1 AUTHENTICATION</h3>
+                    <div class="block2">
+                        <p>
+                            <label>USERNAME</label>
+                            <input type="text" class="input-xlarge" data-bind="value: data.AUTHENTICATION.USERNAME">
+                            <label>PASSWORD</label>
+                            <input type="password" class="input-xlarge" data-bind="value: data.AUTHENTICATION.PASSWORD">
+                        </p>
+                    </div>
+                    <h3>3.2 CERTIFICATE</h3>
+                    <div class="block2">
+                        <h3>3.2.1 AUTHENTICATION</h3>
+                        <div class="block2">
+                            <p>
+                                <label>FILE</label>
+                                <input type="text" class="input-xlarge" data-bind="value: data.CERTIFICATE.AUTHENTICATION.FILE">
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div>
                 <!-- ko if: action == "LOCAL_WS_REMOTE_PROXY_SERVERS_ADD" -->
                     <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_WS_REMOTE_PROXY_SERVERS_ADD">ADD</button>
                 <!-- /ko -->
@@ -493,75 +670,156 @@
                     <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_WS_REMOTE_PROXY_SERVERS_UPDATE">UPDATE</button>
                 <!-- /ko -->
                 <button type="button" class="btn input-medium" data-bind="click: cancel">CANCEL</button>
+            </div>
+        </script>
+        
+        <script type="text/html" id="TEMPLATE_LOCAL_WS_PROXY_SERVERS">
+            <p>
+                <button type="button" class="btn input-medium" data-bind="click: load_LOCAL_WS_PROXY_SERVERS_ADD">ADD</button>
+                <!-- ko if: data.PROXY_SERVERS().length > 0 -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_WS_PROXY_SERVERS_REMOVE_ALL">REMOVE ALL</button>
+                <!-- /ko -->
             </p>
+            <!-- ko if: data.PROXY_SERVERS().length > 0 -->
+                <p>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th style="width: 50%;">ADDRESS</th>
+                                <th style="width: 50%;">PORT</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody data-bind="foreach: data.PROXY_SERVERS">
+                            <tr>
+                                <td data-bind="text: $index() + 1"></td>
+                                <td data-bind="text: ADDRESS"></td>
+                                <td data-bind="text: PORT"></td>
+                                <td>
+                                    <button type="button" class="btn input-medium" data-bind="click: $parent.load_LOCAL_WS_PROXY_SERVERS_UPDATE">UPDATE</button>
+                                    <button type="button" class="btn input-medium" data-bind="click: $parent.action_LOCAL_WS_PROXY_SERVERS_REMOVE">REMOVE</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </p>
+                <p>
+                    <button type="button" class="btn input-medium" data-bind="click: load_LOCAL_WS_PROXY_SERVERS_ADD">ADD</button>
+                    <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_WS_PROXY_SERVERS_REMOVE_ALL">REMOVE ALL</button>
+                </p>
+            <!-- /ko -->
+        </script>
+        
+        <script type="text/html" id="TEMPLATE_LOCAL_WS_PROXY_SERVER">
+            <div>
+                <!-- ko if: action == "LOCAL_WS_PROXY_SERVERS_ADD" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_WS_PROXY_SERVERS_ADD">ADD</button>
+                <!-- /ko -->
+                <!-- ko if: action == "LOCAL_WS_PROXY_SERVERS_UPDATE" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_WS_PROXY_SERVERS_UPDATE">UPDATE</button>
+                <!-- /ko -->
+                <button type="button" class="btn input-medium" data-bind="click: cancel">CANCEL</button>
+            </div>
+            <div class="block1">
+                <div class="block2">
+                    <p>
+                        <label>TYPE</label>
+                        <select data-bind="value: data.TYPE">
+                            <option></option>
+                            <option>HTTP</option>
+                            <option>SOCKS5</option>
+                        </select>
+                        <label>ADDRESS</label>
+                        <input type="text" class="input-xlarge" data-bind="value: data.ADDRESS">
+                        <label>PORT</label>
+                        <input type="text" class="input-xlarge" data-bind="value: data.PORT">
+                    </p>
+                    <h3>4.1 AUTHENTICATION</h3>
+                    <div class="block2">
+                        <p>
+                            <label>USERNAME</label>
+                            <input type="text" class="input-xlarge" data-bind="value: data.AUTHENTICATION.USERNAME">
+                            <label>PASSWORD</label>
+                            <input type="password" class="input-xlarge" data-bind="value: data.AUTHENTICATION.PASSWORD">
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <!-- ko if: action == "LOCAL_WS_PROXY_SERVERS_ADD" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_WS_PROXY_SERVERS_ADD">ADD</button>
+                <!-- /ko -->
+                <!-- ko if: action == "LOCAL_WS_PROXY_SERVERS_UPDATE" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_WS_PROXY_SERVERS_UPDATE">UPDATE</button>
+                <!-- /ko -->
+                <button type="button" class="btn input-medium" data-bind="click: cancel">CANCEL</button>
+            </div>
         </script>
         
         <script type="text/html" id="TEMPLATE_REMOTE_SSH">
-            <p>
+            <div>
                 <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_SSH_UPDATE">UPDATE</button>
-            </p>
-            <p>
+            </div>
+            <div class="block1">
                 <h3>1 LOGGER</h3>
-                <p>
-                    <label>LEVEL</label>
-                    <select data-bind="value: data.LOGGER.LEVEL">
-                        <option></option>
-                        <option>DEBUG</option>
-                        <option>INFO</option>
-                        <option>WARNING</option>
-                        <option>ERROR</option>
-                        <option>CRITICAL</option>
-                    </select>
-                </p>
-                <h3>2 REMOTE PROXY SERVER</h3>
-                <p>
-                    <label>ADDRESS</label>
-                    <input type="text" class="input-xlarge" data-bind="value: data.REMOTE_PROXY_SERVER.ADDRESS">
-                    <label>PORT</label>
-                    <input type="text" class="input-xlarge" data-bind="value: data.REMOTE_PROXY_SERVER.PORT">
-                </p>
-                <h3>2.1 AUTHENTICATION</h3>
-                <div data-bind="template: {name: template_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS().name(), data: template_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS().data()}">
+                <div class="block2">
+                    <p>
+                        <label>LEVEL</label>
+                        <select data-bind="value: data.LOGGER.LEVEL">
+                            <option></option>
+                            <option>DEBUG</option>
+                            <option>INFO</option>
+                            <option>WARNING</option>
+                            <option>ERROR</option>
+                            <option>CRITICAL</option>
+                        </select>
+                    </p>
                 </div>
-                <h3>2.2 KEY</h3>
-                <h3>2.2.1 PUBLIC</h3>
-                <p>
-                    <label>FILE</label>
-                    <input type="text" class="input-xlarge" data-bind="value: data.REMOTE_PROXY_SERVER.KEY.PUBLIC.FILE">
-                    <label>PASSPHRASE</label>
-                    <input type="text" class="input-xlarge" data-bind="value: data.REMOTE_PROXY_SERVER.KEY.PUBLIC.PASSPHRASE">
-                </p>
-                <h3>2.2.1 PRIVATE</h3>
-                <p>
-                    <label>FILE</label>
-                    <input type="text" class="input-xlarge" data-bind="value: data.REMOTE_PROXY_SERVER.KEY.PRIVATE.FILE">
-                    <label>PASSPHRASE</label>
-                    <input type="text" class="input-xlarge" data-bind="value: data.REMOTE_PROXY_SERVER.KEY.PRIVATE.PASSPHRASE">
-                </p>
-                <h3>3 PROXY SERVER</h3>
-                <p>
-                    <label>TYPE</label>
-                    <select data-bind="value: data.PROXY_SERVER.TYPE">
-                        <option></option>
-                        <option>HTTP</option>
-                        <option>SOCKS5</option>
-                    </select>
-                    <label>ADDRESS</label>
-                    <input type="text" class="input-xlarge" data-bind="value: data.PROXY_SERVER.ADDRESS">
-                    <label>PORT</label>
-                    <input type="text" class="input-xlarge" data-bind="value: data.PROXY_SERVER.PORT">
-                </p>
-                <h3>3.1 AUTHENTICATION</h3>
-                <p>
-                    <label>USERNAME</label>
-                    <input type="text" class="input-xlarge" data-bind="value: data.PROXY_SERVER.AUTHENTICATION.USERNAME">
-                    <label>PASSWORD</label>
-                    <input type="password" class="input-xlarge" data-bind="value: data.PROXY_SERVER.AUTHENTICATION.PASSWORD">
-                </p>
-            </p>
-            <p>
+                <h3>2 REMOTE PROXY SERVER</h3>
+                <div class="block2">
+                    <p>
+                        <label>ADDRESS</label>
+                        <input type="text" class="input-xlarge" data-bind="value: data.REMOTE_PROXY_SERVER.ADDRESS">
+                        <label>PORT</label>
+                        <input type="text" class="input-xlarge" data-bind="value: data.REMOTE_PROXY_SERVER.PORT">
+                    </p>
+                    <h3>2.1 AUTHENTICATION</h3>
+                    <div class="block2">
+                        <div data-bind="template: {name: template_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS().name(), data: template_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS().data()}">
+                        </div>
+                    </div>
+                    <h3>2.2 KEY</h3>
+                    <div class="block2">
+                        <h3>2.2.1 PUBLIC</h3>
+                        <div class="block2">
+                            <p>
+                                <label>FILE</label>
+                                <input type="text" class="input-xlarge" data-bind="value: data.REMOTE_PROXY_SERVER.KEY.PUBLIC.FILE">
+                                <label>PASSPHRASE</label>
+                                <input type="text" class="input-xlarge" data-bind="value: data.REMOTE_PROXY_SERVER.KEY.PUBLIC.PASSPHRASE">
+                            </p>
+                        </div>
+                        <h3>2.2.1 PRIVATE</h3>
+                        <div class="block2">
+                            <p>
+                                <label>FILE</label>
+                                <input type="text" class="input-xlarge" data-bind="value: data.REMOTE_PROXY_SERVER.KEY.PRIVATE.FILE">
+                                <label>PASSPHRASE</label>
+                                <input type="text" class="input-xlarge" data-bind="value: data.REMOTE_PROXY_SERVER.KEY.PRIVATE.PASSPHRASE">
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <h3>3 PROXY SERVERS</h3>
+                <div class="block2">
+                    <div data-bind="template: {name: template_REMOTE_SSH_PROXY_SERVERS().name(), data: template_REMOTE_SSH_PROXY_SERVERS().data()}">
+                    </div>
+                </div>
+            </div>
+            <div>
                 <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_SSH_UPDATE">UPDATE</button>
-            </p>
+            </div>
         </script>
         
         <script type="text/html" id="TEMPLATE_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS">
@@ -601,7 +859,7 @@
         </script>
         
         <script type="text/html" id="TEMPLATE_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION">
-            <p>
+            <div>
                 <!-- ko if: action == "REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD" -->
                     <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD">ADD</button>
                 <!-- /ko -->
@@ -609,17 +867,23 @@
                     <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE">UPDATE</button>
                 <!-- /ko -->
                 <button type="button" class="btn input-medium" data-bind="click: cancel">CANCEL</button>
-            </p>
-            <p>
-                <label>USERNAME</label>
-                <input type="text" class="input-xlarge" data-bind="value: data.USERNAME">
-                <label>PASSWORD</label>
-                <input type="password" class="input-xlarge" data-bind="value: data.PASSWORD">
-            </p>
-            <h3>2.1.1 KEYS</h3>
-            <div data-bind="template: {name: template_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS().name(), data: template_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS().data()}">
             </div>
-            <p>
+            <div class="block1">
+                <div class="block2">
+                    <p>
+                        <label>USERNAME</label>
+                        <input type="text" class="input-xlarge" data-bind="value: data.USERNAME">
+                        <label>PASSWORD</label>
+                        <input type="password" class="input-xlarge" data-bind="value: data.PASSWORD">
+                    </p>
+                    <h3>2.1.1 KEYS</h3>
+                    <div class="block2">
+                        <div data-bind="template: {name: template_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS().name(), data: template_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS().data()}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div>
                 <!-- ko if: action == "REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD" -->
                     <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD">ADD</button>
                 <!-- /ko -->
@@ -627,7 +891,7 @@
                     <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE">UPDATE</button>
                 <!-- /ko -->
                 <button type="button" class="btn input-medium" data-bind="click: cancel">CANCEL</button>
-            </p>
+            </div>
         </script>
         
         <script type="text/html" id="TEMPLATE_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS">
@@ -667,7 +931,7 @@
         </script>
         
         <script type="text/html" id="TEMPLATE_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEY">
-            <p>
+            <div>
                 <!-- ko if: action == "REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_ADD" -->
                     <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_ADD">ADD</button>
                 <!-- /ko -->
@@ -675,15 +939,19 @@
                     <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_UPDATE">UPDATE</button>
                 <!-- /ko -->
                 <button type="button" class="btn input-medium" data-bind="click: cancel">CANCEL</button>
-            </p>
-            <h3>2.1.1.1 PUBLIC</h3>
-            <p>
-                <label>FILE</label>
-                <input type="text" class="input-xlarge" data-bind="value: data.PUBLIC.FILE">
-                <label>PASSPHRASE</label>
-                <input type="password" class="input-xlarge" data-bind="value: data.PUBLIC.PASSPHRASE">
-            </p>
-            <p>
+            </div>
+            <div class="block1">
+                <h3>2.1.1.1 PUBLIC</h3>
+                <div class="block2">
+                    <p>
+                        <label>FILE</label>
+                        <input type="text" class="input-xlarge" data-bind="value: data.PUBLIC.FILE">
+                        <label>PASSPHRASE</label>
+                        <input type="password" class="input-xlarge" data-bind="value: data.PUBLIC.PASSPHRASE">
+                    </p>
+                </div>
+            </div>
+            <div>
                 <!-- ko if: action == "REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_ADD" -->
                     <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_ADD">ADD</button>
                 <!-- /ko -->
@@ -691,76 +959,155 @@
                     <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_UPDATE">UPDATE</button>
                 <!-- /ko -->
                 <button type="button" class="btn input-medium" data-bind="click: cancel">CANCEL</button>
+            </div>
+        </script>
+        
+        <script type="text/html" id="TEMPLATE_REMOTE_SSH_PROXY_SERVERS">
+            <p>
+                <button type="button" class="btn input-medium" data-bind="click: load_REMOTE_SSH_PROXY_SERVERS_ADD">ADD</button>
+                <!-- ko if: data.PROXY_SERVERS().length > 0 -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_SSH_PROXY_SERVERS_REMOVE_ALL">REMOVE ALL</button>
+                <!-- /ko -->
             </p>
+            <!-- ko if: data.PROXY_SERVERS().length > 0 -->
+                <p>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th style="width: 50%;">ADDRESS</th>
+                                <th style="width: 50%;">PORT</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody data-bind="foreach: data.PROXY_SERVERS">
+                            <tr>
+                                <td data-bind="text: $index() + 1"></td>
+                                <td data-bind="text: ADDRESS"></td>
+                                <td data-bind="text: PORT"></td>
+                                <td>
+                                    <button type="button" class="btn input-medium" data-bind="click: $parent.load_REMOTE_SSH_PROXY_SERVERS_UPDATE">UPDATE</button>
+                                    <button type="button" class="btn input-medium" data-bind="click: $parent.action_REMOTE_SSH_PROXY_SERVERS_REMOVE">REMOVE</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </p>
+                <p>
+                    <button type="button" class="btn input-medium" data-bind="click: load_REMOTE_SSH_PROXY_SERVERS_ADD">ADD</button>
+                    <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_SSH_PROXY_SERVERS_REMOVE_ALL">REMOVE ALL</button>
+                </p>
+            <!-- /ko -->
+        </script>
+        
+        <script type="text/html" id="TEMPLATE_REMOTE_SSH_PROXY_SERVER">
+            <div>
+                <!-- ko if: action == "REMOTE_SSH_PROXY_SERVERS_ADD" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_SSH_PROXY_SERVERS_ADD">ADD</button>
+                <!-- /ko -->
+                <!-- ko if: action == "REMOTE_SSH_PROXY_SERVERS_UPDATE" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_SSH_PROXY_SERVERS_UPDATE">UPDATE</button>
+                <!-- /ko -->
+                <button type="button" class="btn input-medium" data-bind="click: cancel">CANCEL</button>
+            </div>
+            <div class="block1">
+                <div class="block2">
+                    <p>
+                        <label>TYPE</label>
+                        <select data-bind="value: data.TYPE">
+                            <option></option>
+                            <option>HTTP</option>
+                            <option>SOCKS5</option>
+                        </select>
+                        <label>ADDRESS</label>
+                        <input type="text" class="input-xlarge" data-bind="value: data.ADDRESS">
+                        <label>PORT</label>
+                        <input type="text" class="input-xlarge" data-bind="value: data.PORT">
+                    </p>
+                    <h3>3.1 AUTHENTICATION</h3>
+                    <div class="block2">
+                        <p>
+                            <label>USERNAME</label>
+                            <input type="text" class="input-xlarge" data-bind="value: data.AUTHENTICATION.USERNAME">
+                            <label>PASSWORD</label>
+                            <input type="password" class="input-xlarge" data-bind="value: data.AUTHENTICATION.PASSWORD">
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <!-- ko if: action == "REMOTE_SSH_PROXY_SERVERS_ADD" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_SSH_PROXY_SERVERS_ADD">ADD</button>
+                <!-- /ko -->
+                <!-- ko if: action == "REMOTE_SSH_PROXY_SERVERS_UPDATE" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_SSH_PROXY_SERVERS_UPDATE">UPDATE</button>
+                <!-- /ko -->
+                <button type="button" class="btn input-medium" data-bind="click: cancel">CANCEL</button>
+            </div>
         </script>
         
         <script type="text/html" id="TEMPLATE_REMOTE_WS">
-            <p>
+            <div>
                 <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_WS_UPDATE">UPDATE</button>
-            </p>
-            <p>
+            </div>
+            <div class="block1">
                 <h3>1 LOGGER</h3>
-                <p>
-                    <label>LEVEL</label>
-                    <select data-bind="value: data.LOGGER.LEVEL">
-                        <option></option>
-                        <option>DEBUG</option>
-                        <option>INFO</option>
-                        <option>WARNING</option>
-                        <option>ERROR</option>
-                        <option>CRITICAL</option>
-                    </select>
-                </p>
-                <h3>2 REMOTE PROXY SERVER</h3>
-                <p>
-                    <label>TYPE</label>
-                    <select data-bind="value: data.REMOTE_PROXY_SERVER.TYPE">
-                        <option></option>
-                        <option>HTTP</option>
-                        <option>HTTPS</option>
-                    </select>
-                    <label>ADDRESS</label>
-                    <input type="text" class="input-xlarge" data-bind="value: data.REMOTE_PROXY_SERVER.ADDRESS">
-                    <label>PORT</label>
-                    <input type="text" class="input-xlarge" data-bind="value: data.REMOTE_PROXY_SERVER.PORT">
-                </p>
-                <h3>2.1 AUTHENTICATION</h3>
-                <div data-bind="template: {name: template_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS().name(), data: template_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS().data()}">
+                <div class="block2">
+                    <p>
+                        <label>LEVEL</label>
+                        <select data-bind="value: data.LOGGER.LEVEL">
+                            <option></option>
+                            <option>DEBUG</option>
+                            <option>INFO</option>
+                            <option>WARNING</option>
+                            <option>ERROR</option>
+                            <option>CRITICAL</option>
+                        </select>
+                    </p>
                 </div>
-                <h3>2.2 CERTIFICATE</h3>
-                <p>
-                    <label>FILE</label>
-                    <input type="text" class="input-xlarge" data-bind="value: data.REMOTE_PROXY_SERVER.CERTIFICATE.FILE">
-                </p>
-                <h3>2.2.1 KEY</h3>
-                <p>
-                    <label>FILE</label>
-                    <input type="text" class="input-xlarge" data-bind="value: data.REMOTE_PROXY_SERVER.CERTIFICATE.KEY.FILE">
-                </p>
-                <h3>3 PROXY SERVER</h3>
-                <p>
-                    <label>TYPE</label>
-                    <select data-bind="value: data.PROXY_SERVER.TYPE">
-                        <option></option>
-                        <option>HTTP</option>
-                        <option>SOCKS5</option>
-                    </select>
-                    <label>ADDRESS</label>
-                    <input type="text" class="input-xlarge" data-bind="value: data.PROXY_SERVER.ADDRESS">
-                    <label>PORT</label>
-                    <input type="text" class="input-xlarge" data-bind="value: data.PROXY_SERVER.PORT">
-                </p>
-                <h3>3.1 AUTHENTICATION</h3>
-                <p>
-                    <label>USERNAME</label>
-                    <input type="text" class="input-xlarge" data-bind="value: data.PROXY_SERVER.AUTHENTICATION.USERNAME">
-                    <label>PASSWORD</label>
-                    <input type="password" class="input-xlarge" data-bind="value: data.PROXY_SERVER.AUTHENTICATION.PASSWORD">
-                </p>
-            </p>
-            <p>
+                <h3>2 REMOTE PROXY SERVER</h3>
+                <div class="block2">
+                    <p>
+                        <label>TYPE</label>
+                        <select data-bind="value: data.REMOTE_PROXY_SERVER.TYPE">
+                            <option></option>
+                            <option>HTTP</option>
+                            <option>HTTPS</option>
+                        </select>
+                        <label>ADDRESS</label>
+                        <input type="text" class="input-xlarge" data-bind="value: data.REMOTE_PROXY_SERVER.ADDRESS">
+                        <label>PORT</label>
+                        <input type="text" class="input-xlarge" data-bind="value: data.REMOTE_PROXY_SERVER.PORT">
+                    </p>
+                    <h3>2.1 AUTHENTICATION</h3>
+                    <div class="block2">
+                        <div data-bind="template: {name: template_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS().name(), data: template_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS().data()}">
+                        </div>
+                    </div>
+                    <h3>2.2 CERTIFICATE</h3>
+                    <div class="block2">
+                        <p>
+                            <label>FILE</label>
+                            <input type="text" class="input-xlarge" data-bind="value: data.REMOTE_PROXY_SERVER.CERTIFICATE.FILE">
+                        </p>
+                        <h3>2.2.1 KEY</h3>
+                        <div class="block2">
+                            <p>
+                                <label>FILE</label>
+                                <input type="text" class="input-xlarge" data-bind="value: data.REMOTE_PROXY_SERVER.CERTIFICATE.KEY.FILE">
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <h3>3 PROXY SERVERS</h3>
+                <div class="block2">
+                    <div data-bind="template: {name: template_REMOTE_WS_PROXY_SERVERS().name(), data: template_REMOTE_WS_PROXY_SERVERS().data()}">
+                    </div>
+                </div>
+            </div>
+            <div>
                 <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_WS_UPDATE">UPDATE</button>
-            </p>
+            </div>
         </script>
         
         <script type="text/html" id="TEMPLATE_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS">
@@ -800,7 +1147,7 @@
         </script>
         
         <script type="text/html" id="TEMPLATE_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATION">
-            <p>
+            <div>
                 <!-- ko if: action == "REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD" -->
                     <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD">ADD</button>
                 <!-- /ko -->
@@ -808,14 +1155,18 @@
                     <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE">UPDATE</button>
                 <!-- /ko -->
                 <button type="button" class="btn input-medium" data-bind="click: cancel">CANCEL</button>
-            </p>
-            <p>
-                <label>USERNAME</label>
-                <input type="text" class="input-xlarge" data-bind="value: data.USERNAME">
-                <label>PASSWORD</label>
-                <input type="password" class="input-xlarge" data-bind="value: data.PASSWORD">
-            </p>
-            <p>
+            </div>
+            <div class="block1">
+                <div class="block2">
+                    <p>
+                        <label>USERNAME</label>
+                        <input type="text" class="input-xlarge" data-bind="value: data.USERNAME">
+                        <label>PASSWORD</label>
+                        <input type="password" class="input-xlarge" data-bind="value: data.PASSWORD">
+                    </p>
+                </div>
+            </div>
+            <div>
                 <!-- ko if: action == "REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD" -->
                     <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD">ADD</button>
                 <!-- /ko -->
@@ -823,7 +1174,91 @@
                     <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE">UPDATE</button>
                 <!-- /ko -->
                 <button type="button" class="btn input-medium" data-bind="click: cancel">CANCEL</button>
+            </div>
+        </script>
+        
+        <script type="text/html" id="TEMPLATE_REMOTE_WS_PROXY_SERVERS">
+            <p>
+                <button type="button" class="btn input-medium" data-bind="click: load_REMOTE_WS_PROXY_SERVERS_ADD">ADD</button>
+                <!-- ko if: data.PROXY_SERVERS().length > 0 -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_WS_PROXY_SERVERS_REMOVE_ALL">REMOVE ALL</button>
+                <!-- /ko -->
             </p>
+            <!-- ko if: data.PROXY_SERVERS().length > 0 -->
+                <p>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th style="width: 50%;">ADDRESS</th>
+                                <th style="width: 50%;">PORT</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody data-bind="foreach: data.PROXY_SERVERS">
+                            <tr>
+                                <td data-bind="text: $index() + 1"></td>
+                                <td data-bind="text: ADDRESS"></td>
+                                <td data-bind="text: PORT"></td>
+                                <td>
+                                    <button type="button" class="btn input-medium" data-bind="click: $parent.load_REMOTE_WS_PROXY_SERVERS_UPDATE">UPDATE</button>
+                                    <button type="button" class="btn input-medium" data-bind="click: $parent.action_REMOTE_WS_PROXY_SERVERS_REMOVE">REMOVE</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </p>
+                <p>
+                    <button type="button" class="btn input-medium" data-bind="click: load_REMOTE_WS_PROXY_SERVERS_ADD">ADD</button>
+                    <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_WS_PROXY_SERVERS_REMOVE_ALL">REMOVE ALL</button>
+                </p>
+            <!-- /ko -->
+        </script>
+        
+        <script type="text/html" id="TEMPLATE_REMOTE_WS_PROXY_SERVER">
+            <div>
+                <!-- ko if: action == "REMOTE_WS_PROXY_SERVERS_ADD" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_WS_PROXY_SERVERS_ADD">ADD</button>
+                <!-- /ko -->
+                <!-- ko if: action == "REMOTE_WS_PROXY_SERVERS_UPDATE" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_WS_PROXY_SERVERS_UPDATE">UPDATE</button>
+                <!-- /ko -->
+                <button type="button" class="btn input-medium" data-bind="click: cancel">CANCEL</button>
+            </div>
+            <div class="block1">
+                <div class="block2">
+                    <p>
+                        <label>TYPE</label>
+                        <select data-bind="value: data.TYPE">
+                            <option></option>
+                            <option>HTTP</option>
+                            <option>SOCKS5</option>
+                        </select>
+                        <label>ADDRESS</label>
+                        <input type="text" class="input-xlarge" data-bind="value: data.ADDRESS">
+                        <label>PORT</label>
+                        <input type="text" class="input-xlarge" data-bind="value: data.PORT">
+                    </p>
+                    <h3>3.1 AUTHENTICATION</h3>
+                    <div class="block2">
+                        <p>
+                            <label>USERNAME</label>
+                            <input type="text" class="input-xlarge" data-bind="value: data.AUTHENTICATION.USERNAME">
+                            <label>PASSWORD</label>
+                            <input type="password" class="input-xlarge" data-bind="value: data.AUTHENTICATION.PASSWORD">
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <!-- ko if: action == "REMOTE_WS_PROXY_SERVERS_ADD" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_WS_PROXY_SERVERS_ADD">ADD</button>
+                <!-- /ko -->
+                <!-- ko if: action == "REMOTE_WS_PROXY_SERVERS_UPDATE" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_WS_PROXY_SERVERS_UPDATE">UPDATE</button>
+                <!-- /ko -->
+                <button type="button" class="btn input-medium" data-bind="click: cancel">CANCEL</button>
+            </div>
         </script>
         
         <script type="text/javascript" src="js/app.js"></script>

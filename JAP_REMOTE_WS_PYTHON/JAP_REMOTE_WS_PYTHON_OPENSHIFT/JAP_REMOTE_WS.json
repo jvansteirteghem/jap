@@ -8,10 +8,12 @@
         "TYPE": "HTTPS",
         "AUTHENTICATION":
         [
+            /*
             {
                 "USERNAME": "",
                 "PASSWORD": ""
             }
+            */
         ]
     }
 }

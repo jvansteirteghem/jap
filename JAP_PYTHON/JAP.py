@@ -10,7 +10,6 @@ You should have received a copy of the GNU General Public License along with thi
 """
 
 from twisted.internet import reactor
-import json
 import logging
 import JAP.JAP
 
@@ -18,9 +17,7 @@ file = open("./JAP.json", "r")
 data = file.read()
 file.close()
 
-decoder = json.JSONDecoder()
-configuration = decoder.decode(data)
-
+configuration = JAP.JAP.decodeJSON(data)
 JAP.JAP.setDefaultConfiguration(configuration)
 
 logging.basicConfig()

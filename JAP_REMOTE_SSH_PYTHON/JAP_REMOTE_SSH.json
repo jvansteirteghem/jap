@@ -9,6 +9,7 @@
         "PORT": 0,
         "AUTHENTICATION":
         [
+            /*
             {
                 "USERNAME": "",
                 "PASSWORD": "",
@@ -23,6 +24,7 @@
                     }
                 ]
             }
+            */
         ],
         "KEY":
         {
@@ -38,15 +40,19 @@
             }
         }
     },
-    "PROXY_SERVER":
-    {
-        "TYPE": "",
-        "ADDRESS": "",
-        "PORT": 0,
-        "AUTHENTICATION":
+    "PROXY_SERVERS":
+    [
+        /*
         {
-            "USERNAME": "",
-            "PASSWORD": ""
+            "TYPE": "",
+            "ADDRESS": "",
+            "PORT": 0,
+            "AUTHENTICATION":
+            {
+                "USERNAME": "",
+                "PASSWORD": ""
+            }
         }
-    }
+        */
+    ]
 }

@@ -8,26 +8,14 @@ function LOCAL_ViewModel(parent) {
     var self = this;
     self.parent = parent;
     self.defaultData = {
-        "LOGGER":
-        {
+        "LOGGER": {
             "LEVEL": ""
         },
-        "LOCAL_PROXY_SERVER":
-        {
+        "LOCAL_PROXY_SERVER": {
             "ADDRESS": "",
             "PORT": 0
         },
-        "PROXY_SERVER":
-        {
-            "TYPE": "",
-            "ADDRESS": "",
-            "PORT": 0,
-            "AUTHENTICATION":
-            {
-                "USERNAME": "",
-                "PASSWORD": ""
-            }
-        }
+        "PROXY_SERVERS": []
     }
     self.data = ko.mapping.fromJS(self.defaultData);
     
@@ -40,10 +28,12 @@ function LOCAL_ViewModel(parent) {
             data.LOCAL_PROXY_SERVER.PORT = 0;
         }
         
-        if($.isNumeric(data.PROXY_SERVER.PORT)) {
-            data.PROXY_SERVER.PORT = Number(data.PROXY_SERVER.PORT);
-        } else {
-            data.PROXY_SERVER.PORT = 0;
+        for(var i = 0; i < data.PROXY_SERVERS.length; i = i + 1) {
+            if($.isNumeric(data.PROXY_SERVERS[i].PORT)) {
+                data.PROXY_SERVERS[i].PORT = Number(data.PROXY_SERVERS[i].PORT);
+            } else {
+                data.PROXY_SERVERS[i].PORT = 0;
+            }
         }
         
         $.ajax({
@@ -64,6 +54,38 @@ function LOCAL_ViewModel(parent) {
         )
     }
     
+    self.action_LOCAL_PROXY_SERVERS_ADD = function(data) {
+        self.data.PROXY_SERVERS.push(data);
+    }
+    
+    self.action_LOCAL_PROXY_SERVERS_UPDATE = function(selectedData, data) {
+        ko.mapping.fromJS(ko.mapping.toJS(data), {}, selectedData);
+    }
+    
+    self.action_LOCAL_PROXY_SERVERS_REMOVE = function(selectedData) {
+        self.data.PROXY_SERVERS.remove(selectedData);
+    }
+    
+    self.action_LOCAL_PROXY_SERVERS_REMOVE_ALL = function() {
+        self.data.PROXY_SERVERS.removeAll();
+    }
+    
+    self.load_LOCAL_PROXY_SERVERS_ADD = function() {
+        self.template_LOCAL_PROXY_SERVERS(new Template("TEMPLATE_LOCAL_PROXY_SERVER", new LOCAL_PROXY_SERVERS_ADD_ViewModel(self)));
+    }
+    
+    self.load_LOCAL_PROXY_SERVERS_UPDATE = function(data) {
+        self.template_LOCAL_PROXY_SERVERS(new Template("TEMPLATE_LOCAL_PROXY_SERVER", new LOCAL_PROXY_SERVERS_UPDATE_ViewModel(self, data)));
+    }
+    
+    self.template_LOCAL_PROXY_SERVERS = ko.observable();
+    
+    self.load_LOCAL_PROXY_SERVERS = function() {
+        self.template_LOCAL_PROXY_SERVERS(new Template("TEMPLATE_LOCAL_PROXY_SERVERS", self));
+    }
+    
+    self.load_LOCAL_PROXY_SERVERS();
+    
     $.ajax({
         "type": "GET",
         "url": "/API",
@@ -83,32 +105,62 @@ function LOCAL_ViewModel(parent) {
     );
 }
 
+function LOCAL_PROXY_SERVERS_ADD_ViewModel(parent) {
+    var self = this;
+    self.parent = parent;
+    self.defaultData = {
+        "TYPE": "",
+        "ADDRESS": "",
+        "PORT": 0,
+        "AUTHENTICATION": {
+            "USERNAME": "",
+            "PASSWORD": ""
+        }
+    }
+    self.data = ko.mapping.fromJS(self.defaultData);
+    self.action = "LOCAL_PROXY_SERVERS_ADD";
+    
+    self.action_LOCAL_PROXY_SERVERS_ADD = function() {
+        self.parent.action_LOCAL_PROXY_SERVERS_ADD(self.data);
+        self.parent.load_LOCAL_PROXY_SERVERS();
+    }
+    
+    self.cancel = function() {
+        self.parent.load_LOCAL_PROXY_SERVERS();
+    }
+}
+
+function LOCAL_PROXY_SERVERS_UPDATE_ViewModel(parent, data) {
+    var self = this;
+    self.parent = parent;
+    self.selectedData = data;
+    self.data = ko.mapping.fromJS(ko.mapping.toJS(self.selectedData));
+    self.action = "LOCAL_PROXY_SERVERS_UPDATE";
+    
+    self.action_LOCAL_PROXY_SERVERS_UPDATE = function() {
+        self.parent.action_LOCAL_PROXY_SERVERS_UPDATE(self.selectedData, self.data);
+        self.parent.load_LOCAL_PROXY_SERVERS();
+    }
+    
+    self.cancel = function() {
+        self.parent.load_LOCAL_PROXY_SERVERS();
+    }
+}
+
 function LOCAL_SSH_ViewModel(parent) {
     var self = this;
     self.parent = parent;
     self.defaultData = {
-        "LOGGER":
-        {
+        "LOGGER": {
             "LEVEL": ""
         },
-        "LOCAL_PROXY_SERVER":
-        {
+        "LOCAL_PROXY_SERVER": {
             "ADDRESS": "",
             "PORT": 0,
             "KEYS": []
         },
         "REMOTE_PROXY_SERVERS":[],
-        "PROXY_SERVER":
-        {
-            "TYPE": "",
-            "ADDRESS": "",
-            "PORT": 0,
-            "AUTHENTICATION":
-            {
-                "USERNAME": "",
-                "PASSWORD": ""
-            }
-        }
+        "PROXY_SERVERS": []
     }
     self.data = ko.mapping.fromJS(self.defaultData);
     
@@ -129,10 +181,12 @@ function LOCAL_SSH_ViewModel(parent) {
             }
         }
         
-        if($.isNumeric(data.PROXY_SERVER.PORT)) {
-            data.PROXY_SERVER.PORT = Number(data.PROXY_SERVER.PORT);
-        } else {
-            data.PROXY_SERVER.PORT = 0;
+        for(var i = 0; i < data.PROXY_SERVERS.length; i = i + 1) {
+            if($.isNumeric(data.PROXY_SERVERS[i].PORT)) {
+                data.PROXY_SERVERS[i].PORT = Number(data.PROXY_SERVERS[i].PORT);
+            } else {
+                data.PROXY_SERVERS[i].PORT = 0;
+            }
         }
         
         $.ajax({
@@ -185,6 +239,22 @@ function LOCAL_SSH_ViewModel(parent) {
         self.data.REMOTE_PROXY_SERVERS.removeAll();
     }
     
+    self.action_LOCAL_SSH_PROXY_SERVERS_ADD = function(data) {
+        self.data.PROXY_SERVERS.push(data);
+    }
+    
+    self.action_LOCAL_SSH_PROXY_SERVERS_UPDATE = function(selectedData, data) {
+        ko.mapping.fromJS(ko.mapping.toJS(data), {}, selectedData);
+    }
+    
+    self.action_LOCAL_SSH_PROXY_SERVERS_REMOVE = function(selectedData) {
+        self.data.PROXY_SERVERS.remove(selectedData);
+    }
+    
+    self.action_LOCAL_SSH_PROXY_SERVERS_REMOVE_ALL = function() {
+        self.data.PROXY_SERVERS.removeAll();
+    }
+    
     self.load_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_ADD = function() {
         self.template_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS(new Template("TEMPLATE_LOCAL_SSH_LOCAL_PROXY_SERVER_KEY", new LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_ADD_ViewModel(self)));
     }
@@ -199,6 +269,14 @@ function LOCAL_SSH_ViewModel(parent) {
     
     self.load_LOCAL_SSH_REMOTE_PROXY_SERVERS_UPDATE = function(data) {
         self.template_LOCAL_SSH_REMOTE_PROXY_SERVERS(new Template("TEMPLATE_LOCAL_SSH_REMOTE_PROXY_SERVER", new LOCAL_SSH_REMOTE_PROXY_SERVERS_UPDATE_ViewModel(self, data)));
+    }
+    
+    self.load_LOCAL_SSH_PROXY_SERVERS_ADD = function() {
+        self.template_LOCAL_SSH_PROXY_SERVERS(new Template("TEMPLATE_LOCAL_SSH_PROXY_SERVER", new LOCAL_SSH_PROXY_SERVERS_ADD_ViewModel(self)));
+    }
+    
+    self.load_LOCAL_SSH_PROXY_SERVERS_UPDATE = function(data) {
+        self.template_LOCAL_SSH_PROXY_SERVERS(new Template("TEMPLATE_LOCAL_SSH_PROXY_SERVER", new LOCAL_SSH_PROXY_SERVERS_UPDATE_ViewModel(self, data)));
     }
     
     self.template_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS = ko.observable();
@@ -216,6 +294,14 @@ function LOCAL_SSH_ViewModel(parent) {
     }
     
     self.load_LOCAL_SSH_REMOTE_PROXY_SERVERS();
+    
+    self.template_LOCAL_SSH_PROXY_SERVERS = ko.observable();
+    
+    self.load_LOCAL_SSH_PROXY_SERVERS = function() {
+        self.template_LOCAL_SSH_PROXY_SERVERS(new Template("TEMPLATE_LOCAL_SSH_PROXY_SERVERS", self));
+    }
+    
+    self.load_LOCAL_SSH_PROXY_SERVERS();
     
     $.ajax({
         "type": "GET",
@@ -240,13 +326,11 @@ function LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_ADD_ViewModel(parent) {
     var self = this;
     self.parent = parent;
     self.defaultData = {
-        "PUBLIC": 
-        {
+        "PUBLIC": {
             "FILE": "",
             "PASSPHRASE": ""
         },
-        "PRIVATE": 
-        {
+        "PRIVATE": {
             "FILE": "",
             "PASSPHRASE": ""
         }
@@ -287,15 +371,12 @@ function LOCAL_SSH_REMOTE_PROXY_SERVERS_ADD_ViewModel(parent) {
     self.defaultData = {
         "ADDRESS": "",
         "PORT": 0,
-        "AUTHENTICATION":
-        {
+        "AUTHENTICATION": {
             "USERNAME": "",
             "PASSWORD": ""
         },
-        "KEY": 
-        {
-            "AUTHENTICATION": 
-            {
+        "KEY": {
+            "AUTHENTICATION": {
                 "FINGERPRINT": ""
             }
         }
@@ -330,31 +411,61 @@ function LOCAL_SSH_REMOTE_PROXY_SERVERS_UPDATE_ViewModel(parent, data) {
     }
 }
 
+function LOCAL_SSH_PROXY_SERVERS_ADD_ViewModel(parent) {
+    var self = this;
+    self.parent = parent;
+    self.defaultData = {
+        "TYPE": "",
+        "ADDRESS": "",
+        "PORT": 0,
+        "AUTHENTICATION": {
+            "USERNAME": "",
+            "PASSWORD": ""
+        }
+    }
+    self.data = ko.mapping.fromJS(self.defaultData);
+    self.action = "LOCAL_SSH_PROXY_SERVERS_ADD";
+    
+    self.action_LOCAL_SSH_PROXY_SERVERS_ADD = function() {
+        self.parent.action_LOCAL_SSH_PROXY_SERVERS_ADD(self.data);
+        self.parent.load_LOCAL_SSH_PROXY_SERVERS();
+    }
+    
+    self.cancel = function() {
+        self.parent.load_LOCAL_SSH_PROXY_SERVERS();
+    }
+}
+
+function LOCAL_SSH_PROXY_SERVERS_UPDATE_ViewModel(parent, data) {
+    var self = this;
+    self.parent = parent;
+    self.selectedData = data;
+    self.data = ko.mapping.fromJS(ko.mapping.toJS(self.selectedData));
+    self.action = "LOCAL_SSH_PROXY_SERVERS_UPDATE";
+    
+    self.action_LOCAL_SSH_PROXY_SERVERS_UPDATE = function() {
+        self.parent.action_LOCAL_SSH_PROXY_SERVERS_UPDATE(self.selectedData, self.data);
+        self.parent.load_LOCAL_SSH_PROXY_SERVERS();
+    }
+    
+    self.cancel = function() {
+        self.parent.load_LOCAL_SSH_PROXY_SERVERS();
+    }
+}
+
 function LOCAL_WS_ViewModel(parent) {
     var self = this;
     self.parent = parent;
     self.defaultData = {
-        "LOGGER":
-        {
+        "LOGGER": {
             "LEVEL": ""
         },
-        "LOCAL_PROXY_SERVER":
-        {
+        "LOCAL_PROXY_SERVER": {
             "ADDRESS": "",
             "PORT": 0
         },
         "REMOTE_PROXY_SERVERS": [],
-        "PROXY_SERVER":
-        {
-            "TYPE": "",
-            "ADDRESS": "",
-            "PORT": 0,
-            "AUTHENTICATION":
-            {
-                "USERNAME": "",
-                "PASSWORD": ""
-            }
-        }
+        "PROXY_SERVERS": []
     }
     self.data = ko.mapping.fromJS(self.defaultData);
     
@@ -375,10 +486,12 @@ function LOCAL_WS_ViewModel(parent) {
             }
         }
         
-        if($.isNumeric(data.PROXY_SERVER.PORT)) {
-            data.PROXY_SERVER.PORT = Number(data.PROXY_SERVER.PORT);
-        } else {
-            data.PROXY_SERVER.PORT = 0;
+        for(var i = 0; i < data.PROXY_SERVERS.length; i = i + 1) {
+            if($.isNumeric(data.PROXY_SERVERS[i].PORT)) {
+                data.PROXY_SERVERS[i].PORT = Number(data.PROXY_SERVERS[i].PORT);
+            } else {
+                data.PROXY_SERVERS[i].PORT = 0;
+            }
         }
         
         $.ajax({
@@ -415,12 +528,36 @@ function LOCAL_WS_ViewModel(parent) {
         self.data.REMOTE_PROXY_SERVERS.removeAll();
     }
     
+    self.action_LOCAL_WS_PROXY_SERVERS_ADD = function(data) {
+        self.data.PROXY_SERVERS.push(data);
+    }
+    
+    self.action_LOCAL_WS_PROXY_SERVERS_UPDATE = function(selectedData, data) {
+        ko.mapping.fromJS(ko.mapping.toJS(data), {}, selectedData);
+    }
+    
+    self.action_LOCAL_WS_PROXY_SERVERS_REMOVE = function(selectedData) {
+        self.data.PROXY_SERVERS.remove(selectedData);
+    }
+    
+    self.action_LOCAL_WS_PROXY_SERVERS_REMOVE_ALL = function() {
+        self.data.PROXY_SERVERS.removeAll();
+    }
+    
     self.load_LOCAL_WS_REMOTE_PROXY_SERVERS_ADD = function() {
         self.template_LOCAL_WS_REMOTE_PROXY_SERVERS(new Template("TEMPLATE_LOCAL_WS_REMOTE_PROXY_SERVER", new LOCAL_WS_REMOTE_PROXY_SERVERS_ADD_ViewModel(self)));
     }
     
     self.load_LOCAL_WS_REMOTE_PROXY_SERVERS_UPDATE = function(data) {
         self.template_LOCAL_WS_REMOTE_PROXY_SERVERS(new Template("TEMPLATE_LOCAL_WS_REMOTE_PROXY_SERVER", new LOCAL_WS_REMOTE_PROXY_SERVERS_UPDATE_ViewModel(self, data)));
+    }
+    
+    self.load_LOCAL_WS_PROXY_SERVERS_ADD = function() {
+        self.template_LOCAL_WS_PROXY_SERVERS(new Template("TEMPLATE_LOCAL_WS_PROXY_SERVER", new LOCAL_WS_PROXY_SERVERS_ADD_ViewModel(self)));
+    }
+    
+    self.load_LOCAL_WS_PROXY_SERVERS_UPDATE = function(data) {
+        self.template_LOCAL_WS_PROXY_SERVERS(new Template("TEMPLATE_LOCAL_WS_PROXY_SERVER", new LOCAL_WS_PROXY_SERVERS_UPDATE_ViewModel(self, data)));
     }
     
     self.template_LOCAL_WS_REMOTE_PROXY_SERVERS = ko.observable();
@@ -430,6 +567,14 @@ function LOCAL_WS_ViewModel(parent) {
     }
     
     self.load_LOCAL_WS_REMOTE_PROXY_SERVERS();
+    
+    self.template_LOCAL_WS_PROXY_SERVERS = ko.observable();
+    
+    self.load_LOCAL_WS_PROXY_SERVERS = function() {
+        self.template_LOCAL_WS_PROXY_SERVERS(new Template("TEMPLATE_LOCAL_WS_PROXY_SERVERS", self));
+    }
+    
+    self.load_LOCAL_WS_PROXY_SERVERS();
     
     $.ajax({
         "type": "GET",
@@ -457,15 +602,12 @@ function LOCAL_WS_REMOTE_PROXY_SERVERS_ADD_ViewModel(parent) {
         "TYPE": "",
         "ADDRESS": "",
         "PORT": 0,
-        "AUTHENTICATION":
-        {
+        "AUTHENTICATION": {
             "USERNAME": "",
             "PASSWORD": ""
         },
-        "CERTIFICATE":
-        {
-            "AUTHENTICATION":
-            {
+        "CERTIFICATE": {
+            "AUTHENTICATION": {
                 "FILE": ""
             }
         }
@@ -500,44 +642,71 @@ function LOCAL_WS_REMOTE_PROXY_SERVERS_UPDATE_ViewModel(parent, data) {
     }
 }
 
+function LOCAL_WS_PROXY_SERVERS_ADD_ViewModel(parent) {
+    var self = this;
+    self.parent = parent;
+    self.defaultData = {
+        "TYPE": "",
+        "ADDRESS": "",
+        "PORT": 0,
+        "AUTHENTICATION": {
+            "USERNAME": "",
+            "PASSWORD": ""
+        }
+    }
+    self.data = ko.mapping.fromJS(self.defaultData);
+    self.action = "LOCAL_WS_PROXY_SERVERS_ADD";
+    
+    self.action_LOCAL_WS_PROXY_SERVERS_ADD = function() {
+        self.parent.action_LOCAL_WS_PROXY_SERVERS_ADD(self.data);
+        self.parent.load_LOCAL_WS_PROXY_SERVERS();
+    }
+    
+    self.cancel = function() {
+        self.parent.load_LOCAL_WS_PROXY_SERVERS();
+    }
+}
+
+function LOCAL_WS_PROXY_SERVERS_UPDATE_ViewModel(parent, data) {
+    var self = this;
+    self.parent = parent;
+    self.selectedData = data;
+    self.data = ko.mapping.fromJS(ko.mapping.toJS(self.selectedData));
+    self.action = "LOCAL_WS_PROXY_SERVERS_UPDATE";
+    
+    self.action_LOCAL_WS_PROXY_SERVERS_UPDATE = function() {
+        self.parent.action_LOCAL_WS_PROXY_SERVERS_UPDATE(self.selectedData, self.data);
+        self.parent.load_LOCAL_WS_PROXY_SERVERS();
+    }
+    
+    self.cancel = function() {
+        self.parent.load_LOCAL_WS_PROXY_SERVERS();
+    }
+}
+
 function REMOTE_SSH_ViewModel(parent) {
     var self = this;
     self.parent = parent;
     self.defaultData = {
-        "LOGGER":
-        {
+        "LOGGER": {
             "LEVEL": ""
         },
-        "REMOTE_PROXY_SERVER":
-        {
+        "REMOTE_PROXY_SERVER": {
             "ADDRESS": "",
             "PORT": 0,
             "AUTHENTICATION": [],
-            "KEY":
-            {
-                "PUBLIC":
-                {
+            "KEY": {
+                "PUBLIC": {
                     "FILE": "",
                     "PASSPHRASE": ""
                 },
-                "PRIVATE":
-                {
+                "PRIVATE": {
                     "FILE": "",
                     "PASSPHRASE": ""
                 }
             }
         },
-        "PROXY_SERVER":
-        {
-            "TYPE": "",
-            "ADDRESS": "",
-            "PORT": 0,
-            "AUTHENTICATION":
-            {
-                "USERNAME": "",
-                "PASSWORD": ""
-            }
-        }
+        "PROXY_SERVERS": []
     }
     self.data = ko.mapping.fromJS(self.defaultData);
     
@@ -550,10 +719,12 @@ function REMOTE_SSH_ViewModel(parent) {
             data.REMOTE_PROXY_SERVER.PORT = 0;
         }
         
-        if($.isNumeric(data.PROXY_SERVER.PORT)) {
-            data.PROXY_SERVER.PORT = Number(data.PROXY_SERVER.PORT);
-        } else {
-            data.PROXY_SERVER.PORT = 0;
+        for(var i = 0; i < data.PROXY_SERVERS.length; i = i + 1) {
+            if($.isNumeric(data.PROXY_SERVERS[i].PORT)) {
+                data.PROXY_SERVERS[i].PORT = Number(data.PROXY_SERVERS[i].PORT);
+            } else {
+                data.PROXY_SERVERS[i].PORT = 0;
+            }
         }
         
         $.ajax({
@@ -590,12 +761,36 @@ function REMOTE_SSH_ViewModel(parent) {
         self.data.REMOTE_PROXY_SERVER.AUTHENTICATION.removeAll();
     }
     
+    self.action_REMOTE_SSH_PROXY_SERVERS_ADD = function(data) {
+        self.data.PROXY_SERVERS.push(data);
+    }
+    
+    self.action_REMOTE_SSH_PROXY_SERVERS_UPDATE = function(selectedData, data) {
+        ko.mapping.fromJS(ko.mapping.toJS(data), {}, selectedData);
+    }
+    
+    self.action_REMOTE_SSH_PROXY_SERVERS_REMOVE = function(selectedData) {
+        self.data.PROXY_SERVERS.remove(selectedData);
+    }
+    
+    self.action_REMOTE_SSH_PROXY_SERVERS_REMOVE_ALL = function() {
+        self.data.PROXY_SERVERS.removeAll();
+    }
+    
     self.load_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD = function() {
         self.template_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS(new Template("TEMPLATE_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION", new REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD_ViewModel(self)));
     }
     
     self.load_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE = function(data) {
         self.template_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS(new Template("TEMPLATE_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION", new REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE_ViewModel(self, data)));
+    }
+    
+    self.load_REMOTE_SSH_PROXY_SERVERS_ADD = function() {
+        self.template_REMOTE_SSH_PROXY_SERVERS(new Template("TEMPLATE_REMOTE_SSH_PROXY_SERVER", new REMOTE_SSH_PROXY_SERVERS_ADD_ViewModel(self)));
+    }
+    
+    self.load_REMOTE_SSH_PROXY_SERVERS_UPDATE = function(data) {
+        self.template_REMOTE_SSH_PROXY_SERVERS(new Template("TEMPLATE_REMOTE_SSH_PROXY_SERVER", new REMOTE_SSH_PROXY_SERVERS_UPDATE_ViewModel(self, data)));
     }
     
     self.template_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS = ko.observable();
@@ -605,6 +800,14 @@ function REMOTE_SSH_ViewModel(parent) {
     }
     
     self.load_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS();
+    
+    self.template_REMOTE_SSH_PROXY_SERVERS = ko.observable();
+    
+    self.load_REMOTE_SSH_PROXY_SERVERS = function() {
+        self.template_REMOTE_SSH_PROXY_SERVERS(new Template("TEMPLATE_REMOTE_SSH_PROXY_SERVERS", self));
+    }
+    
+    self.load_REMOTE_SSH_PROXY_SERVERS();
     
     $.ajax({
         "type": "GET",
@@ -731,8 +934,7 @@ function REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_ADD_ViewModel(parent
     var self = this;
     self.parent = parent;
     self.defaultData = {
-        "PUBLIC":
-        {
+        "PUBLIC": {
             "FILE": "",
             "PASSPHRASE": ""
         }
@@ -767,40 +969,68 @@ function REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_UPDATE_ViewModel(par
     }
 }
 
+function REMOTE_SSH_PROXY_SERVERS_ADD_ViewModel(parent) {
+    var self = this;
+    self.parent = parent;
+    self.defaultData = {
+        "TYPE": "",
+        "ADDRESS": "",
+        "PORT": 0,
+        "AUTHENTICATION": {
+            "USERNAME": "",
+            "PASSWORD": ""
+        }
+    }
+    self.data = ko.mapping.fromJS(self.defaultData);
+    self.action = "REMOTE_SSH_PROXY_SERVERS_ADD";
+    
+    self.action_REMOTE_SSH_PROXY_SERVERS_ADD = function() {
+        self.parent.action_REMOTE_SSH_PROXY_SERVERS_ADD(self.data);
+        self.parent.load_REMOTE_SSH_PROXY_SERVERS();
+    }
+    
+    self.cancel = function() {
+        self.parent.load_REMOTE_SSH_PROXY_SERVERS();
+    }
+}
+
+function REMOTE_SSH_PROXY_SERVERS_UPDATE_ViewModel(parent, data) {
+    var self = this;
+    self.parent = parent;
+    self.selectedData = data;
+    self.data = ko.mapping.fromJS(ko.mapping.toJS(self.selectedData));
+    self.action = "REMOTE_SSH_PROXY_SERVERS_UPDATE";
+    
+    self.action_REMOTE_SSH_PROXY_SERVERS_UPDATE = function() {
+        self.parent.action_REMOTE_SSH_PROXY_SERVERS_UPDATE(self.selectedData, self.data);
+        self.parent.load_REMOTE_SSH_PROXY_SERVERS();
+    }
+    
+    self.cancel = function() {
+        self.parent.load_REMOTE_SSH_PROXY_SERVERS();
+    }
+}
+
 function REMOTE_WS_ViewModel(parent) {
     var self = this;
     self.parent = parent;
     self.defaultData = {
-        "LOGGER":
-        {
+        "LOGGER": {
             "LEVEL": "DEBUG"
         },
-        "REMOTE_PROXY_SERVER":
-        {
+        "REMOTE_PROXY_SERVER": {
             "TYPE": "",
             "ADDRESS": "",
             "PORT": 0,
             "AUTHENTICATION": [],
-            "CERTIFICATE":
-            {
-                "KEY":
-                {
+            "CERTIFICATE": {
+                "KEY": {
                     "FILE": ""
                 },
                 "FILE": ""
             }
         },
-        "PROXY_SERVER":
-        {
-            "TYPE": "",
-            "ADDRESS": "",
-            "PORT": 0,
-            "AUTHENTICATION":
-            {
-                "USERNAME": "",
-                "PASSWORD": ""
-            }
-        }
+        "PROXY_SERVERS": []
     }
     self.data = ko.mapping.fromJS(self.defaultData);
     
@@ -813,10 +1043,12 @@ function REMOTE_WS_ViewModel(parent) {
             data.REMOTE_PROXY_SERVER.PORT = 0;
         }
         
-        if($.isNumeric(data.PROXY_SERVER.PORT)) {
-            data.PROXY_SERVER.PORT = Number(data.PROXY_SERVER.PORT);
-        } else {
-            data.PROXY_SERVER.PORT = 0;
+        for(var i = 0; i < data.PROXY_SERVERS.length; i = i + 1) {
+            if($.isNumeric(data.PROXY_SERVERS[i].PORT)) {
+                data.PROXY_SERVERS[i].PORT = Number(data.PROXY_SERVERS[i].PORT);
+            } else {
+                data.PROXY_SERVERS[i].PORT = 0;
+            }
         }
         
         $.ajax({
@@ -853,12 +1085,36 @@ function REMOTE_WS_ViewModel(parent) {
         self.data.REMOTE_PROXY_SERVER.AUTHENTICATION.removeAll();
     }
     
+    self.action_REMOTE_WS_PROXY_SERVERS_ADD = function(data) {
+        self.data.PROXY_SERVERS.push(data);
+    }
+    
+    self.action_REMOTE_WS_PROXY_SERVERS_UPDATE = function(selectedData, data) {
+        ko.mapping.fromJS(ko.mapping.toJS(data), {}, selectedData);
+    }
+    
+    self.action_REMOTE_WS_PROXY_SERVERS_REMOVE = function(selectedData) {
+        self.data.PROXY_SERVERS.remove(selectedData);
+    }
+    
+    self.action_REMOTE_WS_PROXY_SERVERS_REMOVE_ALL = function() {
+        self.data.PROXY_SERVERS.removeAll();
+    }
+    
     self.load_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD = function() {
         self.template_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS(new Template("TEMPLATE_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATION", new REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD_ViewModel(self)));
     }
     
     self.load_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE = function(data) {
         self.template_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS(new Template("TEMPLATE_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATION", new REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE_ViewModel(self, data)));
+    }
+    
+    self.load_REMOTE_WS_PROXY_SERVERS_ADD = function() {
+        self.template_REMOTE_WS_PROXY_SERVERS(new Template("TEMPLATE_REMOTE_WS_PROXY_SERVER", new REMOTE_WS_PROXY_SERVERS_ADD_ViewModel(self)));
+    }
+    
+    self.load_REMOTE_WS_PROXY_SERVERS_UPDATE = function(data) {
+        self.template_REMOTE_WS_PROXY_SERVERS(new Template("TEMPLATE_REMOTE_WS_PROXY_SERVER", new REMOTE_WS_PROXY_SERVERS_UPDATE_ViewModel(self, data)));
     }
     
     self.template_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS = ko.observable();
@@ -868,6 +1124,14 @@ function REMOTE_WS_ViewModel(parent) {
     }
     
     self.load_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS();
+    
+    self.template_REMOTE_WS_PROXY_SERVERS = ko.observable();
+    
+    self.load_REMOTE_WS_PROXY_SERVERS = function() {
+        self.template_REMOTE_WS_PROXY_SERVERS(new Template("TEMPLATE_REMOTE_WS_PROXY_SERVERS", self));
+    }
+    
+    self.load_REMOTE_WS_PROXY_SERVERS();
     
     $.ajax({
         "type": "GET",
@@ -922,6 +1186,48 @@ function REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE_ViewModel(parent, 
     
     self.cancel = function() {
         self.parent.load_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS();
+    }
+}
+
+function REMOTE_WS_PROXY_SERVERS_ADD_ViewModel(parent) {
+    var self = this;
+    self.parent = parent;
+    self.defaultData = {
+        "TYPE": "",
+        "ADDRESS": "",
+        "PORT": 0,
+        "AUTHENTICATION": {
+            "USERNAME": "",
+            "PASSWORD": ""
+        }
+    }
+    self.data = ko.mapping.fromJS(self.defaultData);
+    self.action = "REMOTE_WS_PROXY_SERVERS_ADD";
+    
+    self.action_REMOTE_WS_PROXY_SERVERS_ADD = function() {
+        self.parent.action_REMOTE_WS_PROXY_SERVERS_ADD(self.data);
+        self.parent.load_REMOTE_WS_PROXY_SERVERS();
+    }
+    
+    self.cancel = function() {
+        self.parent.load_REMOTE_WS_PROXY_SERVERS();
+    }
+}
+
+function REMOTE_WS_PROXY_SERVERS_UPDATE_ViewModel(parent, data) {
+    var self = this;
+    self.parent = parent;
+    self.selectedData = data;
+    self.data = ko.mapping.fromJS(ko.mapping.toJS(self.selectedData));
+    self.action = "REMOTE_WS_PROXY_SERVERS_UPDATE";
+    
+    self.action_REMOTE_WS_PROXY_SERVERS_UPDATE = function() {
+        self.parent.action_REMOTE_WS_PROXY_SERVERS_UPDATE(self.selectedData, self.data);
+        self.parent.load_REMOTE_WS_PROXY_SERVERS();
+    }
+    
+    self.cancel = function() {
+        self.parent.load_REMOTE_WS_PROXY_SERVERS();
     }
 }
 

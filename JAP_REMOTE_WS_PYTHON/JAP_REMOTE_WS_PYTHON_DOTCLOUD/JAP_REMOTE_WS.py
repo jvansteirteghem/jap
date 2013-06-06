@@ -10,13 +10,16 @@ You should have received a copy of the GNU General Public License along with thi
 """
 
 from twisted.internet import reactor, ssl
-import json
 import os
 import logging
+import JAP.REMOTE_WS.JAP_LOCAL
 import JAP.REMOTE_WS.JAP_REMOTE_WS
 
-configuration = json.load(open("JAP_REMOTE_WS.json"))
+file = open("./JAP_REMOTE_WS.json", "r")
+data = file.read()
+file.close()
 
+configuration = JAP.REMOTE_WS.JAP_LOCAL.decodeJSON(data)
 JAP.REMOTE_WS.JAP_REMOTE_WS.setDefaultConfiguration(configuration)
 
 logging.basicConfig()
@@ -24,20 +27,16 @@ logger = logging.getLogger("JAP.REMOTE_WS")
 
 if configuration["LOGGER"]["LEVEL"] == "DEBUG":
     logger.setLevel(logging.DEBUG)
+elif configuration["LOGGER"]["LEVEL"] == "INFO":
+    logger.setLevel(logging.INFO)
+elif configuration["LOGGER"]["LEVEL"] == "WARNING":
+    logger.setLevel(logging.WARNING)
+elif configuration["LOGGER"]["LEVEL"] == "ERROR":
+    logger.setLevel(logging.ERROR)
+elif configuration["LOGGER"]["LEVEL"] == "CRITICAL":
+    logger.setLevel(logging.CRITICAL)
 else:
-    if configuration["LOGGER"]["LEVEL"] == "INFO":
-        logger.setLevel(logging.INFO)
-    else:
-        if configuration["LOGGER"]["LEVEL"] == "WARNING":
-            logger.setLevel(logging.WARNING)
-        else:
-            if configuration["LOGGER"]["LEVEL"] == "ERROR":
-                logger.setLevel(logging.ERROR)
-            else:
-                if configuration["LOGGER"]["LEVEL"] == "CRITICAL":
-                    logger.setLevel(logging.CRITICAL)
-                else:
-                    logger.setLevel(logging.NOTSET)
+    logger.setLevel(logging.NOTSET)
 
 if configuration["REMOTE_PROXY_SERVER"]["TYPE"] == "HTTPS":
     factory = JAP.REMOTE_WS.JAP_REMOTE_WS.WSInputProtocolFactory(configuration, str(os.environ["DOTCLOUD_WWW_HTTP_URL"].replace("http://", "wss://")), debug = False)

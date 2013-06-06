@@ -16,12 +16,12 @@ class TunnelProtocol(protocol.Protocol):
     def connectionMade(self):
         logger.debug("TunnelProtocol.connectionMade")
         
-        if self.factory.configuration["PROXY_SERVER"]["TYPE"] == "HTTP":
-            self.tunnelOutputProtocolFactory = HTTPTunnelOutputProtocolFactory(self.factory.configuration, self.factory.address, self.factory.port, self)
+        if self.factory.configuration["PROXY_SERVERS"][self.factory.i]["TYPE"] == "HTTP":
+            self.tunnelOutputProtocolFactory = HTTPTunnelOutputProtocolFactory(self.factory.i, self.factory.configuration, self.factory.address, self.factory.port, self)
             self.tunnelOutputProtocolFactory.protocol = HTTPTunnelOutputProtocol
         else:
-            if self.factory.configuration["PROXY_SERVER"]["TYPE"] == "SOCKS5":
-                self.tunnelOutputProtocolFactory = SOCKS5TunnelOutputProtocolFactory(self.factory.configuration, self.factory.address, self.factory.port, self)
+            if self.factory.configuration["PROXY_SERVERS"][self.factory.i]["TYPE"] == "SOCKS5":
+                self.tunnelOutputProtocolFactory = SOCKS5TunnelOutputProtocolFactory(self.factory.i, self.factory.configuration, self.factory.address, self.factory.port, self)
                 self.tunnelOutputProtocolFactory.protocol = SOCKS5TunnelOutputProtocol
             else:
                 self.transport.loseConnection()
@@ -63,9 +63,10 @@ class TunnelProtocol(protocol.Protocol):
             self.factory.outputProtocol.dataReceived(data)
 
 class TunnelProtocolFactory(protocol.ClientFactory):
-    def __init__(self, configuration, address, port, outputProtocolFactory, contextFactory=None, timeout=30, bindAddress=None):
+    def __init__(self, i, configuration, address, port, outputProtocolFactory, contextFactory=None, timeout=30, bindAddress=None):
         logger.debug("TunnelProtocolFactory.__init__")
         
+        self.i = i
         self.configuration = configuration
         self.address = address
         self.port = port
@@ -102,16 +103,26 @@ class Tunnel(object):
     def connect(self, address, port, outputProtocolFactory, contextFactory=None, timeout=30, bindAddress=None):
         logger.debug("Tunnel.connect")
         
-        if self.configuration["PROXY_SERVER"]["TYPE"] == "":
+        if len(self.configuration["PROXY_SERVERS"]) == 0:
             if contextFactory is None:
                 return reactor.connectTCP(address, port, outputProtocolFactory, timeout, bindAddress)
             else:
                 return reactor.connectSSL(address, port, outputProtocolFactory, contextFactory, timeout, bindAddress)
         else:
-            tunnelProtocolFactory = TunnelProtocolFactory(self.configuration, address, port, outputProtocolFactory, contextFactory, timeout, bindAddress)
+            i = len(self.configuration["PROXY_SERVERS"])
+            
+            tunnelProtocolFactory = TunnelProtocolFactory(i - 1, self.configuration, address, port, outputProtocolFactory, contextFactory, timeout, bindAddress)
             tunnelProtocolFactory.protocol = TunnelProtocol
             
-            return reactor.connectTCP(self.configuration["PROXY_SERVER"]["ADDRESS"], self.configuration["PROXY_SERVER"]["PORT"], tunnelProtocolFactory, timeout, bindAddress)
+            i = i - 1
+            
+            while i > 0:
+                tunnelProtocolFactory = TunnelProtocolFactory(i - 1, self.configuration, self.configuration["PROXY_SERVERS"][i]["ADDRESS"], self.configuration["PROXY_SERVERS"][i]["PORT"], tunnelProtocolFactory, contextFactory, timeout, bindAddress)
+                tunnelProtocolFactory.protocol = TunnelProtocol
+                
+                i = i - 1
+            
+            return reactor.connectTCP(self.configuration["PROXY_SERVERS"][i]["ADDRESS"], self.configuration["PROXY_SERVERS"][i]["PORT"], tunnelProtocolFactory, timeout, bindAddress)
 
 class HTTPTunnelOutputProtocol(protocol.Protocol):
     def __init__(self):
@@ -125,8 +136,8 @@ class HTTPTunnelOutputProtocol(protocol.Protocol):
         
         request = "CONNECT " + str(self.factory.address) + ":" + str(self.factory.port) + " HTTP/1.0\r\n"
         
-        if self.factory.configuration["PROXY_SERVER"]["AUTHENTICATION"]["USERNAME"] != "":
-            request = request + "Proxy-Authorization: Basic " + base64.standard_b64encode(self.factory.configuration["PROXY_SERVER"]["AUTHENTICATION"]["USERNAME"] + ":" + self.factory.configuration["PROXY_SERVER"]["AUTHENTICATION"]["PASSWORD"]) + "\r\n"
+        if self.factory.configuration["PROXY_SERVERS"][self.factory.i]["AUTHENTICATION"]["USERNAME"] != "":
+            request = request + "Proxy-Authorization: Basic " + base64.standard_b64encode(self.factory.configuration["PROXY_SERVERS"][self.factory.i]["AUTHENTICATION"]["USERNAME"] + ":" + self.factory.configuration["PROXY_SERVERS"][self.factory.i]["AUTHENTICATION"]["PASSWORD"]) + "\r\n"
         
         request = request + "\r\n"
         
@@ -171,9 +182,10 @@ class HTTPTunnelOutputProtocol(protocol.Protocol):
         self.dataState = 1
 
 class HTTPTunnelOutputProtocolFactory(protocol.ClientFactory):
-    def __init__(self, configuration, address, port, tunnelProtocol):
+    def __init__(self, i, configuration, address, port, tunnelProtocol):
         logger.debug("HTTPTunnelOutputProtocolFactory.__init__")
         
+        self.i = i
         self.configuration = configuration
         self.address = address
         self.port = port
@@ -275,9 +287,10 @@ class SOCKS5TunnelOutputProtocol(protocol.Protocol):
         self.dataState = 2
 
 class SOCKS5TunnelOutputProtocolFactory(protocol.ClientFactory):
-    def __init__(self, configuration, address, port, tunnelProtocol):
+    def __init__(self, i, configuration, address, port, tunnelProtocol):
         logger.debug("SOCKS5TunnelOutputProtocolFactory.__init__")
         
+        self.i = i
         self.configuration = configuration
         self.address = address
         self.port = port
@@ -324,7 +337,7 @@ class TestProtocol(protocol.Protocol):
         i = i + 4
         
         self.dataState = 1
-        
+        print self.data
         dataLines = self.data[:i].split("\r\n")
         dataLine0 = dataLines[0]
         dataLine0Values = dataLine0.split(" ", 2)
@@ -367,48 +380,29 @@ class Test(object):
         logger.debug("Test.__init__")
         
         self.configuration = configuration
-        self.i = -1
     
     def test_OK(self):
         logger.debug("Test.test_OK")
         
-        logger.info("test " + str(self.configuration["PROXY_SERVERS"][self.i]["TYPE"]) + "://" + str(self.configuration["PROXY_SERVERS"][self.i]["ADDRESS"]) + ":" + str(self.configuration["PROXY_SERVERS"][self.i]["PORT"]) + " OK")
+        logger.info("test OK")
         
-        self.test()
+        reactor.stop()
         
     def test_NOT_OK(self):
         logger.debug("Test.test_NOT_OK")
         
-        logger.info("test " + str(self.configuration["PROXY_SERVERS"][self.i]["TYPE"]) + "://" + str(self.configuration["PROXY_SERVERS"][self.i]["ADDRESS"]) + ":" + str(self.configuration["PROXY_SERVERS"][self.i]["PORT"]) + " NOT OK")
+        logger.info("test NOT OK")
         
-        self.test()
+        reactor.stop()
     
     def test(self):
         logger.debug("Test.test")
-        
-        self.i = self.i + 1
-        
-        if self.i == len(self.configuration["PROXY_SERVERS"]):
-            reactor.stop()
-            
-            return
-        
-        logger.info("test " + str(self.configuration["PROXY_SERVERS"][self.i]["TYPE"]) + "://" + str(self.configuration["PROXY_SERVERS"][self.i]["ADDRESS"]) + ":" + str(self.configuration["PROXY_SERVERS"][self.i]["PORT"]))
         
         testProtocolFactory = TestProtocolFactory()
         testProtocolFactory.protocol = TestProtocol
         testProtocolFactory.test = self
         
-        tunnelConfiguration = {}
-        tunnelConfiguration["PROXY_SERVER"] = {}
-        tunnelConfiguration["PROXY_SERVER"]["TYPE"] = self.configuration["PROXY_SERVERS"][self.i]["TYPE"]
-        tunnelConfiguration["PROXY_SERVER"]["ADDRESS"] = self.configuration["PROXY_SERVERS"][self.i]["ADDRESS"]
-        tunnelConfiguration["PROXY_SERVER"]["PORT"] = self.configuration["PROXY_SERVERS"][self.i]["PORT"]
-        tunnelConfiguration["PROXY_SERVER"]["AUTHENTICATION"] = {}
-        tunnelConfiguration["PROXY_SERVER"]["AUTHENTICATION"]["USERNAME"] = self.configuration["PROXY_SERVERS"][self.i]["AUTHENTICATION"]["USERNAME"]
-        tunnelConfiguration["PROXY_SERVER"]["AUTHENTICATION"]["PASSWORD"] = self.configuration["PROXY_SERVERS"][self.i]["AUTHENTICATION"]["PASSWORD"]
-        
-        tunnel = Tunnel(tunnelConfiguration)
+        tunnel = Tunnel(self.configuration)
         tunnel.connect("www.google.com", 80, testProtocolFactory)
 
 configuration = json.load(open("TEST.json"))

@@ -10,12 +10,15 @@ You should have received a copy of the GNU General Public License along with thi
 """
 
 from twisted.internet import reactor
-import json
 import logging
+import JAP.REMOTE_SSH.JAP_LOCAL
 import JAP.REMOTE_SSH.JAP_REMOTE_SSH
 
-configuration = json.load(open("JAP_REMOTE_SSH.json"))
+file = open("./JAP_REMOTE_SSH.json", "r")
+data = file.read()
+file.close()
 
+configuration = JAP.REMOTE_SSH.JAP_LOCAL.decodeJSON(data)
 JAP.REMOTE_SSH.JAP_REMOTE_SSH.setDefaultConfiguration(configuration)
 
 logging.basicConfig()
@@ -23,20 +26,16 @@ logger = logging.getLogger("JAP.REMOTE_SSH")
 
 if configuration["LOGGER"]["LEVEL"] == "DEBUG":
     logger.setLevel(logging.DEBUG)
+elif configuration["LOGGER"]["LEVEL"] == "INFO":
+    logger.setLevel(logging.INFO)
+elif configuration["LOGGER"]["LEVEL"] == "WARNING":
+    logger.setLevel(logging.WARNING)
+elif configuration["LOGGER"]["LEVEL"] == "ERROR":
+    logger.setLevel(logging.ERROR)
+elif configuration["LOGGER"]["LEVEL"] == "CRITICAL":
+    logger.setLevel(logging.CRITICAL)
 else:
-    if configuration["LOGGER"]["LEVEL"] == "INFO":
-        logger.setLevel(logging.INFO)
-    else:
-        if configuration["LOGGER"]["LEVEL"] == "WARNING":
-            logger.setLevel(logging.WARNING)
-        else:
-            if configuration["LOGGER"]["LEVEL"] == "ERROR":
-                logger.setLevel(logging.ERROR)
-            else:
-                if configuration["LOGGER"]["LEVEL"] == "CRITICAL":
-                    logger.setLevel(logging.CRITICAL)
-                else:
-                    logger.setLevel(logging.NOTSET)
+    logger.setLevel(logging.NOTSET)
 
 factory = JAP.REMOTE_SSH.JAP_REMOTE_SSH.SSHFactory(configuration)
 reactor.listenTCP(configuration["REMOTE_PROXY_SERVER"]["PORT"], factory, 50, configuration["REMOTE_PROXY_SERVER"]["ADDRESS"])
