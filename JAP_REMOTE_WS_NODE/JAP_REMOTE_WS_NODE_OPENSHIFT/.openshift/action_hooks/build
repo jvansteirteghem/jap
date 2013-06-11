@@ -4,5 +4,5 @@
 # before the deploy step.  This script gets executed directly, so it
 # could be python, php, ruby, etc.
 
-source ${OPENSHIFT_DATA_DIR}/virtualenv/bin/activate
-pip install --use-mirrors -r ${OPENSHIFT_REPO_DIR}/requirements.txt
+cd ${OPENSHIFT_REPO_DIR}
+${OPENSHIFT_DATA_DIR}/bin/npm --cache=${OPENSHIFT_DATA_DIR}/.npm --tmp=${OPENSHIFT_TMP_DIR} install

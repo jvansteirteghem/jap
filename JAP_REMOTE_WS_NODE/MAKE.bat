@@ -85,6 +85,18 @@ mkdir JAP
 cd JAP
 copy ..\..\..\JAP\JAP_REMOTE_WS.js JAP_REMOTE_WS.js
 cd ..
+mkdir .openshift
+cd .openshift
+mkdir action_hooks
+cd action_hooks
+copy ..\..\..\..\JAP_REMOTE_WS_NODE_OPENSHIFT\.openshift\action_hooks\build build
+copy ..\..\..\..\JAP_REMOTE_WS_NODE_OPENSHIFT\.openshift\action_hooks\deploy deploy
+copy ..\..\..\..\JAP_REMOTE_WS_NODE_OPENSHIFT\.openshift\action_hooks\post_deploy post_deploy
+copy ..\..\..\..\JAP_REMOTE_WS_NODE_OPENSHIFT\.openshift\action_hooks\pre_build pre_build
+copy ..\..\..\..\JAP_REMOTE_WS_NODE_OPENSHIFT\.openshift\action_hooks\start start
+copy ..\..\..\..\JAP_REMOTE_WS_NODE_OPENSHIFT\.openshift\action_hooks\stop stop
+cd ..
+cd ..
 cd ..
 %SEVENZIP_HOME%\7z.exe a -tzip JAP_REMOTE_WS_NODE_OPENSHIFT-%JAP_REMOTE_WS_NODE_OPENSHIFT_VERSION%.zip JAP_REMOTE_WS_NODE_OPENSHIFT-%JAP_REMOTE_WS_NODE_OPENSHIFT_VERSION%
 cd ..

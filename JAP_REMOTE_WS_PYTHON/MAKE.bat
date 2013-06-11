@@ -83,7 +83,6 @@ copy ..\..\..\..\JAP_REMOTE_WS_PYTHON_OPENSHIFT\.openshift\action_hooks\post_dep
 copy ..\..\..\..\JAP_REMOTE_WS_PYTHON_OPENSHIFT\.openshift\action_hooks\pre_build pre_build
 copy ..\..\..\..\JAP_REMOTE_WS_PYTHON_OPENSHIFT\.openshift\action_hooks\start start
 copy ..\..\..\..\JAP_REMOTE_WS_PYTHON_OPENSHIFT\.openshift\action_hooks\stop stop
-copy ..\..\..\..\JAP_REMOTE_WS_PYTHON_OPENSHIFT\.openshift\action_hooks\vars vars
 cd ..
 cd ..
 cd ..

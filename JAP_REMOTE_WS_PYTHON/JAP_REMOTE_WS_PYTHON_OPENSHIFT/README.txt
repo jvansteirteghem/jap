@@ -9,21 +9,18 @@ INSTALLATION
 - open JAP_REMOTE_WS_PYTHON_OPENSHIFT-X.X.X
 - configure JAP_REMOTE_WS.json
 - open CONSOLE
-	- WINDOWS
-		- rhc app create -a application-id -t diy-0.1
-		- cd application-id
-		- xcopy ..\JAP_REMOTE_WS_PYTHON_OPENSHIFT-X.X.X\*.* /s /y
-		- git add -A
-		- git commit -m "JAP"
-		- git push
-	- LINUX
-		- rhc app create -a application-id -t diy-0.1
-		- cd application-id
-		- cp -r ../JAP_REMOTE_WS_PYTHON_OPENSHIFT-X.X.X/. .
-		- chmod -R +x ./.openshift/action_hooks ./JAP
-		- git add -A
-		- git commit -m "JAP"
-		- git push
+    - rhc app create -a application-id -t diy-0.1
+    - cd application-id
+    - xcopy ..\JAP_REMOTE_WS_PYTHON_OPENSHIFT-X.X.X\*.* /s /y
+    - git update-index --add --chmod=+x .openshift/action_hooks/build
+    - git update-index --add --chmod=+x .openshift/action_hooks/deploy
+    - git update-index --add --chmod=+x .openshift/action_hooks/post_deploy
+    - git update-index --add --chmod=+x .openshift/action_hooks/pre_build
+    - git update-index --add --chmod=+x .openshift/action_hooks/start
+    - git update-index --add --chmod=+x .openshift/action_hooks/stop
+    - git add -A
+    - git commit -m "JAP"
+    - git push
 
 IMPORTANT
 ---------

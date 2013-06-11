@@ -16,6 +16,6 @@ var configuration = require("./JAP_REMOTE_WS.json");
 configuration = jap.setDefaultConfiguration(configuration);
 
 var server = http.createServer();
-server.listen(process.env.OPENSHIFT_INTERNAL_PORT, process.env.OPENSHIFT_INTERNAL_IP);
+server.listen(process.env.OPENSHIFT_DIY_PORT, process.env.OPENSHIFT_DIY_IP);
 
 server = jap.createServer(server, configuration);

@@ -28,13 +28,13 @@ else:
     logger.setLevel(logging.NOTSET)
 
 if configuration["REMOTE_PROXY_SERVER"]["TYPE"] == "HTTPS":
-    factory = JAP.REMOTE_WS.JAP_REMOTE_WS.WSInputProtocolFactory(configuration, "wss://" + str(os.environ["OPENSHIFT_INTERNAL_IP"]) + ":" + str(os.environ["OPENSHIFT_INTERNAL_PORT"]), debug = False)
+    factory = JAP.REMOTE_WS.JAP_REMOTE_WS.WSInputProtocolFactory(configuration, "wss://" + str(os.environ["OPENSHIFT_DIY_IP"]) + ":" + str(os.environ["OPENSHIFT_DIY_PORT"]), debug = False)
     factory.protocol = JAP.REMOTE_WS.JAP_REMOTE_WS.WSInputProtocol
 else:
-    factory = JAP.REMOTE_WS.JAP_REMOTE_WS.WSInputProtocolFactory(configuration, "ws://" + str(os.environ["OPENSHIFT_INTERNAL_IP"]) + ":" + str(os.environ["OPENSHIFT_INTERNAL_PORT"]), debug = False)
+    factory = JAP.REMOTE_WS.JAP_REMOTE_WS.WSInputProtocolFactory(configuration, "ws://" + str(os.environ["OPENSHIFT_DIY_IP"]) + ":" + str(os.environ["OPENSHIFT_DIY_PORT"]), debug = False)
     factory.protocol = JAP.REMOTE_WS.JAP_REMOTE_WS.WSInputProtocol
 
 application = service.Application("JAP")
 
-server = internet.TCPServer(int(os.environ["OPENSHIFT_INTERNAL_PORT"]), factory, interface=str(os.environ["OPENSHIFT_INTERNAL_IP"]))
+server = internet.TCPServer(int(os.environ["OPENSHIFT_DIY_PORT"]), factory, interface=str(os.environ["OPENSHIFT_DIY_IP"]))
 server.setServiceParent(application)

@@ -34,13 +34,17 @@ def setDefaultConfiguration(configuration):
     configuration["REMOTE_PROXY_SERVER"]["CERTIFICATE"].setdefault("KEY", {})
     configuration["REMOTE_PROXY_SERVER"]["CERTIFICATE"]["KEY"].setdefault("FILE", "")
     configuration["REMOTE_PROXY_SERVER"]["CERTIFICATE"].setdefault("FILE", "")
-    configuration.setdefault("PROXY_SERVER", {})
-    configuration["PROXY_SERVER"].setdefault("TYPE", "")
-    configuration["PROXY_SERVER"].setdefault("ADDRESS", "")
-    configuration["PROXY_SERVER"].setdefault("PORT", 0)
-    configuration["PROXY_SERVER"].setdefault("AUTHENTICATION", {})
-    configuration["PROXY_SERVER"]["AUTHENTICATION"].setdefault("USERNAME", "")
-    configuration["PROXY_SERVER"]["AUTHENTICATION"].setdefault("PASSWORD", "")
+    configuration.setdefault("PROXY_SERVERS", [])
+    i = 0
+    while i < len(configuration["PROXY_SERVERS"]):
+        configuration["PROXY_SERVERS"][i].setdefault("TYPE", "")
+        configuration["PROXY_SERVERS"][i].setdefault("ADDRESS", "")
+        configuration["PROXY_SERVERS"][i].setdefault("PORT", 0)
+        configuration["PROXY_SERVERS"][i].setdefault("AUTHENTICATION", {})
+        configuration["PROXY_SERVERS"][i]["AUTHENTICATION"].setdefault("USERNAME", "")
+        configuration["PROXY_SERVERS"][i]["AUTHENTICATION"].setdefault("PASSWORD", "")
+        
+        i = i + 1
     
 class WSInputProtocol(autobahn.websocket.WebSocketServerProtocol):
     def __init__(self):

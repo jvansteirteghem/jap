@@ -1,0 +1,18 @@
+#!/bin/bash
+# This is a simple script and will be executed on your CI system if 
+# available.  Otherwise it will execute while your application is stopped
+# before the build step.  This script gets executed directly, so it
+# could be python, php, ruby, etc.
+
+NODE_VERSION="0.10.9"
+
+if [ ! -f ${OPENSHIFT_DATA_DIR}/bin/node ]; then
+    cd ${OPENSHIFT_TMP_DIR}
+    wget http://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}.tar.gz
+    tar xfz node-v${NODE_VERSION}.tar.gz
+    cd node-v${NODE_VERSION}
+    ./configure --prefix=${OPENSHIFT_DATA_DIR}
+    make install
+fi
+
+rm -rf ${OPENSHIFT_TMP_DIR}/*

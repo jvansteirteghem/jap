@@ -3,6 +3,5 @@
 # script. The application will work only if it binds to
 # $OPENSHIFT_DIY_IP:$OPENSHIFT_DIY_PORT
 
-source ${OPENSHIFT_DATA_DIR}/virtualenv/bin/activate
 cd ${OPENSHIFT_REPO_DIR}
-twistd -l ${OPENSHIFT_DIY_LOG_DIR}/twistd.log --pidfile=${OPENSHIFT_TMP_DIR}/twistd.pid -y app.tac
+nohup ${OPENSHIFT_DATA_DIR}/bin/node server.js >> ${OPENSHIFT_DIY_LOG_DIR}/server.log 2>&1&

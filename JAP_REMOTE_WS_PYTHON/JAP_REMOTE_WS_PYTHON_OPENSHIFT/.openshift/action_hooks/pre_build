@@ -3,3 +3,25 @@
 # available.  Otherwise it will execute while your application is stopped
 # before the build step.  This script gets executed directly, so it
 # could be python, php, ruby, etc.
+
+PYTHON_VERSION="2.7.4"
+VIRTUALENV_VERSION="1.9.1"
+
+if [ ! -f ${OPENSHIFT_DATA_DIR}/bin/python ]; then
+    cd ${OPENSHIFT_TMP_DIR}
+    wget http://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tar.bz2
+    tar jxf Python-${PYTHON_VERSION}.tar.bz2
+    cd Python-${PYTHON_VERSION}
+    ./configure --prefix=${OPENSHIFT_DATA_DIR}
+    make install
+fi
+
+if [ ! -d ${OPENSHIFT_DATA_DIR}/virtualenv ]; then
+    cd ${OPENSHIFT_TMP_DIR}
+    wget --no-check-certificate https://pypi.python.org/packages/source/v/virtualenv/virtualenv-${VIRTUALENV_VERSION}.tar.gz
+    tar zxf virtualenv-${VIRTUALENV_VERSION}.tar.gz
+    cd virtualenv-${VIRTUALENV_VERSION}
+    ${OPENSHIFT_DATA_DIR}/bin/python virtualenv.py ${OPENSHIFT_DATA_DIR}/virtualenv
+fi
+
+rm -rf ${OPENSHIFT_TMP_DIR}/*
