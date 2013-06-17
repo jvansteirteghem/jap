@@ -11,7 +11,6 @@ You should have received a copy of the GNU General Public License along with thi
 
 var fs = require("fs");
 var http = require("http");
-var https = require("https");
 var net = require("net");
 var websocket = require("websocket");
 var util = require("util");
@@ -32,7 +31,7 @@ function HTTPAgent(options) {
 		requestOptions.path = options.host + ":" + options.port;
 		requestOptions.headers = {};
 		requestOptions.headers["Proxy-Authorization"] = "Basic " + new Buffer(options.proxy.auth).toString("base64");
-		requestOptions.agent = http.globalAgent;
+		requestOptions.agent = null;
 		
 		var request = http.request(requestOptions);
 		
@@ -220,7 +219,7 @@ var createServer = function(configuration) {
 				
 				if(configuration.REMOTE_PROXY_SERVERS[i].TYPE === "HTTP") {
 					if(configuration.PROXY_SERVER.ADDRESS === "") {
-						requestOptions.agent = http.globalAgent;
+						requestOptions.agent = null;
 					} else {
 						requestOptions.proxy = {};
 						requestOptions.proxy.host = configuration.PROXY_SERVER.ADDRESS;
@@ -264,7 +263,7 @@ var createServer = function(configuration) {
 					}
 					
 					if(configuration.PROXY_SERVER.ADDRESS === "") {
-						requestOptions.agent = https.globalAgent;
+						requestOptions.agent = null;
 					} else {
 						requestOptions.proxy = {};
 						requestOptions.proxy.host = configuration.PROXY_SERVER.ADDRESS;
