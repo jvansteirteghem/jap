@@ -4,7 +4,65 @@ function Template(name, data) {
     self.data = ko.observable(data);
 }
 
-function LOCAL_ViewModel(parent) {
+function JAP_ViewModel(parent) {
+    var self = this;
+    self.parent = parent;
+    self.defaultData = {
+        "LOGGER": {
+            "LEVEL": ""
+        },
+        "LOCAL_SERVER": {
+            "ADDRESS": "",
+            "PORT": 0,
+            "AUTHENTICATION": {
+                "USERNAME": "",
+                "PASSWORD": ""
+            }
+        }
+    }
+    self.data = ko.mapping.fromJS(self.defaultData);
+    
+    self.action_JAP_UPDATE = function() {
+        var data = ko.mapping.toJS(self.data);
+        
+        $.ajax({
+            "type": "POST",
+            "url": "/API",
+            "dataType": "",
+            "data": {
+                "action": "JAP_UPDATE",
+                "data": ko.toJSON(data)
+            }
+        }).then(
+            function(data, textStatus, jqXHR) {
+                Alertify.log.success("JAP - UPDATE OK");
+            }, 
+            function(jqXHR, textStatus, errorThrown) {
+                Alertify.log.error("JAP - UPDATE NOT OK");
+            }
+        )
+    }
+    
+    $.ajax({
+        "type": "GET",
+        "url": "/API",
+        "dataType": "JSON",
+        "data": {
+            "action": "JAP"
+        }
+    }).then(
+        function(data, textStatus, jqXHR) {
+            Alertify.log.success("JAP - OK");
+            
+            ko.mapping.fromJS(data, self.data);
+        }, 
+        function(jqXHR, textStatus, errorThrown) {
+            Alertify.log.error("JAP - NOT OK");
+        }
+    );
+}
+
+function JAP_LOCAL_ViewModel(parent) {
     var self = this;
     self.parent = parent;
     self.defaultData = {
@@ -19,7 +77,7 @@ function LOCAL_ViewModel(parent) {
     }
     self.data = ko.mapping.fromJS(self.defaultData);
     
-    self.action_LOCAL_UPDATE = function() {
+    self.action_JAP_LOCAL_UPDATE = function() {
         var data = ko.mapping.toJS(self.data);
         
         if($.isNumeric(data.LOCAL_PROXY_SERVER.PORT)) {
@@ -41,71 +99,71 @@ function LOCAL_ViewModel(parent) {
             "url": "/API",
             "dataType": "",
             "data": {
-                "action": "LOCAL_UPDATE",
+                "action": "JAP_LOCAL_UPDATE",
                 "data": ko.toJSON(data)
             }
         }).then(
             function(data, textStatus, jqXHR) {
-                Alertify.log.success("LOCAL - UPDATE OK");
+                Alertify.log.success("JAP LOCAL - UPDATE OK");
             }, 
             function(jqXHR, textStatus, errorThrown) {
-                Alertify.log.error("LOCAL - UPDATE NOT OK");
+                Alertify.log.error("JAP LOCAL - UPDATE NOT OK");
             }
         )
     }
     
-    self.action_LOCAL_PROXY_SERVERS_ADD = function(data) {
+    self.action_JAP_LOCAL_PROXY_SERVERS_ADD = function(data) {
         self.data.PROXY_SERVERS.push(data);
     }
     
-    self.action_LOCAL_PROXY_SERVERS_UPDATE = function(selectedData, data) {
+    self.action_JAP_LOCAL_PROXY_SERVERS_UPDATE = function(selectedData, data) {
         ko.mapping.fromJS(ko.mapping.toJS(data), {}, selectedData);
     }
     
-    self.action_LOCAL_PROXY_SERVERS_REMOVE = function(selectedData) {
+    self.action_JAP_LOCAL_PROXY_SERVERS_REMOVE = function(selectedData) {
         self.data.PROXY_SERVERS.remove(selectedData);
     }
     
-    self.action_LOCAL_PROXY_SERVERS_REMOVE_ALL = function() {
+    self.action_JAP_LOCAL_PROXY_SERVERS_REMOVE_ALL = function() {
         self.data.PROXY_SERVERS.removeAll();
     }
     
-    self.load_LOCAL_PROXY_SERVERS_ADD = function() {
-        self.template_LOCAL_PROXY_SERVERS(new Template("TEMPLATE_LOCAL_PROXY_SERVER", new LOCAL_PROXY_SERVERS_ADD_ViewModel(self)));
+    self.load_JAP_LOCAL_PROXY_SERVERS_ADD = function() {
+        self.template_JAP_LOCAL_PROXY_SERVERS(new Template("TEMPLATE_JAP_LOCAL_PROXY_SERVER", new JAP_LOCAL_PROXY_SERVERS_ADD_ViewModel(self)));
     }
     
-    self.load_LOCAL_PROXY_SERVERS_UPDATE = function(data) {
-        self.template_LOCAL_PROXY_SERVERS(new Template("TEMPLATE_LOCAL_PROXY_SERVER", new LOCAL_PROXY_SERVERS_UPDATE_ViewModel(self, data)));
+    self.load_JAP_LOCAL_PROXY_SERVERS_UPDATE = function(data) {
+        self.template_JAP_LOCAL_PROXY_SERVERS(new Template("TEMPLATE_JAP_LOCAL_PROXY_SERVER", new JAP_LOCAL_PROXY_SERVERS_UPDATE_ViewModel(self, data)));
     }
     
-    self.template_LOCAL_PROXY_SERVERS = ko.observable();
+    self.template_JAP_LOCAL_PROXY_SERVERS = ko.observable();
     
-    self.load_LOCAL_PROXY_SERVERS = function() {
-        self.template_LOCAL_PROXY_SERVERS(new Template("TEMPLATE_LOCAL_PROXY_SERVERS", self));
+    self.load_JAP_LOCAL_PROXY_SERVERS = function() {
+        self.template_JAP_LOCAL_PROXY_SERVERS(new Template("TEMPLATE_JAP_LOCAL_PROXY_SERVERS", self));
     }
     
-    self.load_LOCAL_PROXY_SERVERS();
+    self.load_JAP_LOCAL_PROXY_SERVERS();
     
     $.ajax({
         "type": "GET",
         "url": "/API",
         "dataType": "JSON",
         "data": {
-            "action": "LOCAL"
+            "action": "JAP_LOCAL"
         }
     }).then(
         function(data, textStatus, jqXHR) {
-            Alertify.log.success("LOCAL - OK");
+            Alertify.log.success("JAP LOCAL - OK");
             
             ko.mapping.fromJS(data, self.data);
         }, 
         function(jqXHR, textStatus, errorThrown) {
-            Alertify.log.error("LOCAL - NOT OK");
+            Alertify.log.error("JAP LOCAL - NOT OK");
         }
     );
 }
 
-function LOCAL_PROXY_SERVERS_ADD_ViewModel(parent) {
+function JAP_LOCAL_PROXY_SERVERS_ADD_ViewModel(parent) {
     var self = this;
     self.parent = parent;
     self.defaultData = {
@@ -118,36 +176,36 @@ function LOCAL_PROXY_SERVERS_ADD_ViewModel(parent) {
         }
     }
     self.data = ko.mapping.fromJS(self.defaultData);
-    self.action = "LOCAL_PROXY_SERVERS_ADD";
+    self.action = "JAP_LOCAL_PROXY_SERVERS_ADD";
     
-    self.action_LOCAL_PROXY_SERVERS_ADD = function() {
-        self.parent.action_LOCAL_PROXY_SERVERS_ADD(self.data);
-        self.parent.load_LOCAL_PROXY_SERVERS();
+    self.action_JAP_LOCAL_PROXY_SERVERS_ADD = function() {
+        self.parent.action_JAP_LOCAL_PROXY_SERVERS_ADD(self.data);
+        self.parent.load_JAP_LOCAL_PROXY_SERVERS();
     }
     
     self.cancel = function() {
-        self.parent.load_LOCAL_PROXY_SERVERS();
+        self.parent.load_JAP_LOCAL_PROXY_SERVERS();
     }
 }
 
-function LOCAL_PROXY_SERVERS_UPDATE_ViewModel(parent, data) {
+function JAP_LOCAL_PROXY_SERVERS_UPDATE_ViewModel(parent, data) {
     var self = this;
     self.parent = parent;
     self.selectedData = data;
     self.data = ko.mapping.fromJS(ko.mapping.toJS(self.selectedData));
-    self.action = "LOCAL_PROXY_SERVERS_UPDATE";
+    self.action = "JAP_LOCAL_PROXY_SERVERS_UPDATE";
     
-    self.action_LOCAL_PROXY_SERVERS_UPDATE = function() {
-        self.parent.action_LOCAL_PROXY_SERVERS_UPDATE(self.selectedData, self.data);
-        self.parent.load_LOCAL_PROXY_SERVERS();
+    self.action_JAP_LOCAL_PROXY_SERVERS_UPDATE = function() {
+        self.parent.action_JAP_LOCAL_PROXY_SERVERS_UPDATE(self.selectedData, self.data);
+        self.parent.load_JAP_LOCAL_PROXY_SERVERS();
     }
     
     self.cancel = function() {
-        self.parent.load_LOCAL_PROXY_SERVERS();
+        self.parent.load_JAP_LOCAL_PROXY_SERVERS();
     }
 }
 
-function LOCAL_SSH_ViewModel(parent) {
+function JAP_LOCAL_SSH_ViewModel(parent) {
     var self = this;
     self.parent = parent;
     self.defaultData = {
@@ -164,7 +222,7 @@ function LOCAL_SSH_ViewModel(parent) {
     }
     self.data = ko.mapping.fromJS(self.defaultData);
     
-    self.action_LOCAL_SSH_UPDATE = function() {
+    self.action_JAP_LOCAL_SSH_UPDATE = function() {
         var data = ko.mapping.toJS(self.data);
         
         if($.isNumeric(data.LOCAL_PROXY_SERVER.PORT)) {
@@ -194,135 +252,135 @@ function LOCAL_SSH_ViewModel(parent) {
             "url": "/API",
             "dataType": "",
             "data": {
-                "action": "LOCAL_SSH_UPDATE",
+                "action": "JAP_LOCAL_SSH_UPDATE",
                 "data": ko.toJSON(data)
             }
         }).then(
             function(data, textStatus, jqXHR) {
-                Alertify.log.success("LOCAL SSH - UPDATE OK");
+                Alertify.log.success("JAP LOCAL SSH - UPDATE OK");
             }, 
             function(jqXHR, textStatus, errorThrown) {
-                Alertify.log.error("LOCAL SSH - UPDATE NOT OK");
+                Alertify.log.error("JAP LOCAL SSH - UPDATE NOT OK");
             }
         )
     }
     
-    self.action_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_ADD = function(data) {
+    self.action_JAP_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_ADD = function(data) {
         self.data.LOCAL_PROXY_SERVER.KEYS.push(data);
     }
     
-    self.action_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_UPDATE = function(selectedData, data) {
+    self.action_JAP_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_UPDATE = function(selectedData, data) {
         ko.mapping.fromJS(ko.mapping.toJS(data), {}, selectedData);
     }
     
-    self.action_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_REMOVE = function(selectedData) {
+    self.action_JAP_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_REMOVE = function(selectedData) {
         self.data.LOCAL_PROXY_SERVER.KEYS.remove(selectedData);
     }
     
-    self.action_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_REMOVE_ALL = function() {
+    self.action_JAP_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_REMOVE_ALL = function() {
         self.data.LOCAL_PROXY_SERVER.KEYS.removeAll();
     }
     
-    self.action_LOCAL_SSH_REMOTE_PROXY_SERVERS_ADD = function(data) {
+    self.action_JAP_LOCAL_SSH_REMOTE_PROXY_SERVERS_ADD = function(data) {
         self.data.REMOTE_PROXY_SERVERS.push(data);
     }
     
-    self.action_LOCAL_SSH_REMOTE_PROXY_SERVERS_UPDATE = function(selectedData, data) {
+    self.action_JAP_LOCAL_SSH_REMOTE_PROXY_SERVERS_UPDATE = function(selectedData, data) {
         ko.mapping.fromJS(ko.mapping.toJS(data), {}, selectedData);
     }
     
-    self.action_LOCAL_SSH_REMOTE_PROXY_SERVERS_REMOVE = function(selectedData) {
+    self.action_JAP_LOCAL_SSH_REMOTE_PROXY_SERVERS_REMOVE = function(selectedData) {
         self.data.REMOTE_PROXY_SERVERS.remove(selectedData);
     }
     
-    self.action_LOCAL_SSH_REMOTE_PROXY_SERVERS_REMOVE_ALL = function() {
+    self.action_JAP_LOCAL_SSH_REMOTE_PROXY_SERVERS_REMOVE_ALL = function() {
         self.data.REMOTE_PROXY_SERVERS.removeAll();
     }
     
-    self.action_LOCAL_SSH_PROXY_SERVERS_ADD = function(data) {
+    self.action_JAP_LOCAL_SSH_PROXY_SERVERS_ADD = function(data) {
         self.data.PROXY_SERVERS.push(data);
     }
     
-    self.action_LOCAL_SSH_PROXY_SERVERS_UPDATE = function(selectedData, data) {
+    self.action_JAP_LOCAL_SSH_PROXY_SERVERS_UPDATE = function(selectedData, data) {
         ko.mapping.fromJS(ko.mapping.toJS(data), {}, selectedData);
     }
     
-    self.action_LOCAL_SSH_PROXY_SERVERS_REMOVE = function(selectedData) {
+    self.action_JAP_LOCAL_SSH_PROXY_SERVERS_REMOVE = function(selectedData) {
         self.data.PROXY_SERVERS.remove(selectedData);
     }
     
-    self.action_LOCAL_SSH_PROXY_SERVERS_REMOVE_ALL = function() {
+    self.action_JAP_LOCAL_SSH_PROXY_SERVERS_REMOVE_ALL = function() {
         self.data.PROXY_SERVERS.removeAll();
     }
     
-    self.load_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_ADD = function() {
-        self.template_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS(new Template("TEMPLATE_LOCAL_SSH_LOCAL_PROXY_SERVER_KEY", new LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_ADD_ViewModel(self)));
+    self.load_JAP_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_ADD = function() {
+        self.template_JAP_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS(new Template("TEMPLATE_JAP_LOCAL_SSH_LOCAL_PROXY_SERVER_KEY", new JAP_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_ADD_ViewModel(self)));
     }
     
-    self.load_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_UPDATE = function(data) {
-        self.template_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS(new Template("TEMPLATE_LOCAL_SSH_LOCAL_PROXY_SERVER_KEY", new LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_UPDATE_ViewModel(self, data)));
+    self.load_JAP_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_UPDATE = function(data) {
+        self.template_JAP_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS(new Template("TEMPLATE_JAP_LOCAL_SSH_LOCAL_PROXY_SERVER_KEY", new JAP_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_UPDATE_ViewModel(self, data)));
     }
     
-    self.load_LOCAL_SSH_REMOTE_PROXY_SERVERS_ADD = function() {
-        self.template_LOCAL_SSH_REMOTE_PROXY_SERVERS(new Template("TEMPLATE_LOCAL_SSH_REMOTE_PROXY_SERVER", new LOCAL_SSH_REMOTE_PROXY_SERVERS_ADD_ViewModel(self)));
+    self.load_JAP_LOCAL_SSH_REMOTE_PROXY_SERVERS_ADD = function() {
+        self.template_JAP_LOCAL_SSH_REMOTE_PROXY_SERVERS(new Template("TEMPLATE_JAP_LOCAL_SSH_REMOTE_PROXY_SERVER", new JAP_LOCAL_SSH_REMOTE_PROXY_SERVERS_ADD_ViewModel(self)));
     }
     
-    self.load_LOCAL_SSH_REMOTE_PROXY_SERVERS_UPDATE = function(data) {
-        self.template_LOCAL_SSH_REMOTE_PROXY_SERVERS(new Template("TEMPLATE_LOCAL_SSH_REMOTE_PROXY_SERVER", new LOCAL_SSH_REMOTE_PROXY_SERVERS_UPDATE_ViewModel(self, data)));
+    self.load_JAP_LOCAL_SSH_REMOTE_PROXY_SERVERS_UPDATE = function(data) {
+        self.template_JAP_LOCAL_SSH_REMOTE_PROXY_SERVERS(new Template("TEMPLATE_JAP_LOCAL_SSH_REMOTE_PROXY_SERVER", new JAP_LOCAL_SSH_REMOTE_PROXY_SERVERS_UPDATE_ViewModel(self, data)));
     }
     
-    self.load_LOCAL_SSH_PROXY_SERVERS_ADD = function() {
-        self.template_LOCAL_SSH_PROXY_SERVERS(new Template("TEMPLATE_LOCAL_SSH_PROXY_SERVER", new LOCAL_SSH_PROXY_SERVERS_ADD_ViewModel(self)));
+    self.load_JAP_LOCAL_SSH_PROXY_SERVERS_ADD = function() {
+        self.template_JAP_LOCAL_SSH_PROXY_SERVERS(new Template("TEMPLATE_JAP_LOCAL_SSH_PROXY_SERVER", new JAP_LOCAL_SSH_PROXY_SERVERS_ADD_ViewModel(self)));
     }
     
-    self.load_LOCAL_SSH_PROXY_SERVERS_UPDATE = function(data) {
-        self.template_LOCAL_SSH_PROXY_SERVERS(new Template("TEMPLATE_LOCAL_SSH_PROXY_SERVER", new LOCAL_SSH_PROXY_SERVERS_UPDATE_ViewModel(self, data)));
+    self.load_JAP_LOCAL_SSH_PROXY_SERVERS_UPDATE = function(data) {
+        self.template_JAP_LOCAL_SSH_PROXY_SERVERS(new Template("TEMPLATE_JAP_LOCAL_SSH_PROXY_SERVER", new JAP_LOCAL_SSH_PROXY_SERVERS_UPDATE_ViewModel(self, data)));
     }
     
-    self.template_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS = ko.observable();
+    self.template_JAP_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS = ko.observable();
     
-    self.load_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS = function() {
-        self.template_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS(new Template("TEMPLATE_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS", self));
+    self.load_JAP_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS = function() {
+        self.template_JAP_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS(new Template("TEMPLATE_JAP_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS", self));
     }
     
-    self.load_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS();
+    self.load_JAP_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS();
     
-    self.template_LOCAL_SSH_REMOTE_PROXY_SERVERS = ko.observable();
+    self.template_JAP_LOCAL_SSH_REMOTE_PROXY_SERVERS = ko.observable();
     
-    self.load_LOCAL_SSH_REMOTE_PROXY_SERVERS = function() {
-        self.template_LOCAL_SSH_REMOTE_PROXY_SERVERS(new Template("TEMPLATE_LOCAL_SSH_REMOTE_PROXY_SERVERS", self));
+    self.load_JAP_LOCAL_SSH_REMOTE_PROXY_SERVERS = function() {
+        self.template_JAP_LOCAL_SSH_REMOTE_PROXY_SERVERS(new Template("TEMPLATE_JAP_LOCAL_SSH_REMOTE_PROXY_SERVERS", self));
     }
     
-    self.load_LOCAL_SSH_REMOTE_PROXY_SERVERS();
+    self.load_JAP_LOCAL_SSH_REMOTE_PROXY_SERVERS();
     
-    self.template_LOCAL_SSH_PROXY_SERVERS = ko.observable();
+    self.template_JAP_LOCAL_SSH_PROXY_SERVERS = ko.observable();
     
-    self.load_LOCAL_SSH_PROXY_SERVERS = function() {
-        self.template_LOCAL_SSH_PROXY_SERVERS(new Template("TEMPLATE_LOCAL_SSH_PROXY_SERVERS", self));
+    self.load_JAP_LOCAL_SSH_PROXY_SERVERS = function() {
+        self.template_JAP_LOCAL_SSH_PROXY_SERVERS(new Template("TEMPLATE_JAP_LOCAL_SSH_PROXY_SERVERS", self));
     }
     
-    self.load_LOCAL_SSH_PROXY_SERVERS();
+    self.load_JAP_LOCAL_SSH_PROXY_SERVERS();
     
     $.ajax({
         "type": "GET",
         "url": "/API",
         "dataType": "JSON",
         "data": {
-            "action": "LOCAL_SSH"
+            "action": "JAP_LOCAL_SSH"
         }
     }).then(
         function(data, textStatus, jqXHR) {
-            Alertify.log.success("LOCAL SSH - OK");
+            Alertify.log.success("JAP LOCAL SSH - OK");
             
             ko.mapping.fromJS(data, self.data);
         }, 
         function(jqXHR, textStatus, errorThrown) {
-            Alertify.log.error("LOCAL SSH - NOT OK");
+            Alertify.log.error("JAP LOCAL SSH - NOT OK");
         }
     );
 }
 
-function LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_ADD_ViewModel(parent) {
+function JAP_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_ADD_ViewModel(parent) {
     var self = this;
     self.parent = parent;
     self.defaultData = {
@@ -336,36 +394,36 @@ function LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_ADD_ViewModel(parent) {
         }
     }
     self.data = ko.mapping.fromJS(self.defaultData);
-    self.action = "LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_ADD";
+    self.action = "JAP_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_ADD";
     
-    self.action_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_ADD = function() {
-        self.parent.action_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_ADD(self.data);
-        self.parent.load_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS();
+    self.action_JAP_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_ADD = function() {
+        self.parent.action_JAP_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_ADD(self.data);
+        self.parent.load_JAP_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS();
     }
     
     self.cancel = function() {
-        self.parent.load_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS();
+        self.parent.load_JAP_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS();
     }
 }
 
-function LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_UPDATE_ViewModel(parent, selectedData) {
+function JAP_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_UPDATE_ViewModel(parent, selectedData) {
     var self = this;
     self.parent = parent;
     self.selectedData = selectedData;
     self.data = ko.mapping.fromJS(ko.mapping.toJS(self.selectedData));
-    self.action = "LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_UPDATE";
+    self.action = "JAP_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_UPDATE";
     
-    self.action_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_UPDATE = function() {
-        self.parent.action_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_UPDATE(self.selectedData, self.data);
-        self.parent.load_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS();
+    self.action_JAP_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_UPDATE = function() {
+        self.parent.action_JAP_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_UPDATE(self.selectedData, self.data);
+        self.parent.load_JAP_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS();
     }
     
     self.cancel = function() {
-        self.parent.load_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS();
+        self.parent.load_JAP_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS();
     }
 }
 
-function LOCAL_SSH_REMOTE_PROXY_SERVERS_ADD_ViewModel(parent) {
+function JAP_LOCAL_SSH_REMOTE_PROXY_SERVERS_ADD_ViewModel(parent) {
     var self = this;
     self.parent = parent;
     self.defaultData = {
@@ -382,36 +440,36 @@ function LOCAL_SSH_REMOTE_PROXY_SERVERS_ADD_ViewModel(parent) {
         }
     }
     self.data = ko.mapping.fromJS(self.defaultData);
-    self.action = "LOCAL_SSH_REMOTE_PROXY_SERVERS_ADD";
+    self.action = "JAP_LOCAL_SSH_REMOTE_PROXY_SERVERS_ADD";
     
-    self.action_LOCAL_SSH_REMOTE_PROXY_SERVERS_ADD = function() {
-        self.parent.action_LOCAL_SSH_REMOTE_PROXY_SERVERS_ADD(self.data);
-        self.parent.load_LOCAL_SSH_REMOTE_PROXY_SERVERS();
+    self.action_JAP_LOCAL_SSH_REMOTE_PROXY_SERVERS_ADD = function() {
+        self.parent.action_JAP_LOCAL_SSH_REMOTE_PROXY_SERVERS_ADD(self.data);
+        self.parent.load_JAP_LOCAL_SSH_REMOTE_PROXY_SERVERS();
     }
     
     self.cancel = function() {
-        self.parent.load_LOCAL_SSH_REMOTE_PROXY_SERVERS();
+        self.parent.load_JAP_LOCAL_SSH_REMOTE_PROXY_SERVERS();
     }
 }
 
-function LOCAL_SSH_REMOTE_PROXY_SERVERS_UPDATE_ViewModel(parent, data) {
+function JAP_LOCAL_SSH_REMOTE_PROXY_SERVERS_UPDATE_ViewModel(parent, data) {
     var self = this;
     self.parent = parent;
     self.selectedData = data;
     self.data = ko.mapping.fromJS(ko.mapping.toJS(self.selectedData));
-    self.action = "LOCAL_SSH_REMOTE_PROXY_SERVERS_UPDATE";
+    self.action = "JAP_LOCAL_SSH_REMOTE_PROXY_SERVERS_UPDATE";
     
-    self.action_LOCAL_SSH_REMOTE_PROXY_SERVERS_UPDATE = function() {
-        self.parent.action_LOCAL_SSH_REMOTE_PROXY_SERVERS_UPDATE(self.selectedData, self.data);
-        self.parent.load_LOCAL_SSH_REMOTE_PROXY_SERVERS();
+    self.action_JAP_LOCAL_SSH_REMOTE_PROXY_SERVERS_UPDATE = function() {
+        self.parent.action_JAP_LOCAL_SSH_REMOTE_PROXY_SERVERS_UPDATE(self.selectedData, self.data);
+        self.parent.load_JAP_LOCAL_SSH_REMOTE_PROXY_SERVERS();
     }
     
     self.cancel = function() {
-        self.parent.load_LOCAL_SSH_REMOTE_PROXY_SERVERS();
+        self.parent.load_JAP_LOCAL_SSH_REMOTE_PROXY_SERVERS();
     }
 }
 
-function LOCAL_SSH_PROXY_SERVERS_ADD_ViewModel(parent) {
+function JAP_LOCAL_SSH_PROXY_SERVERS_ADD_ViewModel(parent) {
     var self = this;
     self.parent = parent;
     self.defaultData = {
@@ -424,36 +482,36 @@ function LOCAL_SSH_PROXY_SERVERS_ADD_ViewModel(parent) {
         }
     }
     self.data = ko.mapping.fromJS(self.defaultData);
-    self.action = "LOCAL_SSH_PROXY_SERVERS_ADD";
+    self.action = "JAP_LOCAL_SSH_PROXY_SERVERS_ADD";
     
-    self.action_LOCAL_SSH_PROXY_SERVERS_ADD = function() {
-        self.parent.action_LOCAL_SSH_PROXY_SERVERS_ADD(self.data);
-        self.parent.load_LOCAL_SSH_PROXY_SERVERS();
+    self.action_JAP_LOCAL_SSH_PROXY_SERVERS_ADD = function() {
+        self.parent.action_JAP_LOCAL_SSH_PROXY_SERVERS_ADD(self.data);
+        self.parent.load_JAP_LOCAL_SSH_PROXY_SERVERS();
     }
     
     self.cancel = function() {
-        self.parent.load_LOCAL_SSH_PROXY_SERVERS();
+        self.parent.load_JAP_LOCAL_SSH_PROXY_SERVERS();
     }
 }
 
-function LOCAL_SSH_PROXY_SERVERS_UPDATE_ViewModel(parent, data) {
+function JAP_LOCAL_SSH_PROXY_SERVERS_UPDATE_ViewModel(parent, data) {
     var self = this;
     self.parent = parent;
     self.selectedData = data;
     self.data = ko.mapping.fromJS(ko.mapping.toJS(self.selectedData));
-    self.action = "LOCAL_SSH_PROXY_SERVERS_UPDATE";
+    self.action = "JAP_LOCAL_SSH_PROXY_SERVERS_UPDATE";
     
-    self.action_LOCAL_SSH_PROXY_SERVERS_UPDATE = function() {
-        self.parent.action_LOCAL_SSH_PROXY_SERVERS_UPDATE(self.selectedData, self.data);
-        self.parent.load_LOCAL_SSH_PROXY_SERVERS();
+    self.action_JAP_LOCAL_SSH_PROXY_SERVERS_UPDATE = function() {
+        self.parent.action_JAP_LOCAL_SSH_PROXY_SERVERS_UPDATE(self.selectedData, self.data);
+        self.parent.load_JAP_LOCAL_SSH_PROXY_SERVERS();
     }
     
     self.cancel = function() {
-        self.parent.load_LOCAL_SSH_PROXY_SERVERS();
+        self.parent.load_JAP_LOCAL_SSH_PROXY_SERVERS();
     }
 }
 
-function LOCAL_WS_ViewModel(parent) {
+function JAP_LOCAL_WS_ViewModel(parent) {
     var self = this;
     self.parent = parent;
     self.defaultData = {
@@ -469,7 +527,7 @@ function LOCAL_WS_ViewModel(parent) {
     }
     self.data = ko.mapping.fromJS(self.defaultData);
     
-    self.action_LOCAL_WS_UPDATE = function() {
+    self.action_JAP_LOCAL_WS_UPDATE = function() {
         var data = ko.mapping.toJS(self.data);
         
         if($.isNumeric(data.LOCAL_PROXY_SERVER.PORT)) {
@@ -499,103 +557,103 @@ function LOCAL_WS_ViewModel(parent) {
             "url": "/API",
             "dataType": "",
             "data": {
-                "action": "LOCAL_WS_UPDATE",
+                "action": "JAP_LOCAL_WS_UPDATE",
                 "data": ko.toJSON(data)
             }
         }).then(
             function(data, textStatus, jqXHR) {
-                Alertify.log.success("LOCAL WS - UPDATE OK");
+                Alertify.log.success("JAP LOCAL WS - UPDATE OK");
             }, 
             function(jqXHR, textStatus, errorThrown) {
-                Alertify.log.error("LOCAL WS - UPDATE NOT OK");
+                Alertify.log.error("JAP LOCAL WS - UPDATE NOT OK");
             }
         )
     }
     
-    self.action_LOCAL_WS_REMOTE_PROXY_SERVERS_ADD = function(data) {
+    self.action_JAP_LOCAL_WS_REMOTE_PROXY_SERVERS_ADD = function(data) {
         self.data.REMOTE_PROXY_SERVERS.push(data);
     }
     
-    self.action_LOCAL_WS_REMOTE_PROXY_SERVERS_UPDATE = function(selectedData, data) {
+    self.action_JAP_LOCAL_WS_REMOTE_PROXY_SERVERS_UPDATE = function(selectedData, data) {
         ko.mapping.fromJS(ko.mapping.toJS(data), {}, selectedData);
     }
     
-    self.action_LOCAL_WS_REMOTE_PROXY_SERVERS_REMOVE = function(selectedData) {
+    self.action_JAP_LOCAL_WS_REMOTE_PROXY_SERVERS_REMOVE = function(selectedData) {
         self.data.REMOTE_PROXY_SERVERS.remove(selectedData);
     }
     
-    self.action_LOCAL_WS_REMOTE_PROXY_SERVERS_REMOVE_ALL = function() {
+    self.action_JAP_LOCAL_WS_REMOTE_PROXY_SERVERS_REMOVE_ALL = function() {
         self.data.REMOTE_PROXY_SERVERS.removeAll();
     }
     
-    self.action_LOCAL_WS_PROXY_SERVERS_ADD = function(data) {
+    self.action_JAP_LOCAL_WS_PROXY_SERVERS_ADD = function(data) {
         self.data.PROXY_SERVERS.push(data);
     }
     
-    self.action_LOCAL_WS_PROXY_SERVERS_UPDATE = function(selectedData, data) {
+    self.action_JAP_LOCAL_WS_PROXY_SERVERS_UPDATE = function(selectedData, data) {
         ko.mapping.fromJS(ko.mapping.toJS(data), {}, selectedData);
     }
     
-    self.action_LOCAL_WS_PROXY_SERVERS_REMOVE = function(selectedData) {
+    self.action_JAP_LOCAL_WS_PROXY_SERVERS_REMOVE = function(selectedData) {
         self.data.PROXY_SERVERS.remove(selectedData);
     }
     
-    self.action_LOCAL_WS_PROXY_SERVERS_REMOVE_ALL = function() {
+    self.action_JAP_LOCAL_WS_PROXY_SERVERS_REMOVE_ALL = function() {
         self.data.PROXY_SERVERS.removeAll();
     }
     
-    self.load_LOCAL_WS_REMOTE_PROXY_SERVERS_ADD = function() {
-        self.template_LOCAL_WS_REMOTE_PROXY_SERVERS(new Template("TEMPLATE_LOCAL_WS_REMOTE_PROXY_SERVER", new LOCAL_WS_REMOTE_PROXY_SERVERS_ADD_ViewModel(self)));
+    self.load_JAP_LOCAL_WS_REMOTE_PROXY_SERVERS_ADD = function() {
+        self.template_JAP_LOCAL_WS_REMOTE_PROXY_SERVERS(new Template("TEMPLATE_JAP_LOCAL_WS_REMOTE_PROXY_SERVER", new JAP_LOCAL_WS_REMOTE_PROXY_SERVERS_ADD_ViewModel(self)));
     }
     
-    self.load_LOCAL_WS_REMOTE_PROXY_SERVERS_UPDATE = function(data) {
-        self.template_LOCAL_WS_REMOTE_PROXY_SERVERS(new Template("TEMPLATE_LOCAL_WS_REMOTE_PROXY_SERVER", new LOCAL_WS_REMOTE_PROXY_SERVERS_UPDATE_ViewModel(self, data)));
+    self.load_JAP_LOCAL_WS_REMOTE_PROXY_SERVERS_UPDATE = function(data) {
+        self.template_JAP_LOCAL_WS_REMOTE_PROXY_SERVERS(new Template("TEMPLATE_JAP_LOCAL_WS_REMOTE_PROXY_SERVER", new JAP_LOCAL_WS_REMOTE_PROXY_SERVERS_UPDATE_ViewModel(self, data)));
     }
     
-    self.load_LOCAL_WS_PROXY_SERVERS_ADD = function() {
-        self.template_LOCAL_WS_PROXY_SERVERS(new Template("TEMPLATE_LOCAL_WS_PROXY_SERVER", new LOCAL_WS_PROXY_SERVERS_ADD_ViewModel(self)));
+    self.load_JAP_LOCAL_WS_PROXY_SERVERS_ADD = function() {
+        self.template_JAP_LOCAL_WS_PROXY_SERVERS(new Template("TEMPLATE_JAP_LOCAL_WS_PROXY_SERVER", new JAP_LOCAL_WS_PROXY_SERVERS_ADD_ViewModel(self)));
     }
     
-    self.load_LOCAL_WS_PROXY_SERVERS_UPDATE = function(data) {
-        self.template_LOCAL_WS_PROXY_SERVERS(new Template("TEMPLATE_LOCAL_WS_PROXY_SERVER", new LOCAL_WS_PROXY_SERVERS_UPDATE_ViewModel(self, data)));
+    self.load_JAP_LOCAL_WS_PROXY_SERVERS_UPDATE = function(data) {
+        self.template_JAP_LOCAL_WS_PROXY_SERVERS(new Template("TEMPLATE_JAP_LOCAL_WS_PROXY_SERVER", new JAP_LOCAL_WS_PROXY_SERVERS_UPDATE_ViewModel(self, data)));
     }
     
-    self.template_LOCAL_WS_REMOTE_PROXY_SERVERS = ko.observable();
+    self.template_JAP_LOCAL_WS_REMOTE_PROXY_SERVERS = ko.observable();
     
-    self.load_LOCAL_WS_REMOTE_PROXY_SERVERS = function() {
-        self.template_LOCAL_WS_REMOTE_PROXY_SERVERS(new Template("TEMPLATE_LOCAL_WS_REMOTE_PROXY_SERVERS", self));
+    self.load_JAP_LOCAL_WS_REMOTE_PROXY_SERVERS = function() {
+        self.template_JAP_LOCAL_WS_REMOTE_PROXY_SERVERS(new Template("TEMPLATE_JAP_LOCAL_WS_REMOTE_PROXY_SERVERS", self));
     }
     
-    self.load_LOCAL_WS_REMOTE_PROXY_SERVERS();
+    self.load_JAP_LOCAL_WS_REMOTE_PROXY_SERVERS();
     
-    self.template_LOCAL_WS_PROXY_SERVERS = ko.observable();
+    self.template_JAP_LOCAL_WS_PROXY_SERVERS = ko.observable();
     
-    self.load_LOCAL_WS_PROXY_SERVERS = function() {
-        self.template_LOCAL_WS_PROXY_SERVERS(new Template("TEMPLATE_LOCAL_WS_PROXY_SERVERS", self));
+    self.load_JAP_LOCAL_WS_PROXY_SERVERS = function() {
+        self.template_JAP_LOCAL_WS_PROXY_SERVERS(new Template("TEMPLATE_JAP_LOCAL_WS_PROXY_SERVERS", self));
     }
     
-    self.load_LOCAL_WS_PROXY_SERVERS();
+    self.load_JAP_LOCAL_WS_PROXY_SERVERS();
     
     $.ajax({
         "type": "GET",
         "url": "/API",
         "dataType": "JSON",
         "data": {
-            "action": "LOCAL_WS"
+            "action": "JAP_LOCAL_WS"
         }
     }).then(
         function(data, textStatus, jqXHR) {
-            Alertify.log.success("LOCAL WS - OK");
+            Alertify.log.success("JAP LOCAL WS - OK");
             
             ko.mapping.fromJS(data, self.data);
         }, 
         function(jqXHR, textStatus, errorThrown) {
-            Alertify.log.error("LOCAL WS - NOT OK");
+            Alertify.log.error("JAP LOCAL WS - NOT OK");
         }
     );
 }
 
-function LOCAL_WS_REMOTE_PROXY_SERVERS_ADD_ViewModel(parent) {
+function JAP_LOCAL_WS_REMOTE_PROXY_SERVERS_ADD_ViewModel(parent) {
     var self = this;
     self.parent = parent;
     self.defaultData = {
@@ -613,36 +671,36 @@ function LOCAL_WS_REMOTE_PROXY_SERVERS_ADD_ViewModel(parent) {
         }
     }
     self.data = ko.mapping.fromJS(self.defaultData);
-    self.action = "LOCAL_WS_REMOTE_PROXY_SERVERS_ADD";
+    self.action = "JAP_LOCAL_WS_REMOTE_PROXY_SERVERS_ADD";
     
-    self.action_LOCAL_WS_REMOTE_PROXY_SERVERS_ADD = function() {
-        self.parent.action_LOCAL_WS_REMOTE_PROXY_SERVERS_ADD(self.data);
-        self.parent.load_LOCAL_WS_REMOTE_PROXY_SERVERS();
+    self.action_JAP_LOCAL_WS_REMOTE_PROXY_SERVERS_ADD = function() {
+        self.parent.action_JAP_LOCAL_WS_REMOTE_PROXY_SERVERS_ADD(self.data);
+        self.parent.load_JAP_LOCAL_WS_REMOTE_PROXY_SERVERS();
     }
     
     self.cancel = function() {
-        self.parent.load_LOCAL_WS_REMOTE_PROXY_SERVERS();
+        self.parent.load_JAP_LOCAL_WS_REMOTE_PROXY_SERVERS();
     }
 }
 
-function LOCAL_WS_REMOTE_PROXY_SERVERS_UPDATE_ViewModel(parent, data) {
+function JAP_LOCAL_WS_REMOTE_PROXY_SERVERS_UPDATE_ViewModel(parent, data) {
     var self = this;
     self.parent = parent;
     self.selectedData = data;
     self.data = ko.mapping.fromJS(ko.mapping.toJS(self.selectedData));
-    self.action = "LOCAL_WS_REMOTE_PROXY_SERVERS_UPDATE";
+    self.action = "JAP_LOCAL_WS_REMOTE_PROXY_SERVERS_UPDATE";
     
-    self.action_LOCAL_WS_REMOTE_PROXY_SERVERS_UPDATE = function() {
-        self.parent.action_LOCAL_WS_REMOTE_PROXY_SERVERS_UPDATE(self.selectedData, self.data);
-        self.parent.load_LOCAL_WS_REMOTE_PROXY_SERVERS();
+    self.action_JAP_LOCAL_WS_REMOTE_PROXY_SERVERS_UPDATE = function() {
+        self.parent.action_JAP_LOCAL_WS_REMOTE_PROXY_SERVERS_UPDATE(self.selectedData, self.data);
+        self.parent.load_JAP_LOCAL_WS_REMOTE_PROXY_SERVERS();
     }
     
     self.cancel = function() {
-        self.parent.load_LOCAL_WS_REMOTE_PROXY_SERVERS();
+        self.parent.load_JAP_LOCAL_WS_REMOTE_PROXY_SERVERS();
     }
 }
 
-function LOCAL_WS_PROXY_SERVERS_ADD_ViewModel(parent) {
+function JAP_LOCAL_WS_PROXY_SERVERS_ADD_ViewModel(parent) {
     var self = this;
     self.parent = parent;
     self.defaultData = {
@@ -655,36 +713,36 @@ function LOCAL_WS_PROXY_SERVERS_ADD_ViewModel(parent) {
         }
     }
     self.data = ko.mapping.fromJS(self.defaultData);
-    self.action = "LOCAL_WS_PROXY_SERVERS_ADD";
+    self.action = "JAP_LOCAL_WS_PROXY_SERVERS_ADD";
     
-    self.action_LOCAL_WS_PROXY_SERVERS_ADD = function() {
-        self.parent.action_LOCAL_WS_PROXY_SERVERS_ADD(self.data);
-        self.parent.load_LOCAL_WS_PROXY_SERVERS();
+    self.action_JAP_LOCAL_WS_PROXY_SERVERS_ADD = function() {
+        self.parent.action_JAP_LOCAL_WS_PROXY_SERVERS_ADD(self.data);
+        self.parent.load_JAP_LOCAL_WS_PROXY_SERVERS();
     }
     
     self.cancel = function() {
-        self.parent.load_LOCAL_WS_PROXY_SERVERS();
+        self.parent.load_JAP_LOCAL_WS_PROXY_SERVERS();
     }
 }
 
-function LOCAL_WS_PROXY_SERVERS_UPDATE_ViewModel(parent, data) {
+function JAP_LOCAL_WS_PROXY_SERVERS_UPDATE_ViewModel(parent, data) {
     var self = this;
     self.parent = parent;
     self.selectedData = data;
     self.data = ko.mapping.fromJS(ko.mapping.toJS(self.selectedData));
-    self.action = "LOCAL_WS_PROXY_SERVERS_UPDATE";
+    self.action = "JAP_LOCAL_WS_PROXY_SERVERS_UPDATE";
     
-    self.action_LOCAL_WS_PROXY_SERVERS_UPDATE = function() {
-        self.parent.action_LOCAL_WS_PROXY_SERVERS_UPDATE(self.selectedData, self.data);
-        self.parent.load_LOCAL_WS_PROXY_SERVERS();
+    self.action_JAP_LOCAL_WS_PROXY_SERVERS_UPDATE = function() {
+        self.parent.action_JAP_LOCAL_WS_PROXY_SERVERS_UPDATE(self.selectedData, self.data);
+        self.parent.load_JAP_LOCAL_WS_PROXY_SERVERS();
     }
     
     self.cancel = function() {
-        self.parent.load_LOCAL_WS_PROXY_SERVERS();
+        self.parent.load_JAP_LOCAL_WS_PROXY_SERVERS();
     }
 }
 
-function REMOTE_SSH_ViewModel(parent) {
+function JAP_REMOTE_SSH_ViewModel(parent) {
     var self = this;
     self.parent = parent;
     self.defaultData = {
@@ -710,7 +768,7 @@ function REMOTE_SSH_ViewModel(parent) {
     }
     self.data = ko.mapping.fromJS(self.defaultData);
     
-    self.action_REMOTE_SSH_UPDATE = function() {
+    self.action_JAP_REMOTE_SSH_UPDATE = function() {
         var data = ko.mapping.toJS(self.data);
         
         if($.isNumeric(data.REMOTE_PROXY_SERVER.PORT)) {
@@ -732,103 +790,103 @@ function REMOTE_SSH_ViewModel(parent) {
             "url": "/API",
             "dataType": "",
             "data": {
-                "action": "REMOTE_SSH_UPDATE",
+                "action": "JAP_REMOTE_SSH_UPDATE",
                 "data": ko.toJSON(data)
             }
         }).then(
             function(data, textStatus, jqXHR) {
-                Alertify.log.success("REMOTE SSH - UPDATE OK");
+                Alertify.log.success("JAP REMOTE SSH - UPDATE OK");
             }, 
             function(jqXHR, textStatus, errorThrown) {
-                Alertify.log.error("REMOTE SSH - UPDATE NOT OK");
+                Alertify.log.error("JAP REMOTE SSH - UPDATE NOT OK");
             }
         )
     }
     
-    self.action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD = function(data) {
+    self.action_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD = function(data) {
         self.data.REMOTE_PROXY_SERVER.AUTHENTICATION.push(data);
     }
     
-    self.action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE = function(selectedData, data) {
+    self.action_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE = function(selectedData, data) {
         ko.mapping.fromJS(ko.mapping.toJS(data), {}, selectedData);
     }
     
-    self.action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_REMOVE = function(selectedData) {
+    self.action_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_REMOVE = function(selectedData) {
         self.data.REMOTE_PROXY_SERVER.AUTHENTICATION.remove(selectedData);
     }
     
-    self.action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_REMOVE_ALL = function() {
+    self.action_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_REMOVE_ALL = function() {
         self.data.REMOTE_PROXY_SERVER.AUTHENTICATION.removeAll();
     }
     
-    self.action_REMOTE_SSH_PROXY_SERVERS_ADD = function(data) {
+    self.action_JAP_REMOTE_SSH_PROXY_SERVERS_ADD = function(data) {
         self.data.PROXY_SERVERS.push(data);
     }
     
-    self.action_REMOTE_SSH_PROXY_SERVERS_UPDATE = function(selectedData, data) {
+    self.action_JAP_REMOTE_SSH_PROXY_SERVERS_UPDATE = function(selectedData, data) {
         ko.mapping.fromJS(ko.mapping.toJS(data), {}, selectedData);
     }
     
-    self.action_REMOTE_SSH_PROXY_SERVERS_REMOVE = function(selectedData) {
+    self.action_JAP_REMOTE_SSH_PROXY_SERVERS_REMOVE = function(selectedData) {
         self.data.PROXY_SERVERS.remove(selectedData);
     }
     
-    self.action_REMOTE_SSH_PROXY_SERVERS_REMOVE_ALL = function() {
+    self.action_JAP_REMOTE_SSH_PROXY_SERVERS_REMOVE_ALL = function() {
         self.data.PROXY_SERVERS.removeAll();
     }
     
-    self.load_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD = function() {
-        self.template_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS(new Template("TEMPLATE_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION", new REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD_ViewModel(self)));
+    self.load_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD = function() {
+        self.template_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS(new Template("TEMPLATE_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION", new JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD_ViewModel(self)));
     }
     
-    self.load_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE = function(data) {
-        self.template_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS(new Template("TEMPLATE_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION", new REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE_ViewModel(self, data)));
+    self.load_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE = function(data) {
+        self.template_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS(new Template("TEMPLATE_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION", new JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE_ViewModel(self, data)));
     }
     
-    self.load_REMOTE_SSH_PROXY_SERVERS_ADD = function() {
-        self.template_REMOTE_SSH_PROXY_SERVERS(new Template("TEMPLATE_REMOTE_SSH_PROXY_SERVER", new REMOTE_SSH_PROXY_SERVERS_ADD_ViewModel(self)));
+    self.load_JAP_REMOTE_SSH_PROXY_SERVERS_ADD = function() {
+        self.template_JAP_REMOTE_SSH_PROXY_SERVERS(new Template("TEMPLATE_JAP_REMOTE_SSH_PROXY_SERVER", new JAP_REMOTE_SSH_PROXY_SERVERS_ADD_ViewModel(self)));
     }
     
-    self.load_REMOTE_SSH_PROXY_SERVERS_UPDATE = function(data) {
-        self.template_REMOTE_SSH_PROXY_SERVERS(new Template("TEMPLATE_REMOTE_SSH_PROXY_SERVER", new REMOTE_SSH_PROXY_SERVERS_UPDATE_ViewModel(self, data)));
+    self.load_JAP_REMOTE_SSH_PROXY_SERVERS_UPDATE = function(data) {
+        self.template_JAP_REMOTE_SSH_PROXY_SERVERS(new Template("TEMPLATE_JAP_REMOTE_SSH_PROXY_SERVER", new JAP_REMOTE_SSH_PROXY_SERVERS_UPDATE_ViewModel(self, data)));
     }
     
-    self.template_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS = ko.observable();
+    self.template_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS = ko.observable();
     
-    self.load_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS = function() {
-        self.template_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS(new Template("TEMPLATE_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS", self));
+    self.load_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS = function() {
+        self.template_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS(new Template("TEMPLATE_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS", self));
     }
     
-    self.load_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS();
+    self.load_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS();
     
-    self.template_REMOTE_SSH_PROXY_SERVERS = ko.observable();
+    self.template_JAP_REMOTE_SSH_PROXY_SERVERS = ko.observable();
     
-    self.load_REMOTE_SSH_PROXY_SERVERS = function() {
-        self.template_REMOTE_SSH_PROXY_SERVERS(new Template("TEMPLATE_REMOTE_SSH_PROXY_SERVERS", self));
+    self.load_JAP_REMOTE_SSH_PROXY_SERVERS = function() {
+        self.template_JAP_REMOTE_SSH_PROXY_SERVERS(new Template("TEMPLATE_JAP_REMOTE_SSH_PROXY_SERVERS", self));
     }
     
-    self.load_REMOTE_SSH_PROXY_SERVERS();
+    self.load_JAP_REMOTE_SSH_PROXY_SERVERS();
     
     $.ajax({
         "type": "GET",
         "url": "/API",
         "dataType": "JSON",
         "data": {
-            "action": "REMOTE_SSH"
+            "action": "JAP_REMOTE_SSH"
         }
     }).then(
         function(data, textStatus, jqXHR) {
-            Alertify.log.success("REMOTE SSH - OK");
+            Alertify.log.success("JAP REMOTE SSH - OK");
             
             ko.mapping.fromJS(data, self.data);
         }, 
         function(jqXHR, textStatus, errorThrown) {
-            Alertify.log.error("REMOTE SSH - NOT OK");
+            Alertify.log.error("JAP REMOTE SSH - NOT OK");
         }
     );
 }
 
-function REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD_ViewModel(parent) {
+function JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD_ViewModel(parent) {
     var self = this;
     self.parent = parent;
     self.defaultData = {
@@ -837,100 +895,100 @@ function REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD_ViewModel(parent) {
         "KEYS": []
     }
     self.data = ko.mapping.fromJS(self.defaultData);
-    self.action = "REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD";
+    self.action = "JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD";
     
-    self.action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD = function() {
-        self.parent.action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD(self.data);
-        self.parent.load_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS();
+    self.action_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD = function() {
+        self.parent.action_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD(self.data);
+        self.parent.load_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS();
     }
     
     self.cancel = function() {
-        self.parent.load_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS();
+        self.parent.load_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS();
     }
     
-    self.action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_ADD = function(data) {
+    self.action_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_ADD = function(data) {
         self.data.KEYS.push(data);
     }
     
-    self.action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_UPDATE = function(selectedData, data) {
+    self.action_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_UPDATE = function(selectedData, data) {
         ko.mapping.fromJS(ko.mapping.toJS(data), {}, selectedData);
     }
     
-    self.action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_REMOVE = function(selectedData) {
+    self.action_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_REMOVE = function(selectedData) {
         self.data.KEYS.remove(selectedData);
     }
     
-    self.action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_REMOVE_ALL = function() {
+    self.action_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_REMOVE_ALL = function() {
         self.data.KEYS.removeAll();
     }
     
-    self.load_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_ADD = function() {
-        self.template_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS(new Template("TEMPLATE_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEY", new REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_ADD_ViewModel(self)));
+    self.load_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_ADD = function() {
+        self.template_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS(new Template("TEMPLATE_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEY", new JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_ADD_ViewModel(self)));
     }
     
-    self.load_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_UPDATE = function(data) {
-        self.template_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS(new Template("TEMPLATE_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEY", new REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_UPDATE_ViewModel(self, data)));
+    self.load_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_UPDATE = function(data) {
+        self.template_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS(new Template("TEMPLATE_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEY", new JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_UPDATE_ViewModel(self, data)));
     }
     
-    self.template_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS = ko.observable();
+    self.template_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS = ko.observable();
     
-    self.load_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS = function() {
-        self.template_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS(new Template("TEMPLATE_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS", self));
+    self.load_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS = function() {
+        self.template_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS(new Template("TEMPLATE_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS", self));
     }
     
-    self.load_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS();
+    self.load_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS();
 }
 
-function REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE_ViewModel(parent, data) {
+function JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE_ViewModel(parent, data) {
     var self = this;
     self.parent = parent;
     self.selectedData = data;
     self.data = ko.mapping.fromJS(ko.mapping.toJS(self.selectedData));
-    self.action = "REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE";
+    self.action = "JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE";
     
-    self.action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE = function() {
-        self.parent.action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE(self.selectedData, self.data);
-        self.parent.load_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS();
+    self.action_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE = function() {
+        self.parent.action_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE(self.selectedData, self.data);
+        self.parent.load_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS();
     }
     
     self.cancel = function() {
-        self.parent.load_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS();
+        self.parent.load_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS();
     }
     
-    self.action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_ADD = function(data) {
+    self.action_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_ADD = function(data) {
         self.data.KEYS.push(data);
     }
     
-    self.action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_UPDATE = function(selectedData, data) {
+    self.action_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_UPDATE = function(selectedData, data) {
         ko.mapping.fromJS(ko.mapping.toJS(data), {}, selectedData);
     }
     
-    self.action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_REMOVE = function(selectedData) {
+    self.action_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_REMOVE = function(selectedData) {
         self.data.KEYS.remove(selectedData);
     }
     
-    self.action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_REMOVE_ALL = function() {
+    self.action_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_REMOVE_ALL = function() {
         self.data.KEYS.removeAll();
     }
     
-    self.load_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_ADD = function() {
-        self.template_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS(new Template("TEMPLATE_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEY", new REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_ADD_ViewModel(self)));
+    self.load_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_ADD = function() {
+        self.template_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS(new Template("TEMPLATE_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEY", new JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_ADD_ViewModel(self)));
     }
     
-    self.load_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_UPDATE = function(data) {
-        self.template_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS(new Template("TEMPLATE_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEY", new REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_UPDATE_ViewModel(self, data)));
+    self.load_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_UPDATE = function(data) {
+        self.template_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS(new Template("TEMPLATE_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEY", new JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_UPDATE_ViewModel(self, data)));
     }
     
-    self.template_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS = ko.observable();
+    self.template_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS = ko.observable();
     
-    self.load_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS = function() {
-        self.template_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS(new Template("TEMPLATE_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS", self));
+    self.load_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS = function() {
+        self.template_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS(new Template("TEMPLATE_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS", self));
     }
     
-    self.load_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS();
+    self.load_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS();
 }
 
-function REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_ADD_ViewModel(parent) {
+function JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_ADD_ViewModel(parent) {
     var self = this;
     self.parent = parent;
     self.defaultData = {
@@ -940,36 +998,36 @@ function REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_ADD_ViewModel(parent
         }
     }
     self.data = ko.mapping.fromJS(self.defaultData);
-    self.action = "REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_ADD";
+    self.action = "JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_ADD";
     
-    self.action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_ADD = function() {
-        self.parent.action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_ADD(self.data);
-        self.parent.load_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS();
+    self.action_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_ADD = function() {
+        self.parent.action_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_ADD(self.data);
+        self.parent.load_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS();
     }
     
     self.cancel = function() {
-        self.parent.load_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS();
+        self.parent.load_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS();
     }
 }
 
-function REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_UPDATE_ViewModel(parent, data) {
+function JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_UPDATE_ViewModel(parent, data) {
     var self = this;
     self.parent = parent;
     self.selectedData = data;
     self.data = ko.mapping.fromJS(ko.mapping.toJS(self.selectedData));
-    self.action = "REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_UPDATE";
+    self.action = "JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_UPDATE";
     
-    self.action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_UPDATE = function() {
-        self.parent.action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_UPDATE(self.selectedData, self.data);
-        self.parent.load_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS();
+    self.action_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_UPDATE = function() {
+        self.parent.action_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_UPDATE(self.selectedData, self.data);
+        self.parent.load_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS();
     }
     
     self.cancel = function() {
-        self.parent.load_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS();
+        self.parent.load_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS();
     }
 }
 
-function REMOTE_SSH_PROXY_SERVERS_ADD_ViewModel(parent) {
+function JAP_REMOTE_SSH_PROXY_SERVERS_ADD_ViewModel(parent) {
     var self = this;
     self.parent = parent;
     self.defaultData = {
@@ -982,36 +1040,36 @@ function REMOTE_SSH_PROXY_SERVERS_ADD_ViewModel(parent) {
         }
     }
     self.data = ko.mapping.fromJS(self.defaultData);
-    self.action = "REMOTE_SSH_PROXY_SERVERS_ADD";
+    self.action = "JAP_REMOTE_SSH_PROXY_SERVERS_ADD";
     
-    self.action_REMOTE_SSH_PROXY_SERVERS_ADD = function() {
-        self.parent.action_REMOTE_SSH_PROXY_SERVERS_ADD(self.data);
-        self.parent.load_REMOTE_SSH_PROXY_SERVERS();
+    self.action_JAP_REMOTE_SSH_PROXY_SERVERS_ADD = function() {
+        self.parent.action_JAP_REMOTE_SSH_PROXY_SERVERS_ADD(self.data);
+        self.parent.load_JAP_REMOTE_SSH_PROXY_SERVERS();
     }
     
     self.cancel = function() {
-        self.parent.load_REMOTE_SSH_PROXY_SERVERS();
+        self.parent.load_JAP_REMOTE_SSH_PROXY_SERVERS();
     }
 }
 
-function REMOTE_SSH_PROXY_SERVERS_UPDATE_ViewModel(parent, data) {
+function JAP_REMOTE_SSH_PROXY_SERVERS_UPDATE_ViewModel(parent, data) {
     var self = this;
     self.parent = parent;
     self.selectedData = data;
     self.data = ko.mapping.fromJS(ko.mapping.toJS(self.selectedData));
-    self.action = "REMOTE_SSH_PROXY_SERVERS_UPDATE";
+    self.action = "JAP_REMOTE_SSH_PROXY_SERVERS_UPDATE";
     
-    self.action_REMOTE_SSH_PROXY_SERVERS_UPDATE = function() {
-        self.parent.action_REMOTE_SSH_PROXY_SERVERS_UPDATE(self.selectedData, self.data);
-        self.parent.load_REMOTE_SSH_PROXY_SERVERS();
+    self.action_JAP_REMOTE_SSH_PROXY_SERVERS_UPDATE = function() {
+        self.parent.action_JAP_REMOTE_SSH_PROXY_SERVERS_UPDATE(self.selectedData, self.data);
+        self.parent.load_JAP_REMOTE_SSH_PROXY_SERVERS();
     }
     
     self.cancel = function() {
-        self.parent.load_REMOTE_SSH_PROXY_SERVERS();
+        self.parent.load_JAP_REMOTE_SSH_PROXY_SERVERS();
     }
 }
 
-function REMOTE_WS_ViewModel(parent) {
+function JAP_REMOTE_WS_ViewModel(parent) {
     var self = this;
     self.parent = parent;
     self.defaultData = {
@@ -1034,7 +1092,7 @@ function REMOTE_WS_ViewModel(parent) {
     }
     self.data = ko.mapping.fromJS(self.defaultData);
     
-    self.action_REMOTE_WS_UPDATE = function() {
+    self.action_JAP_REMOTE_WS_UPDATE = function() {
         var data = ko.mapping.toJS(self.data);
         
         if($.isNumeric(data.REMOTE_PROXY_SERVER.PORT)) {
@@ -1056,103 +1114,103 @@ function REMOTE_WS_ViewModel(parent) {
             "url": "/API",
             "dataType": "",
             "data": {
-                "action": "REMOTE_WS_UPDATE",
+                "action": "JAP_REMOTE_WS_UPDATE",
                 "data": ko.toJSON(data)
             }
         }).then(
             function(data, textStatus, jqXHR) {
-                Alertify.log.success("REMOTE WS - UPDATE OK");
+                Alertify.log.success("JAP REMOTE WS - UPDATE OK");
             }, 
             function(jqXHR, textStatus, errorThrown) {
-                Alertify.log.error("REMOTE WS - UPDATE NOT OK");
+                Alertify.log.error("JAP REMOTE WS - UPDATE NOT OK");
             }
         )
     }
     
-    self.action_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD = function(data) {
+    self.action_JAP_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD = function(data) {
         self.data.REMOTE_PROXY_SERVER.AUTHENTICATION.push(data);
     }
     
-    self.action_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE = function(selectedData, data) {
+    self.action_JAP_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE = function(selectedData, data) {
         ko.mapping.fromJS(ko.mapping.toJS(data), {}, selectedData);
     }
     
-    self.action_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_REMOVE = function(selectedData) {
+    self.action_JAP_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_REMOVE = function(selectedData) {
         self.data.REMOTE_PROXY_SERVER.AUTHENTICATION.remove(selectedData);
     }
     
-    self.action_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_REMOVE_ALL = function() {
+    self.action_JAP_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_REMOVE_ALL = function() {
         self.data.REMOTE_PROXY_SERVER.AUTHENTICATION.removeAll();
     }
     
-    self.action_REMOTE_WS_PROXY_SERVERS_ADD = function(data) {
+    self.action_JAP_REMOTE_WS_PROXY_SERVERS_ADD = function(data) {
         self.data.PROXY_SERVERS.push(data);
     }
     
-    self.action_REMOTE_WS_PROXY_SERVERS_UPDATE = function(selectedData, data) {
+    self.action_JAP_REMOTE_WS_PROXY_SERVERS_UPDATE = function(selectedData, data) {
         ko.mapping.fromJS(ko.mapping.toJS(data), {}, selectedData);
     }
     
-    self.action_REMOTE_WS_PROXY_SERVERS_REMOVE = function(selectedData) {
+    self.action_JAP_REMOTE_WS_PROXY_SERVERS_REMOVE = function(selectedData) {
         self.data.PROXY_SERVERS.remove(selectedData);
     }
     
-    self.action_REMOTE_WS_PROXY_SERVERS_REMOVE_ALL = function() {
+    self.action_JAP_REMOTE_WS_PROXY_SERVERS_REMOVE_ALL = function() {
         self.data.PROXY_SERVERS.removeAll();
     }
     
-    self.load_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD = function() {
-        self.template_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS(new Template("TEMPLATE_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATION", new REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD_ViewModel(self)));
+    self.load_JAP_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD = function() {
+        self.template_JAP_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS(new Template("TEMPLATE_JAP_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATION", new JAP_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD_ViewModel(self)));
     }
     
-    self.load_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE = function(data) {
-        self.template_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS(new Template("TEMPLATE_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATION", new REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE_ViewModel(self, data)));
+    self.load_JAP_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE = function(data) {
+        self.template_JAP_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS(new Template("TEMPLATE_JAP_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATION", new JAP_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE_ViewModel(self, data)));
     }
     
-    self.load_REMOTE_WS_PROXY_SERVERS_ADD = function() {
-        self.template_REMOTE_WS_PROXY_SERVERS(new Template("TEMPLATE_REMOTE_WS_PROXY_SERVER", new REMOTE_WS_PROXY_SERVERS_ADD_ViewModel(self)));
+    self.load_JAP_REMOTE_WS_PROXY_SERVERS_ADD = function() {
+        self.template_JAP_REMOTE_WS_PROXY_SERVERS(new Template("TEMPLATE_JAP_REMOTE_WS_PROXY_SERVER", new JAP_REMOTE_WS_PROXY_SERVERS_ADD_ViewModel(self)));
     }
     
-    self.load_REMOTE_WS_PROXY_SERVERS_UPDATE = function(data) {
-        self.template_REMOTE_WS_PROXY_SERVERS(new Template("TEMPLATE_REMOTE_WS_PROXY_SERVER", new REMOTE_WS_PROXY_SERVERS_UPDATE_ViewModel(self, data)));
+    self.load_JAP_REMOTE_WS_PROXY_SERVERS_UPDATE = function(data) {
+        self.template_JAP_REMOTE_WS_PROXY_SERVERS(new Template("TEMPLATE_JAP_REMOTE_WS_PROXY_SERVER", new JAP_REMOTE_WS_PROXY_SERVERS_UPDATE_ViewModel(self, data)));
     }
     
-    self.template_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS = ko.observable();
+    self.template_JAP_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS = ko.observable();
     
-    self.load_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS = function() {
-        self.template_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS(new Template("TEMPLATE_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS", self));
+    self.load_JAP_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS = function() {
+        self.template_JAP_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS(new Template("TEMPLATE_JAP_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS", self));
     }
     
-    self.load_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS();
+    self.load_JAP_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS();
     
-    self.template_REMOTE_WS_PROXY_SERVERS = ko.observable();
+    self.template_JAP_REMOTE_WS_PROXY_SERVERS = ko.observable();
     
-    self.load_REMOTE_WS_PROXY_SERVERS = function() {
-        self.template_REMOTE_WS_PROXY_SERVERS(new Template("TEMPLATE_REMOTE_WS_PROXY_SERVERS", self));
+    self.load_JAP_REMOTE_WS_PROXY_SERVERS = function() {
+        self.template_JAP_REMOTE_WS_PROXY_SERVERS(new Template("TEMPLATE_JAP_REMOTE_WS_PROXY_SERVERS", self));
     }
     
-    self.load_REMOTE_WS_PROXY_SERVERS();
+    self.load_JAP_REMOTE_WS_PROXY_SERVERS();
     
     $.ajax({
         "type": "GET",
         "url": "/API",
         "dataType": "JSON",
         "data": {
-            "action": "REMOTE_WS"
+            "action": "JAP_REMOTE_WS"
         }
     }).then(
         function(data, textStatus, jqXHR) {
-            Alertify.log.success("REMOTE WS - OK");
+            Alertify.log.success("JAP REMOTE WS - OK");
             
             ko.mapping.fromJS(data, self.data);
         }, 
         function(jqXHR, textStatus, errorThrown) {
-            Alertify.log.error("REMOTE WS - NOT OK");
+            Alertify.log.error("JAP REMOTE WS - NOT OK");
         }
     );
 }
 
-function REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD_ViewModel(parent) {
+function JAP_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD_ViewModel(parent) {
     var self = this;
     self.parent = parent;
     self.defaultData = {
@@ -1160,36 +1218,36 @@ function REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD_ViewModel(parent) {
         "PASSWORD": ""
     }
     self.data = ko.mapping.fromJS(self.defaultData);
-    self.action = "REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD";
+    self.action = "JAP_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD";
     
-    self.action_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD = function() {
-        self.parent.action_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD(self.data);
-        self.parent.load_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS();
+    self.action_JAP_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD = function() {
+        self.parent.action_JAP_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD(self.data);
+        self.parent.load_JAP_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS();
     }
     
     self.cancel = function() {
-        self.parent.load_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS();
+        self.parent.load_JAP_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS();
     }
 }
 
-function REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE_ViewModel(parent, data) {
+function JAP_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE_ViewModel(parent, data) {
     var self = this;
     self.parent = parent;
     self.selectedData = data;
     self.data = ko.mapping.fromJS(ko.mapping.toJS(self.selectedData));
-    self.action = "REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE";
+    self.action = "JAP_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE";
     
-    self.action_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE = function() {
-        self.parent.action_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE(self.selectedData, self.data);
-        self.parent.load_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS();
+    self.action_JAP_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE = function() {
+        self.parent.action_JAP_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE(self.selectedData, self.data);
+        self.parent.load_JAP_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS();
     }
     
     self.cancel = function() {
-        self.parent.load_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS();
+        self.parent.load_JAP_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS();
     }
 }
 
-function REMOTE_WS_PROXY_SERVERS_ADD_ViewModel(parent) {
+function JAP_REMOTE_WS_PROXY_SERVERS_ADD_ViewModel(parent) {
     var self = this;
     self.parent = parent;
     self.defaultData = {
@@ -1202,257 +1260,265 @@ function REMOTE_WS_PROXY_SERVERS_ADD_ViewModel(parent) {
         }
     }
     self.data = ko.mapping.fromJS(self.defaultData);
-    self.action = "REMOTE_WS_PROXY_SERVERS_ADD";
+    self.action = "JAP_REMOTE_WS_PROXY_SERVERS_ADD";
     
-    self.action_REMOTE_WS_PROXY_SERVERS_ADD = function() {
-        self.parent.action_REMOTE_WS_PROXY_SERVERS_ADD(self.data);
-        self.parent.load_REMOTE_WS_PROXY_SERVERS();
+    self.action_JAP_REMOTE_WS_PROXY_SERVERS_ADD = function() {
+        self.parent.action_JAP_REMOTE_WS_PROXY_SERVERS_ADD(self.data);
+        self.parent.load_JAP_REMOTE_WS_PROXY_SERVERS();
     }
     
     self.cancel = function() {
-        self.parent.load_REMOTE_WS_PROXY_SERVERS();
+        self.parent.load_JAP_REMOTE_WS_PROXY_SERVERS();
     }
 }
 
-function REMOTE_WS_PROXY_SERVERS_UPDATE_ViewModel(parent, data) {
+function JAP_REMOTE_WS_PROXY_SERVERS_UPDATE_ViewModel(parent, data) {
     var self = this;
     self.parent = parent;
     self.selectedData = data;
     self.data = ko.mapping.fromJS(ko.mapping.toJS(self.selectedData));
-    self.action = "REMOTE_WS_PROXY_SERVERS_UPDATE";
+    self.action = "JAP_REMOTE_WS_PROXY_SERVERS_UPDATE";
     
-    self.action_REMOTE_WS_PROXY_SERVERS_UPDATE = function() {
-        self.parent.action_REMOTE_WS_PROXY_SERVERS_UPDATE(self.selectedData, self.data);
-        self.parent.load_REMOTE_WS_PROXY_SERVERS();
+    self.action_JAP_REMOTE_WS_PROXY_SERVERS_UPDATE = function() {
+        self.parent.action_JAP_REMOTE_WS_PROXY_SERVERS_UPDATE(self.selectedData, self.data);
+        self.parent.load_JAP_REMOTE_WS_PROXY_SERVERS();
     }
     
     self.cancel = function() {
-        self.parent.load_REMOTE_WS_PROXY_SERVERS();
+        self.parent.load_JAP_REMOTE_WS_PROXY_SERVERS();
     }
 }
 
 function ViewModel() {
     var self = this;
     
-    self.action_LOCAL_START = function() {
+    self.action_JAP_LOCAL_START = function() {
         $.ajax({
             "type": "POST",
             "url": "/API",
             "dataType": "",
             "data": {
-                "action": "LOCAL_START"
+                "action": "JAP_LOCAL_START"
             }
         }).then(
             function(data, textStatus, jqXHR) {
-                Alertify.log.success("LOCAL - START OK");
+                Alertify.log.success("JAP LOCAL - START OK");
             }, 
             function(jqXHR, textStatus, errorThrown) {
-                Alertify.log.error("LOCAL - START NOT OK");
+                Alertify.log.error("JAP LOCAL - START NOT OK");
             }
         )
     }
     
-    self.action_LOCAL_STOP = function() {
+    self.action_JAP_LOCAL_STOP = function() {
         $.ajax({
             "type": "POST",
             "url": "/API",
             "dataType": "",
             "data": {
-                "action": "LOCAL_STOP"
+                "action": "JAP_LOCAL_STOP"
             }
         }).then(
             function(data, textStatus, jqXHR) {
-                Alertify.log.success("LOCAL - STOP OK");
+                Alertify.log.success("JAP LOCAL - STOP OK");
             }, 
             function(jqXHR, textStatus, errorThrown) {
-                Alertify.log.error("LOCAL - STOP NOT OK");
+                Alertify.log.error("JAP LOCAL - STOP NOT OK");
             }
         )
     }
     
-    self.action_LOCAL_SSH_START = function() {
+    self.action_JAP_LOCAL_SSH_START = function() {
         $.ajax({
             "type": "POST",
             "url": "/API",
             "dataType": "",
             "data": {
-                "action": "LOCAL_SSH_START"
+                "action": "JAP_LOCAL_SSH_START"
             }
         }).then(
             function(data, textStatus, jqXHR) {
-                Alertify.log.success("LOCAL SSH - START OK");
+                Alertify.log.success("JAP LOCAL SSH - START OK");
             }, 
             function(jqXHR, textStatus, errorThrown) {
-                Alertify.log.error("LOCAL SSH - START NOT OK");
+                Alertify.log.error("JAP LOCAL SSH - START NOT OK");
             }
         )
     }
     
-    self.action_LOCAL_SSH_STOP = function() {
+    self.action_JAP_LOCAL_SSH_STOP = function() {
         $.ajax({
             "type": "POST",
             "url": "/API",
             "dataType": "",
             "data": {
-                "action": "LOCAL_SSH_STOP"
+                "action": "JAP_LOCAL_SSH_STOP"
             }
         }).then(
             function(data, textStatus, jqXHR) {
-                Alertify.log.success("LOCAL SSH - STOP OK");
+                Alertify.log.success("JAP LOCAL SSH - STOP OK");
             }, 
             function(jqXHR, textStatus, errorThrown) {
-                Alertify.log.error("LOCAL SSH - STOP NOT OK");
+                Alertify.log.error("JAP LOCAL SSH - STOP NOT OK");
             }
         )
     }
     
-    self.action_LOCAL_WS_START = function() {
+    self.action_JAP_LOCAL_WS_START = function() {
         $.ajax({
             "type": "POST",
             "url": "/API",
             "dataType": "",
             "data": {
-                "action": "LOCAL_WS_START"
+                "action": "JAP_LOCAL_WS_START"
             }
         }).then(
             function(data, textStatus, jqXHR) {
-                Alertify.log.success("LOCAL WS - START OK");
+                Alertify.log.success("JAP LOCAL WS - START OK");
             }, 
             function(jqXHR, textStatus, errorThrown) {
-                Alertify.log.error("LOCAL WS - START NOT OK");
+                Alertify.log.error("JAP LOCAL WS - START NOT OK");
             }
         )
     }
     
-    self.action_LOCAL_WS_STOP = function() {
+    self.action_JAP_LOCAL_WS_STOP = function() {
         $.ajax({
             "type": "POST",
             "url": "/API",
             "dataType": "",
             "data": {
-                "action": "LOCAL_WS_STOP"
+                "action": "JAP_LOCAL_WS_STOP"
             }
         }).then(
             function(data, textStatus, jqXHR) {
-                Alertify.log.success("LOCAL WS - STOP OK");
+                Alertify.log.success("JAP LOCAL WS - STOP OK");
             }, 
             function(jqXHR, textStatus, errorThrown) {
-                Alertify.log.error("LOCAL WS - STOP NOT OK");
+                Alertify.log.error("JAP LOCAL WS - STOP NOT OK");
             }
         )
     }
     
-    self.action_REMOTE_SSH_START = function() {
+    self.action_JAP_REMOTE_SSH_START = function() {
         $.ajax({
             "type": "POST",
             "url": "/API",
             "dataType": "",
             "data": {
-                "action": "REMOTE_SSH_START"
+                "action": "JAP_REMOTE_SSH_START"
             }
         }).then(
             function(data, textStatus, jqXHR) {
-                Alertify.log.success("REMOTE SSH - START OK");
+                Alertify.log.success("JAP REMOTE SSH - START OK");
             }, 
             function(jqXHR, textStatus, errorThrown) {
-                Alertify.log.error("REMOTE SSH - START NOT OK");
+                Alertify.log.error("JAP REMOTE SSH - START NOT OK");
             }
         )
     }
     
-    self.action_REMOTE_SSH_STOP = function() {
+    self.action_JAP_REMOTE_SSH_STOP = function() {
         $.ajax({
             "type": "POST",
             "url": "/API",
             "dataType": "",
             "data": {
-                "action": "REMOTE_SSH_STOP"
+                "action": "JAP_REMOTE_SSH_STOP"
             }
         }).then(
             function(data, textStatus, jqXHR) {
-                Alertify.log.success("REMOTE SSH - STOP OK");
+                Alertify.log.success("JAP REMOTE SSH - STOP OK");
             }, 
             function(jqXHR, textStatus, errorThrown) {
-                Alertify.log.error("REMOTE SSH - STOP NOT OK");
+                Alertify.log.error("JAP REMOTE SSH - STOP NOT OK");
             }
         )
     }
     
-    self.action_REMOTE_WS_START = function() {
+    self.action_JAP_REMOTE_WS_START = function() {
         $.ajax({
             "type": "POST",
             "url": "/API",
             "dataType": "",
             "data": {
-                "action": "REMOTE_WS_START"
+                "action": "JAP_REMOTE_WS_START"
             }
         }).then(
             function(data, textStatus, jqXHR) {
-                Alertify.log.success("REMOTE WS - START OK");
+                Alertify.log.success("JAP REMOTE WS - START OK");
             }, 
             function(jqXHR, textStatus, errorThrown) {
-                Alertify.log.error("REMOTE WS - START NOT OK");
+                Alertify.log.error("JAP REMOTE WS - START NOT OK");
             }
         )
     }
     
-    self.action_REMOTE_WS_STOP = function() {
+    self.action_JAP_REMOTE_WS_STOP = function() {
         $.ajax({
             "type": "POST",
             "url": "/API",
             "dataType": "",
             "data": {
-                "action": "REMOTE_WS_STOP"
+                "action": "JAP_REMOTE_WS_STOP"
             }
         }).then(
             function(data, textStatus, jqXHR) {
-                Alertify.log.success("REMOTE WS - STOP OK");
+                Alertify.log.success("JAP REMOTE WS - STOP OK");
             }, 
             function(jqXHR, textStatus, errorThrown) {
-                Alertify.log.error("REMOTE WS - STOP NOT OK");
+                Alertify.log.error("JAP REMOTE WS - STOP NOT OK");
             }
         )
     }
     
-    self.template_LOCAL = ko.observable();
+    self.template_JAP = ko.observable();
     
-    self.load_LOCAL = function() {
-        self.template_LOCAL(new Template("TEMPLATE_LOCAL", new LOCAL_ViewModel(self)));
+    self.load_JAP = function() {
+        self.template_JAP(new Template("TEMPLATE_JAP", new JAP_ViewModel(self)));
     }
     
-    self.load_LOCAL();
+    self.load_JAP();
     
-    self.template_LOCAL_SSH = ko.observable();
+    self.template_JAP_LOCAL = ko.observable();
     
-    self.load_LOCAL_SSH = function() {
-        self.template_LOCAL_SSH(new Template("TEMPLATE_LOCAL_SSH", new LOCAL_SSH_ViewModel(self)));
+    self.load_JAP_LOCAL = function() {
+        self.template_JAP_LOCAL(new Template("TEMPLATE_JAP_LOCAL", new JAP_LOCAL_ViewModel(self)));
     }
     
-    self.load_LOCAL_SSH();
+    self.load_JAP_LOCAL();
     
-    self.template_LOCAL_WS = ko.observable();
+    self.template_JAP_LOCAL_SSH = ko.observable();
     
-    self.load_LOCAL_WS = function() {
-        self.template_LOCAL_WS(new Template("TEMPLATE_LOCAL_WS", new LOCAL_WS_ViewModel(self)));
+    self.load_JAP_LOCAL_SSH = function() {
+        self.template_JAP_LOCAL_SSH(new Template("TEMPLATE_JAP_LOCAL_SSH", new JAP_LOCAL_SSH_ViewModel(self)));
     }
     
-    self.load_LOCAL_WS();
+    self.load_JAP_LOCAL_SSH();
     
-    self.template_REMOTE_SSH = ko.observable();
+    self.template_JAP_LOCAL_WS = ko.observable();
     
-    self.load_REMOTE_SSH = function() {
-        self.template_REMOTE_SSH(new Template("TEMPLATE_REMOTE_SSH", new REMOTE_SSH_ViewModel(self)));
+    self.load_JAP_LOCAL_WS = function() {
+        self.template_JAP_LOCAL_WS(new Template("TEMPLATE_JAP_LOCAL_WS", new JAP_LOCAL_WS_ViewModel(self)));
     }
     
-    self.load_REMOTE_SSH();
+    self.load_JAP_LOCAL_WS();
     
-    self.template_REMOTE_WS = ko.observable();
+    self.template_JAP_REMOTE_SSH = ko.observable();
     
-    self.load_REMOTE_WS = function() {
-        self.template_REMOTE_WS(new Template("TEMPLATE_REMOTE_WS", new REMOTE_WS_ViewModel(self)));
+    self.load_JAP_REMOTE_SSH = function() {
+        self.template_JAP_REMOTE_SSH(new Template("TEMPLATE_JAP_REMOTE_SSH", new JAP_REMOTE_SSH_ViewModel(self)));
     }
     
-    self.load_REMOTE_WS();
+    self.load_JAP_REMOTE_SSH();
+    
+    self.template_JAP_REMOTE_WS = ko.observable();
+    
+    self.load_JAP_REMOTE_WS = function() {
+        self.template_JAP_REMOTE_WS(new Template("TEMPLATE_JAP_REMOTE_WS", new JAP_REMOTE_WS_ViewModel(self)));
+    }
+    
+    self.load_JAP_REMOTE_WS();
 }
 
 ko.applyBindings(new ViewModel());

@@ -11,18 +11,13 @@ You should have received a copy of the GNU General Public License along with thi
 
 from twisted.internet import reactor
 import logging
-import JAP.REMOTE_SSH.JAP_LOCAL
-import JAP.REMOTE_SSH.JAP_REMOTE_SSH
+import JAP.JAP_LOCAL
+import JAP.JAP_REMOTE_SSH
 
-file = open("./JAP_REMOTE_SSH.json", "r")
-data = file.read()
-file.close()
-
-configuration = JAP.REMOTE_SSH.JAP_LOCAL.decodeJSON(data)
-JAP.REMOTE_SSH.JAP_REMOTE_SSH.setDefaultConfiguration(configuration)
+configuration = JAP.JAP_LOCAL.getConfiguration("./JAP_REMOTE_SSH.json", JAP.JAP_REMOTE_SSH.getDefaultConfiguration)
 
 logging.basicConfig()
-logger = logging.getLogger("JAP.REMOTE_SSH")
+logger = logging.getLogger("JAP")
 
 if configuration["LOGGER"]["LEVEL"] == "DEBUG":
     logger.setLevel(logging.DEBUG)
@@ -37,6 +32,6 @@ elif configuration["LOGGER"]["LEVEL"] == "CRITICAL":
 else:
     logger.setLevel(logging.NOTSET)
 
-factory = JAP.REMOTE_SSH.JAP_REMOTE_SSH.SSHFactory(configuration)
+factory = JAP.JAP_REMOTE_SSH.SSHFactory(configuration)
 reactor.listenTCP(configuration["REMOTE_PROXY_SERVER"]["PORT"], factory, 50, configuration["REMOTE_PROXY_SERVER"]["ADDRESS"])
 reactor.run()

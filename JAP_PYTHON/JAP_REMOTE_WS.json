@@ -1,1 +1,18 @@
-{"LOGGER":{"LEVEL":""},"REMOTE_PROXY_SERVER":{"TYPE":"","ADDRESS":"","PORT":0,"AUTHENTICATION":[],"CERTIFICATE":{"KEY":{"FILE":""},"FILE":""}},"PROXY_SERVERS":[]}
+{
+    "LOGGER": {
+        "LEVEL": ""
+    },
+    "REMOTE_PROXY_SERVER": {
+        "TYPE": "",
+        "ADDRESS": "",
+        "PORT": 0,
+        "AUTHENTICATION": [],
+        "CERTIFICATE": {
+            "KEY": {
+                "FILE": ""
+            },
+            "FILE": ""
+        }
+    },
+    "PROXY_SERVERS": []
+}

@@ -11,33 +11,83 @@ You should have received a copy of the GNU General Public License along with thi
 
 from twisted.internet import protocol, reactor, ssl
 import struct
-import json
 import random
 import OpenSSL
 import base64
 import socket
 import logging
+import collections
 import autobahn.websocket
 import JAP_LOCAL
 
 logger = logging.getLogger(__name__)
 
-def setDefaultConfiguration(configuration):
-    JAP_LOCAL.setDefaultConfiguration(configuration)
+def getDefaultConfiguration(configuration=None):
+    if configuration is None:
+        configuration = collections.OrderedDict()
     
+    configuration.setdefault("LOGGER", collections.OrderedDict())
+    configuration["LOGGER"].setdefault("LEVEL", "")
+    configuration.setdefault("LOCAL_PROXY_SERVER", collections.OrderedDict())
+    configuration["LOCAL_PROXY_SERVER"].setdefault("ADDRESS", "")
+    configuration["LOCAL_PROXY_SERVER"].setdefault("PORT", 0)
     configuration.setdefault("REMOTE_PROXY_SERVERS", [])
     i = 0
     while i < len(configuration["REMOTE_PROXY_SERVERS"]):
         configuration["REMOTE_PROXY_SERVERS"][i].setdefault("TYPE", "")
         configuration["REMOTE_PROXY_SERVERS"][i].setdefault("ADDRESS", "")
         configuration["REMOTE_PROXY_SERVERS"][i].setdefault("PORT", 0)
-        configuration["REMOTE_PROXY_SERVERS"][i].setdefault("AUTHENTICATION", {})
+        configuration["REMOTE_PROXY_SERVERS"][i].setdefault("AUTHENTICATION", collections.OrderedDict())
         configuration["REMOTE_PROXY_SERVERS"][i]["AUTHENTICATION"].setdefault("USERNAME", "")
         configuration["REMOTE_PROXY_SERVERS"][i]["AUTHENTICATION"].setdefault("PASSWORD", "")
-        configuration["REMOTE_PROXY_SERVERS"][i].setdefault("CERTIFICATE", {})
-        configuration["REMOTE_PROXY_SERVERS"][i]["CERTIFICATE"].setdefault("AUTHENTICATION", {})
+        configuration["REMOTE_PROXY_SERVERS"][i].setdefault("CERTIFICATE", collections.OrderedDict())
+        configuration["REMOTE_PROXY_SERVERS"][i]["CERTIFICATE"].setdefault("AUTHENTICATION", collections.OrderedDict())
         configuration["REMOTE_PROXY_SERVERS"][i]["CERTIFICATE"]["AUTHENTICATION"].setdefault("FILE", "")
         i = i + 1
+    configuration.setdefault("PROXY_SERVERS", [])
+    i = 0
+    while i < len(configuration["PROXY_SERVERS"]):
+        configuration["PROXY_SERVERS"][i].setdefault("TYPE", "")
+        configuration["PROXY_SERVERS"][i].setdefault("ADDRESS", "")
+        configuration["PROXY_SERVERS"][i].setdefault("PORT", 0)
+        configuration["PROXY_SERVERS"][i].setdefault("AUTHENTICATION", collections.OrderedDict())
+        configuration["PROXY_SERVERS"][i]["AUTHENTICATION"].setdefault("USERNAME", "")
+        configuration["PROXY_SERVERS"][i]["AUTHENTICATION"].setdefault("PASSWORD", "")
+        
+        i = i + 1
+    
+    defaultConfiguration = collections.OrderedDict()
+    defaultConfiguration["LOGGER"] = collections.OrderedDict()
+    defaultConfiguration["LOGGER"]["LEVEL"] = configuration["LOGGER"]["LEVEL"]
+    defaultConfiguration["LOCAL_PROXY_SERVER"] = collections.OrderedDict()
+    defaultConfiguration["LOCAL_PROXY_SERVER"]["ADDRESS"] = configuration["LOCAL_PROXY_SERVER"]["ADDRESS"]
+    defaultConfiguration["LOCAL_PROXY_SERVER"]["PORT"] = configuration["LOCAL_PROXY_SERVER"]["PORT"]
+    defaultConfiguration["REMOTE_PROXY_SERVERS"] = [collections.OrderedDict()] * len(configuration["REMOTE_PROXY_SERVERS"])
+    i = 0
+    while i < len(configuration["REMOTE_PROXY_SERVERS"]):
+        defaultConfiguration["REMOTE_PROXY_SERVERS"][i]["TYPE"] = configuration["REMOTE_PROXY_SERVERS"][i]["TYPE"]
+        defaultConfiguration["REMOTE_PROXY_SERVERS"][i]["ADDRESS"] = configuration["REMOTE_PROXY_SERVERS"][i]["ADDRESS"]
+        defaultConfiguration["REMOTE_PROXY_SERVERS"][i]["PORT"] = configuration["REMOTE_PROXY_SERVERS"][i]["PORT"]
+        defaultConfiguration["REMOTE_PROXY_SERVERS"][i]["AUTHENTICATION"] = collections.OrderedDict()
+        defaultConfiguration["REMOTE_PROXY_SERVERS"][i]["AUTHENTICATION"]["USERNAME"] = configuration["REMOTE_PROXY_SERVERS"][i]["AUTHENTICATION"]["USERNAME"]
+        defaultConfiguration["REMOTE_PROXY_SERVERS"][i]["AUTHENTICATION"]["PASSWORD"] = configuration["REMOTE_PROXY_SERVERS"][i]["AUTHENTICATION"]["PASSWORD"]
+        defaultConfiguration["REMOTE_PROXY_SERVERS"][i]["CERTIFICATE"] = collections.OrderedDict()
+        defaultConfiguration["REMOTE_PROXY_SERVERS"][i]["CERTIFICATE"]["AUTHENTICATION"] = collections.OrderedDict()
+        defaultConfiguration["REMOTE_PROXY_SERVERS"][i]["CERTIFICATE"]["AUTHENTICATION"]["FILE"] = configuration["REMOTE_PROXY_SERVERS"][i]["CERTIFICATE"]["AUTHENTICATION"]["FILE"]
+        i = i + 1
+    defaultConfiguration["PROXY_SERVERS"] = [collections.OrderedDict()] * len(configuration["PROXY_SERVERS"])
+    i = 0
+    while i < len(configuration["PROXY_SERVERS"]):
+        defaultConfiguration["PROXY_SERVERS"][i]["TYPE"] = configuration["PROXY_SERVERS"][i]["TYPE"]
+        defaultConfiguration["PROXY_SERVERS"][i]["ADDRESS"] = configuration["PROXY_SERVERS"][i]["ADDRESS"]
+        defaultConfiguration["PROXY_SERVERS"][i]["PORT"] = configuration["PROXY_SERVERS"][i]["PORT"]
+        defaultConfiguration["PROXY_SERVERS"][i]["AUTHENTICATION"] = configuration["PROXY_SERVERS"][i]["AUTHENTICATION"]
+        defaultConfiguration["PROXY_SERVERS"][i]["AUTHENTICATION"]["USERNAME"] = configuration["PROXY_SERVERS"][i]["AUTHENTICATION"]["USERNAME"]
+        defaultConfiguration["PROXY_SERVERS"][i]["AUTHENTICATION"]["PASSWORD"] = configuration["PROXY_SERVERS"][i]["AUTHENTICATION"]["PASSWORD"]
+        
+        i = i + 1
+    
+    return defaultConfiguration
 
 class WSOutputProtocol(autobahn.websocket.WebSocketClientProtocol):
     def __init__(self):
@@ -53,15 +103,15 @@ class WSOutputProtocol(autobahn.websocket.WebSocketClientProtocol):
         
         self.connectionState = 1
         
-        request = {}
-        request["REMOTE_PROXY_SERVER"] = {}
-        request["REMOTE_PROXY_SERVER"]["AUTHENTICATION"] = {}
+        request = collections.OrderedDict()
+        request["REMOTE_PROXY_SERVER"] = collections.OrderedDict()
+        request["REMOTE_PROXY_SERVER"]["AUTHENTICATION"] = collections.OrderedDict()
         request["REMOTE_PROXY_SERVER"]["AUTHENTICATION"]["USERNAME"] = str(self.inputProtocol.configuration["REMOTE_PROXY_SERVERS"][self.inputProtocol.i]["AUTHENTICATION"]["USERNAME"])
         request["REMOTE_PROXY_SERVER"]["AUTHENTICATION"]["PASSWORD"] = str(self.inputProtocol.configuration["REMOTE_PROXY_SERVERS"][self.inputProtocol.i]["AUTHENTICATION"]["PASSWORD"])
         request["REMOTE_ADDRESS"] = str(self.inputProtocol.remoteAddress)
         request["REMOTE_PORT"] = self.inputProtocol.remotePort
         
-        encoder = json.JSONEncoder()
+        encoder = JAP_LOCAL.JSONEncoder()
         message = encoder.encode(request)
         
         self.sendMessage(message, False)
@@ -90,7 +140,7 @@ class WSOutputProtocol(autobahn.websocket.WebSocketClientProtocol):
     def processMessageState0(self):
         logger.debug("WSOutputProtocol.processMessageState0")
         
-        decoder = json.JSONDecoder()
+        decoder = JAP_LOCAL.JSONDecoder()
         response = decoder.decode(self.message)
         
         self.inputProtocol.outputProtocol_connectionMade()

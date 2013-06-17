@@ -10,17 +10,20 @@ You should have received a copy of the GNU General Public License along with thi
 """
 
 from twisted.internet import reactor, protocol
-import json
 import logging
+import collections
 import autobahn.websocket
 import JAP_LOCAL
 
 logger = logging.getLogger(__name__)
 
-def setDefaultConfiguration(configuration):
-    configuration.setdefault("LOGGER", {})
+def getDefaultConfiguration(configuration=None):
+    if configuration is None:
+        configuration = collections.OrderedDict()
+    
+    configuration.setdefault("LOGGER", collections.OrderedDict())
     configuration["LOGGER"].setdefault("LEVEL", "")
-    configuration.setdefault("REMOTE_PROXY_SERVER", {})
+    configuration.setdefault("REMOTE_PROXY_SERVER", collections.OrderedDict())
     configuration["REMOTE_PROXY_SERVER"].setdefault("TYPE", "")
     configuration["REMOTE_PROXY_SERVER"].setdefault("ADDRESS", "")
     configuration["REMOTE_PROXY_SERVER"].setdefault("PORT", 0)
@@ -30,8 +33,8 @@ def setDefaultConfiguration(configuration):
         configuration["REMOTE_PROXY_SERVER"]["AUTHENTICATION"][i].setdefault("USERNAME", "")
         configuration["REMOTE_PROXY_SERVER"]["AUTHENTICATION"][i].setdefault("PASSWORD", "")
         i = i + 1
-    configuration["REMOTE_PROXY_SERVER"].setdefault("CERTIFICATE", {})
-    configuration["REMOTE_PROXY_SERVER"]["CERTIFICATE"].setdefault("KEY", {})
+    configuration["REMOTE_PROXY_SERVER"].setdefault("CERTIFICATE", collections.OrderedDict())
+    configuration["REMOTE_PROXY_SERVER"]["CERTIFICATE"].setdefault("KEY", collections.OrderedDict())
     configuration["REMOTE_PROXY_SERVER"]["CERTIFICATE"]["KEY"].setdefault("FILE", "")
     configuration["REMOTE_PROXY_SERVER"]["CERTIFICATE"].setdefault("FILE", "")
     configuration.setdefault("PROXY_SERVERS", [])
@@ -40,12 +43,43 @@ def setDefaultConfiguration(configuration):
         configuration["PROXY_SERVERS"][i].setdefault("TYPE", "")
         configuration["PROXY_SERVERS"][i].setdefault("ADDRESS", "")
         configuration["PROXY_SERVERS"][i].setdefault("PORT", 0)
-        configuration["PROXY_SERVERS"][i].setdefault("AUTHENTICATION", {})
+        configuration["PROXY_SERVERS"][i].setdefault("AUTHENTICATION", collections.OrderedDict())
         configuration["PROXY_SERVERS"][i]["AUTHENTICATION"].setdefault("USERNAME", "")
         configuration["PROXY_SERVERS"][i]["AUTHENTICATION"].setdefault("PASSWORD", "")
         
         i = i + 1
     
+    defaultConfiguration = collections.OrderedDict()
+    defaultConfiguration["LOGGER"] = collections.OrderedDict()
+    defaultConfiguration["LOGGER"]["LEVEL"] = configuration["LOGGER"]["LEVEL"]
+    defaultConfiguration["REMOTE_PROXY_SERVER"] = collections.OrderedDict()
+    defaultConfiguration["REMOTE_PROXY_SERVER"]["TYPE"] = configuration["REMOTE_PROXY_SERVER"]["TYPE"]
+    defaultConfiguration["REMOTE_PROXY_SERVER"]["ADDRESS"] = configuration["REMOTE_PROXY_SERVER"]["ADDRESS"]
+    defaultConfiguration["REMOTE_PROXY_SERVER"]["PORT"] = configuration["REMOTE_PROXY_SERVER"]["PORT"]
+    defaultConfiguration["REMOTE_PROXY_SERVER"]["AUTHENTICATION"] = [collections.OrderedDict()] * len(configuration["REMOTE_PROXY_SERVER"]["AUTHENTICATION"])
+    i = 0
+    while i < len(configuration["REMOTE_PROXY_SERVER"]["AUTHENTICATION"]):
+        defaultConfiguration["REMOTE_PROXY_SERVER"]["AUTHENTICATION"][i]["USERNAME"] = configuration["REMOTE_PROXY_SERVER"]["AUTHENTICATION"][i]["USERNAME"]
+        defaultConfiguration["REMOTE_PROXY_SERVER"]["AUTHENTICATION"][i]["PASSWORD"] = configuration["REMOTE_PROXY_SERVER"]["AUTHENTICATION"][i]["PASSWORD"]
+        i = i + 1
+    defaultConfiguration["REMOTE_PROXY_SERVER"]["CERTIFICATE"] = collections.OrderedDict()
+    defaultConfiguration["REMOTE_PROXY_SERVER"]["CERTIFICATE"]["KEY"] = collections.OrderedDict()
+    defaultConfiguration["REMOTE_PROXY_SERVER"]["CERTIFICATE"]["KEY"]["FILE"] = configuration["REMOTE_PROXY_SERVER"]["CERTIFICATE"]["KEY"]["FILE"]
+    defaultConfiguration["REMOTE_PROXY_SERVER"]["CERTIFICATE"]["FILE"] = configuration["REMOTE_PROXY_SERVER"]["CERTIFICATE"]["FILE"]
+    defaultConfiguration["PROXY_SERVERS"] = [collections.OrderedDict()] * len(configuration["PROXY_SERVERS"])
+    i = 0
+    while i < len(configuration["PROXY_SERVERS"]):
+        defaultConfiguration["PROXY_SERVERS"][i]["TYPE"] = configuration["PROXY_SERVERS"][i]["TYPE"]
+        defaultConfiguration["PROXY_SERVERS"][i]["ADDRESS"] = configuration["PROXY_SERVERS"][i]["ADDRESS"]
+        defaultConfiguration["PROXY_SERVERS"][i]["PORT"] = configuration["PROXY_SERVERS"][i]["PORT"]
+        defaultConfiguration["PROXY_SERVERS"][i]["AUTHENTICATION"] = collections.OrderedDict()
+        defaultConfiguration["PROXY_SERVERS"][i]["AUTHENTICATION"]["USERNAME"] = configuration["PROXY_SERVERS"][i]["AUTHENTICATION"]["USERNAME"]
+        defaultConfiguration["PROXY_SERVERS"][i]["AUTHENTICATION"]["PASSWORD"] = configuration["PROXY_SERVERS"][i]["AUTHENTICATION"]["PASSWORD"]
+        
+        i = i + 1
+    
+    return defaultConfiguration
+
 class WSInputProtocol(autobahn.websocket.WebSocketServerProtocol):
     def __init__(self):
         logger.debug("WSInputProtocol.__init__")
@@ -85,7 +119,7 @@ class WSInputProtocol(autobahn.websocket.WebSocketServerProtocol):
     def processMessageState0(self):
         logger.debug("WSInputProtocol.processMessageState0")
         
-        decoder = json.JSONDecoder()
+        decoder = JAP_LOCAL.JSONDecoder()
         request = decoder.decode(self.message)
         
         authorized = False;
@@ -130,11 +164,11 @@ class WSInputProtocol(autobahn.websocket.WebSocketServerProtocol):
         logger.debug("WSInputProtocol.outputProtocol_connectionMade")
         
         if self.connectionState == 1:
-            response = {}
+            response = collections.OrderedDict()
             response["REMOTE_ADDRESS"] = self.remoteAddress
             response["REMOTE_PORT"] = self.remotePort
             
-            encoder = json.JSONEncoder()
+            encoder = JAP_LOCAL.JSONEncoder()
             message = encoder.encode(response)
             
             self.sendMessage(message, False)

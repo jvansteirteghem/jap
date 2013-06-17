@@ -17,14 +17,18 @@ from twisted.conch.ssh import channel, factory, forwarding, keys
 from twisted.cred import portal, checkers, credentials
 from twisted.cred.error import UnauthorizedLogin
 import logging
+import collections
 import JAP_LOCAL
 
 logger = logging.getLogger(__name__)
 
-def setDefaultConfiguration(configuration):
-    configuration.setdefault("LOGGER", {})
+def getDefaultConfiguration(configuration=None):
+    if configuration is None:
+        configuration = collections.OrderedDict()
+    
+    configuration.setdefault("LOGGER", collections.OrderedDict())
     configuration["LOGGER"].setdefault("LEVEL", "")
-    configuration.setdefault("REMOTE_PROXY_SERVER", {})
+    configuration.setdefault("REMOTE_PROXY_SERVER", collections.OrderedDict())
     configuration["REMOTE_PROXY_SERVER"].setdefault("ADDRESS", "")
     configuration["REMOTE_PROXY_SERVER"].setdefault("PORT", 0)
     configuration["REMOTE_PROXY_SERVER"].setdefault("AUTHENTICATION", [])
@@ -35,24 +39,69 @@ def setDefaultConfiguration(configuration):
         configuration["REMOTE_PROXY_SERVER"]["AUTHENTICATION"][i].setdefault("KEYS", [])
         j = 0
         while j < len(configuration["REMOTE_PROXY_SERVER"]["AUTHENTICATION"][i]["KEYS"]):
-            configuration["REMOTE_PROXY_SERVER"]["AUTHENTICATION"][i]["KEYS"][j].setdefault("PUBLIC", {})
+            configuration["REMOTE_PROXY_SERVER"]["AUTHENTICATION"][i]["KEYS"][j].setdefault("PUBLIC", collections.OrderedDict())
             configuration["REMOTE_PROXY_SERVER"]["AUTHENTICATION"][i]["KEYS"][j]["PUBLIC"].setdefault("FILE", "")
             configuration["REMOTE_PROXY_SERVER"]["AUTHENTICATION"][i]["KEYS"][j]["PUBLIC"].setdefault("PASSPHRASE", "")
             j = j + 1
         i = i + 1
-    configuration["REMOTE_PROXY_SERVER"]["KEY"].setdefault("PUBLIC", {})
+    configuration["REMOTE_PROXY_SERVER"].setdefault("KEY", collections.OrderedDict())
+    configuration["REMOTE_PROXY_SERVER"]["KEY"].setdefault("PUBLIC", collections.OrderedDict())
     configuration["REMOTE_PROXY_SERVER"]["KEY"]["PUBLIC"].setdefault("FILE", "")
     configuration["REMOTE_PROXY_SERVER"]["KEY"]["PUBLIC"].setdefault("PASSPHRASE", "")
-    configuration["REMOTE_PROXY_SERVER"]["KEY"].setdefault("PRIVATE", {})
+    configuration["REMOTE_PROXY_SERVER"]["KEY"].setdefault("PRIVATE", collections.OrderedDict())
     configuration["REMOTE_PROXY_SERVER"]["KEY"]["PRIVATE"].setdefault("FILE", "")
     configuration["REMOTE_PROXY_SERVER"]["KEY"]["PRIVATE"].setdefault("PASSPHRASE", "")
-    configuration.setdefault("PROXY_SERVER", {})
-    configuration["PROXY_SERVER"].setdefault("TYPE", "")
-    configuration["PROXY_SERVER"].setdefault("ADDRESS", "")
-    configuration["PROXY_SERVER"].setdefault("PORT", 0)
-    configuration["PROXY_SERVER"].setdefault("AUTHENTICATION", {})
-    configuration["PROXY_SERVER"]["AUTHENTICATION"].setdefault("USERNAME", "")
-    configuration["PROXY_SERVER"]["AUTHENTICATION"].setdefault("PASSWORD", "")
+    configuration.setdefault("PROXY_SERVERS", [])
+    i = 0
+    while i < len(configuration["PROXY_SERVERS"]):
+        configuration["PROXY_SERVERS"][i].setdefault("TYPE", "")
+        configuration["PROXY_SERVERS"][i].setdefault("ADDRESS", "")
+        configuration["PROXY_SERVERS"][i].setdefault("PORT", 0)
+        configuration["PROXY_SERVERS"][i].setdefault("AUTHENTICATION", collections.OrderedDict())
+        configuration["PROXY_SERVERS"][i]["AUTHENTICATION"].setdefault("USERNAME", "")
+        configuration["PROXY_SERVERS"][i]["AUTHENTICATION"].setdefault("PASSWORD", "")
+        
+        i = i + 1
+    
+    defaultConfiguration = collections.OrderedDict()
+    defaultConfiguration["LOGGER"] = collections.OrderedDict()
+    defaultConfiguration["LOGGER"]["LEVEL"] = configuration["LOGGER"]["LEVEL"]
+    defaultConfiguration["REMOTE_PROXY_SERVER"] = collections.OrderedDict()
+    defaultConfiguration["REMOTE_PROXY_SERVER"]["ADDRESS"] = configuration["REMOTE_PROXY_SERVER"]["ADDRESS"]
+    defaultConfiguration["REMOTE_PROXY_SERVER"]["PORT"] = configuration["REMOTE_PROXY_SERVER"]["PORT"]
+    defaultConfiguration["REMOTE_PROXY_SERVER"]["AUTHENTICATION"] = [collections.OrderedDict()] * len(configuration["REMOTE_PROXY_SERVER"]["AUTHENTICATION"])
+    i = 0
+    while i < len(configuration["REMOTE_PROXY_SERVER"]["AUTHENTICATION"]):
+        defaultConfiguration["REMOTE_PROXY_SERVER"]["AUTHENTICATION"][i]["USERNAME"] = configuration["REMOTE_PROXY_SERVER"]["AUTHENTICATION"][i]["USERNAME"]
+        defaultConfiguration["REMOTE_PROXY_SERVER"]["AUTHENTICATION"][i]["PASSWORD"] = configuration["REMOTE_PROXY_SERVER"]["AUTHENTICATION"][i]["PASSWORD"]
+        defaultConfiguration["REMOTE_PROXY_SERVER"]["AUTHENTICATION"][i]["KEYS"] = [collections.OrderedDict()] * len(configuration["REMOTE_PROXY_SERVER"]["AUTHENTICATION"][i]["KEYS"])
+        j = 0
+        while j < len(configuration["REMOTE_PROXY_SERVER"]["AUTHENTICATION"][i]["KEYS"]):
+            defaultConfiguration["REMOTE_PROXY_SERVER"]["AUTHENTICATION"][i]["KEYS"][j]["PUBLIC"] = collections.OrderedDict()
+            defaultConfiguration["REMOTE_PROXY_SERVER"]["AUTHENTICATION"][i]["KEYS"][j]["PUBLIC"]["FILE"] = configuration["REMOTE_PROXY_SERVER"]["AUTHENTICATION"][i]["KEYS"][j]["PUBLIC"]["FILE"]
+            defaultConfiguration["REMOTE_PROXY_SERVER"]["AUTHENTICATION"][i]["KEYS"][j]["PUBLIC"]["PASSPHRASE"] = configuration["REMOTE_PROXY_SERVER"]["AUTHENTICATION"][i]["KEYS"][j]["PUBLIC"]["PASSPHRASE"]
+            j = j + 1
+        i = i + 1
+    defaultConfiguration["REMOTE_PROXY_SERVER"]["KEY"] = collections.OrderedDict()
+    defaultConfiguration["REMOTE_PROXY_SERVER"]["KEY"]["PUBLIC"] = collections.OrderedDict()
+    defaultConfiguration["REMOTE_PROXY_SERVER"]["KEY"]["PUBLIC"]["FILE"] = configuration["REMOTE_PROXY_SERVER"]["KEY"]["PUBLIC"]["FILE"]
+    defaultConfiguration["REMOTE_PROXY_SERVER"]["KEY"]["PUBLIC"]["PASSPHRASE"] = configuration["REMOTE_PROXY_SERVER"]["KEY"]["PUBLIC"]["PASSPHRASE"]
+    defaultConfiguration["REMOTE_PROXY_SERVER"]["KEY"]["PRIVATE"] = collections.OrderedDict()
+    defaultConfiguration["REMOTE_PROXY_SERVER"]["KEY"]["PRIVATE"]["FILE"] = configuration["REMOTE_PROXY_SERVER"]["KEY"]["PRIVATE"]["FILE"]
+    defaultConfiguration["REMOTE_PROXY_SERVER"]["KEY"]["PRIVATE"]["PASSPHRASE"] = configuration["REMOTE_PROXY_SERVER"]["KEY"]["PRIVATE"]["PASSPHRASE"]
+    defaultConfiguration["PROXY_SERVERS"] = [collections.OrderedDict()] * len(configuration["PROXY_SERVERS"])
+    i = 0
+    while i < len(configuration["PROXY_SERVERS"]):
+        defaultConfiguration["PROXY_SERVERS"][i]["TYPE"] = configuration["PROXY_SERVERS"][i]["TYPE"]
+        defaultConfiguration["PROXY_SERVERS"][i]["ADDRESS"] = configuration["PROXY_SERVERS"][i]["ADDRESS"]
+        defaultConfiguration["PROXY_SERVERS"][i]["PORT"] = configuration["PROXY_SERVERS"][i]["PORT"]
+        defaultConfiguration["PROXY_SERVERS"][i]["AUTHENTICATION"] = collections.OrderedDict()
+        defaultConfiguration["PROXY_SERVERS"][i]["AUTHENTICATION"]["USERNAME"] = configuration["PROXY_SERVERS"][i]["AUTHENTICATION"]["USERNAME"]
+        defaultConfiguration["PROXY_SERVERS"][i]["AUTHENTICATION"]["PASSWORD"] = configuration["PROXY_SERVERS"][i]["AUTHENTICATION"]["PASSWORD"]
+        
+        i = i + 1
+    
+    return defaultConfiguration
 
 class SSHOutputProtocol(JAP_LOCAL.OutputProtocol):
     pass

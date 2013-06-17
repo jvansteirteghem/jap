@@ -1,1 +1,21 @@
-{"LOGGER":{"LEVEL":""},"REMOTE_PROXY_SERVER":{"ADDRESS":"","PORT":0,"AUTHENTICATION":[],"KEY":{"PUBLIC":{"FILE":"","PASSPHRASE":""},"PRIVATE":{"FILE":"","PASSPHRASE":""}}},"PROXY_SERVERS":[]}
+{
+    "LOGGER": {
+        "LEVEL": ""
+    },
+    "REMOTE_PROXY_SERVER": {
+        "ADDRESS": "",
+        "PORT": 0,
+        "AUTHENTICATION": [],
+        "KEY": {
+            "PUBLIC": {
+                "FILE": "",
+                "PASSPHRASE": ""
+            },
+            "PRIVATE": {
+                "FILE": "",
+                "PASSPHRASE": ""
+            }
+        }
+    },
+    "PROXY_SERVERS": []
+}

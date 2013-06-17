@@ -11,18 +11,13 @@ You should have received a copy of the GNU General Public License along with thi
 
 from twisted.internet import reactor
 import logging
-import JAP.LOCAL_SSH.JAP_LOCAL
-import JAP.LOCAL_SSH.JAP_LOCAL_SSH
+import JAP.JAP_LOCAL
+import JAP.JAP_LOCAL_SSH
 
-file = open("./JAP_LOCAL_SSH.json", "r")
-data = file.read()
-file.close()
-
-configuration = JAP.LOCAL_SSH.JAP_LOCAL.decodeJSON(data)
-JAP.LOCAL_SSH.JAP_LOCAL_SSH.setDefaultConfiguration(configuration)
+configuration = JAP.JAP_LOCAL.getConfiguration("./JAP_LOCAL_SSH.json", JAP.JAP_LOCAL_SSH.getDefaultConfiguration)
 
 logging.basicConfig()
-logger = logging.getLogger("JAP.LOCAL_SSH")
+logger = logging.getLogger("JAP")
 
 if configuration["LOGGER"]["LEVEL"] == "DEBUG":
     logger.setLevel(logging.DEBUG)
@@ -37,7 +32,7 @@ elif configuration["LOGGER"]["LEVEL"] == "CRITICAL":
 else:
     logger.setLevel(logging.NOTSET)
 
-factory = JAP.LOCAL_SSH.JAP_LOCAL_SSH.SSHInputProtocolFactory(configuration)
-factory.protocol = JAP.LOCAL_SSH.JAP_LOCAL_SSH.SSHInputProtocol
+factory = JAP.JAP_LOCAL_SSH.SSHInputProtocolFactory(configuration)
+factory.protocol = JAP.JAP_LOCAL_SSH.SSHInputProtocol
 reactor.listenTCP(configuration["LOCAL_PROXY_SERVER"]["PORT"], factory, 50, configuration["LOCAL_PROXY_SERVER"]["ADDRESS"])
 reactor.run()

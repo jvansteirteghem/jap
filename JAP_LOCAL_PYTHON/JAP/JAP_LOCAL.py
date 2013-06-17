@@ -17,6 +17,7 @@ import json
 import socket
 import logging
 import re
+import collections
 
 logger = logging.getLogger(__name__)
 
@@ -319,20 +320,29 @@ class SOCKS5TunnelOutputProtocolFactory(protocol.ClientFactory):
     def clientConnectionLost(self, connector, reason):
         logger.debug("SOCKS5TunnelOutputProtocolFactory.clientConnectionLost")
 
-def encodeJSON(data):
-    encoder = json.JSONEncoder()
-    return encoder.encode(data)
-
-def decodeJSON(data):
-    data = re.sub(re.compile("/\*.*?\*/", re.DOTALL), "", data)
+class JSONDecoder(json.JSONDecoder):
+    def __init__(self):
+        json.JSONDecoder.__init__(self, object_pairs_hook=collections.OrderedDict)
     
-    decoder = json.JSONDecoder()
-    return decoder.decode(data)
+    def decode(self, data):
+        data = re.sub(re.compile("/\*.*?\*/", re.DOTALL), "", data)
+        
+        return super(JSONDecoder, self).decode(data)
 
-def setDefaultConfiguration(configuration):
-    configuration.setdefault("LOGGER", {})
+class JSONEncoder(json.JSONEncoder):
+    def __init__(self):
+        json.JSONEncoder.__init__(self, sort_keys=False, indent=4, separators=(",", ": "))
+    
+    def encode(self, data):
+        return super(JSONEncoder, self).encode(data)
+
+def getDefaultConfiguration(configuration=None):
+    if configuration is None:
+        configuration = collections.OrderedDict()
+    
+    configuration.setdefault("LOGGER", collections.OrderedDict())
     configuration["LOGGER"].setdefault("LEVEL", "")
-    configuration.setdefault("LOCAL_PROXY_SERVER", {})
+    configuration.setdefault("LOCAL_PROXY_SERVER", collections.OrderedDict())
     configuration["LOCAL_PROXY_SERVER"].setdefault("ADDRESS", "")
     configuration["LOCAL_PROXY_SERVER"].setdefault("PORT", 0)
     configuration.setdefault("PROXY_SERVERS", [])
@@ -341,11 +351,55 @@ def setDefaultConfiguration(configuration):
         configuration["PROXY_SERVERS"][i].setdefault("TYPE", "")
         configuration["PROXY_SERVERS"][i].setdefault("ADDRESS", "")
         configuration["PROXY_SERVERS"][i].setdefault("PORT", 0)
-        configuration["PROXY_SERVERS"][i].setdefault("AUTHENTICATION", {})
+        configuration["PROXY_SERVERS"][i].setdefault("AUTHENTICATION", collections.OrderedDict())
         configuration["PROXY_SERVERS"][i]["AUTHENTICATION"].setdefault("USERNAME", "")
         configuration["PROXY_SERVERS"][i]["AUTHENTICATION"].setdefault("PASSWORD", "")
         
         i = i + 1
+    
+    defaultConfiguration = collections.OrderedDict()
+    defaultConfiguration["LOGGER"] = collections.OrderedDict()
+    defaultConfiguration["LOGGER"]["LEVEL"] = configuration["LOGGER"]["LEVEL"]
+    defaultConfiguration["LOCAL_PROXY_SERVER"] = collections.OrderedDict()
+    defaultConfiguration["LOCAL_PROXY_SERVER"]["ADDRESS"] = configuration["LOCAL_PROXY_SERVER"]["ADDRESS"]
+    defaultConfiguration["LOCAL_PROXY_SERVER"]["PORT"] = configuration["LOCAL_PROXY_SERVER"]["PORT"]
+    defaultConfiguration["PROXY_SERVERS"] = [collections.OrderedDict()] * len(configuration["PROXY_SERVERS"])
+    i = 0
+    while i < len(configuration["PROXY_SERVERS"]):
+        defaultConfiguration["PROXY_SERVERS"][i]["TYPE"] = configuration["PROXY_SERVERS"][i]["TYPE"]
+        defaultConfiguration["PROXY_SERVERS"][i]["ADDRESS"] = configuration["PROXY_SERVERS"][i]["ADDRESS"]
+        defaultConfiguration["PROXY_SERVERS"][i]["PORT"] = configuration["PROXY_SERVERS"][i]["PORT"]
+        defaultConfiguration["PROXY_SERVERS"][i]["AUTHENTICATION"] = configuration["PROXY_SERVERS"][i]["AUTHENTICATION"]
+        defaultConfiguration["PROXY_SERVERS"][i]["AUTHENTICATION"]["USERNAME"] = configuration["PROXY_SERVERS"][i]["AUTHENTICATION"]["USERNAME"]
+        defaultConfiguration["PROXY_SERVERS"][i]["AUTHENTICATION"]["PASSWORD"] = configuration["PROXY_SERVERS"][i]["AUTHENTICATION"]["PASSWORD"]
+        
+        i = i + 1
+    
+    return defaultConfiguration
+
+def getConfiguration(configurationFile, getDefaultConfiguration=None):
+    file = open(configurationFile, "r")
+    data = file.read()
+    file.close()
+    
+    decoder = JSONDecoder()
+    configuration = decoder.decode(data)
+    
+    if getDefaultConfiguration is not None:
+        configuration = getDefaultConfiguration(configuration)
+    
+    return configuration
+
+def setConfiguration(configurationFile, configuration, getDefaultConfiguration=None):
+    if getDefaultConfiguration is not None:
+        configuration = getDefaultConfiguration(configuration)
+    
+    encoder = JSONEncoder()
+    data = encoder.encode(configuration)
+    
+    file = open(configurationFile, "w")
+    file.write(data)
+    file.close()
 
 class OutputProtocol(protocol.Protocol):
     def __init__(self):

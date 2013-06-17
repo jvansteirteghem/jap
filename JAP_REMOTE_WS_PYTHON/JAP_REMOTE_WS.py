@@ -11,18 +11,13 @@ You should have received a copy of the GNU General Public License along with thi
 
 from twisted.internet import reactor, ssl
 import logging
-import JAP.REMOTE_WS.JAP_LOCAL
-import JAP.REMOTE_WS.JAP_REMOTE_WS
+import JAP.JAP_LOCAL
+import JAP.JAP_REMOTE_WS
 
-file = open("./JAP_REMOTE_WS.json", "r")
-data = file.read()
-file.close()
-
-configuration = JAP.REMOTE_WS.JAP_LOCAL.decodeJSON(data)
-JAP.REMOTE_WS.JAP_REMOTE_WS.setDefaultConfiguration(configuration)
+configuration = JAP.JAP_LOCAL.getConfiguration("./JAP_REMOTE_WS.json", JAP.JAP_REMOTE_WS.getDefaultConfiguration)
 
 logging.basicConfig()
-logger = logging.getLogger("JAP.REMOTE_WS")
+logger = logging.getLogger("JAP")
 
 if configuration["LOGGER"]["LEVEL"] == "DEBUG":
     logger.setLevel(logging.DEBUG)
@@ -38,15 +33,15 @@ else:
     logger.setLevel(logging.NOTSET)
 
 if configuration["REMOTE_PROXY_SERVER"]["TYPE"] == "HTTPS":
-    factory = JAP.REMOTE_WS.JAP_REMOTE_WS.WSInputProtocolFactory(configuration, "wss://" + str(configuration["REMOTE_PROXY_SERVER"]["ADDRESS"]) + ":" + str(configuration["REMOTE_PROXY_SERVER"]["PORT"]), debug = False)
-    factory.protocol = JAP.REMOTE_WS.JAP_REMOTE_WS.WSInputProtocol
+    factory = JAP.JAP_REMOTE_WS.WSInputProtocolFactory(configuration, "wss://" + str(configuration["REMOTE_PROXY_SERVER"]["ADDRESS"]) + ":" + str(configuration["REMOTE_PROXY_SERVER"]["PORT"]), debug = False)
+    factory.protocol = JAP.JAP_REMOTE_WS.WSInputProtocol
     
     contextFactory = ssl.DefaultOpenSSLContextFactory(configuration["REMOTE_PROXY_SERVER"]["CERTIFICATE"]["KEY"]["FILE"], configuration["REMOTE_PROXY_SERVER"]["CERTIFICATE"]["FILE"])
     
     reactor.listenSSL(configuration["REMOTE_PROXY_SERVER"]["PORT"], factory, contextFactory, 50, configuration["REMOTE_PROXY_SERVER"]["ADDRESS"])
 else:
-    factory = JAP.REMOTE_WS.JAP_REMOTE_WS.WSInputProtocolFactory(configuration, "ws://" + str(configuration["REMOTE_PROXY_SERVER"]["ADDRESS"]) + ":" + str(configuration["REMOTE_PROXY_SERVER"]["PORT"]), debug = False)
-    factory.protocol = JAP.REMOTE_WS.JAP_REMOTE_WS.WSInputProtocol
+    factory = JAP.JAP_REMOTE_WS.WSInputProtocolFactory(configuration, "ws://" + str(configuration["REMOTE_PROXY_SERVER"]["ADDRESS"]) + ":" + str(configuration["REMOTE_PROXY_SERVER"]["PORT"]), debug = False)
+    factory.protocol = JAP.JAP_REMOTE_WS.WSInputProtocol
     
     reactor.listenTCP(configuration["REMOTE_PROXY_SERVER"]["PORT"], factory, 50, configuration["REMOTE_PROXY_SERVER"]["ADDRESS"])
 

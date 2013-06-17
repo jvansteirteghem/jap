@@ -18,6 +18,7 @@ INSTALLATION
 IMPORTANT
 ---------
 - LINUX
+    - chmod +w JAP.json
     - chmod +w JAP_LOCAL.json
     - chmod +w JAP_LOCAL_SSH.json
     - chmod +w JAP_LOCAL_WS.json

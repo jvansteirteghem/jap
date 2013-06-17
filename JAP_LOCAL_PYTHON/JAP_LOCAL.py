@@ -11,17 +11,12 @@ You should have received a copy of the GNU General Public License along with thi
 
 from twisted.internet import reactor
 import logging
-import JAP.LOCAL.JAP_LOCAL
+import JAP.JAP_LOCAL
 
-file = open("./JAP_LOCAL.json", "r")
-data = file.read()
-file.close()
-
-configuration = JAP.LOCAL.JAP_LOCAL.decodeJSON(data)
-JAP.LOCAL.JAP_LOCAL.setDefaultConfiguration(configuration)
+configuration = JAP.JAP_LOCAL.getConfiguration("./JAP_LOCAL.json", JAP.JAP_LOCAL.getDefaultConfiguration)
 
 logging.basicConfig()
-logger = logging.getLogger("JAP.LOCAL")
+logger = logging.getLogger("JAP")
 
 if configuration["LOGGER"]["LEVEL"] == "DEBUG":
     logger.setLevel(logging.DEBUG)
@@ -36,7 +31,7 @@ elif configuration["LOGGER"]["LEVEL"] == "CRITICAL":
 else:
     logger.setLevel(logging.NOTSET)
 
-factory = JAP.LOCAL.JAP_LOCAL.InputProtocolFactory(configuration)
-factory.protocol = JAP.LOCAL.JAP_LOCAL.InputProtocol
+factory = JAP.JAP_LOCAL.InputProtocolFactory(configuration)
+factory.protocol = JAP.JAP_LOCAL.InputProtocol
 reactor.listenTCP(configuration["LOCAL_PROXY_SERVER"]["PORT"], factory, 50, configuration["LOCAL_PROXY_SERVER"]["ADDRESS"])
 reactor.run()

@@ -1,8 +1,8 @@
 set SEVENZIP_HOME="C:\Program Files\7-Zip"
-set PYINSTALLER_HOME="C:\pyinstaller-2.0"
-set JAP_REMOTE_WS_PYTHON_VERSION=2.0.0
-set JAP_REMOTE_WS_PYTHON_OPENSHIFT_VERSION=2.0.0
-set JAP_REMOTE_WS_PYTHON_WINDOWS_VERSION=2.0.0
+set PYINSTALLER_HOME="C:\pyinstaller-SNAPSHOT"
+set JAP_REMOTE_WS_PYTHON_VERSION=3.0.0-SNAPSHOT
+set JAP_REMOTE_WS_PYTHON_OPENSHIFT_VERSION=3.0.0-SNAPSHOT
+set JAP_REMOTE_WS_PYTHON_WINDOWS_VERSION=3.0.0-SNAPSHOT
 if exist MAKE rmdir MAKE /s /q
 mkdir MAKE
 cd MAKE
@@ -26,12 +26,8 @@ copy ..\..\README.txt README.txt
 mkdir JAP
 cd JAP
 copy ..\..\..\JAP\__init__.py __init__.py
-mkdir REMOTE_WS
-cd REMOTE_WS
-copy ..\..\..\..\JAP\REMOTE_WS\__init__.py __init__.py
-copy ..\..\..\..\JAP\REMOTE_WS\JAP_LOCAL.py JAP_LOCAL.py
-copy ..\..\..\..\JAP\REMOTE_WS\JAP_REMOTE_WS.py JAP_REMOTE_WS.py
-cd ..
+copy ..\..\..\JAP\JAP_LOCAL.py JAP_LOCAL.py
+copy ..\..\..\JAP\JAP_REMOTE_WS.py JAP_REMOTE_WS.py
 cd ..
 cd ..
 %SEVENZIP_HOME%\7z.exe a -tzip JAP_REMOTE_WS_PYTHON-%JAP_REMOTE_WS_PYTHON_VERSION%.zip JAP_REMOTE_WS_PYTHON-%JAP_REMOTE_WS_PYTHON_VERSION%
@@ -45,12 +41,8 @@ copy ..\..\JAP_REMOTE_WS_PYTHON_OPENSHIFT\requirements.txt requirements.txt
 mkdir JAP
 cd JAP
 copy ..\..\..\JAP\__init__.py __init__.py
-mkdir REMOTE_WS
-cd REMOTE_WS
-copy ..\..\..\..\JAP\REMOTE_WS\__init__.py __init__.py
-copy ..\..\..\..\JAP\REMOTE_WS\JAP_LOCAL.py JAP_LOCAL.py
-copy ..\..\..\..\JAP\REMOTE_WS\JAP_REMOTE_WS.py JAP_REMOTE_WS.py
-cd ..
+copy ..\..\..\JAP\JAP_LOCAL.py JAP_LOCAL.py
+copy ..\..\..\JAP\JAP_REMOTE_WS.py JAP_REMOTE_WS.py
 cd ..
 mkdir .openshift
 cd .openshift
@@ -69,7 +61,7 @@ cd ..
 rem JAP_REMOTE_WS_PYTHON_WINDOWS
 mkdir PYINSTALLER
 cd PYINSTALLER
-python %PYINSTALLER_HOME%\pyinstaller.py -c -F ..\..\JAP_REMOTE_WS.py
+python %PYINSTALLER_HOME%\pyinstaller.py -c -F ..\JAP_REMOTE_WS_PYTHON-%JAP_REMOTE_WS_PYTHON_VERSION%\JAP_REMOTE_WS.py
 cd ..
 mkdir JAP_REMOTE_WS_PYTHON_WINDOWS-%JAP_REMOTE_WS_PYTHON_WINDOWS_VERSION%
 cd JAP_REMOTE_WS_PYTHON_WINDOWS-%JAP_REMOTE_WS_PYTHON_WINDOWS_VERSION%

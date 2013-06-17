@@ -12,7 +12,7 @@
                 overflow: scroll;
             }
             .tab-content {
-                padding: 5px;
+                padding: 0px 0px 0px 20px;
             }
             .block1 {
                 border-left: 5px solid #EEEEEE;
@@ -36,70 +36,78 @@
             <div class="tabbable">
                 <ul class="nav nav-tabs">
                     <li class="active">
-                        <a href="#TAB_LOCAL" data-toggle="tab">LOCAL</a>
+                        <a href="#TAB_JAP" data-toggle="tab">JAP</a>
                     </li>
                     <li>
-                        <a href="#TAB_LOCAL_SSH" data-toggle="tab">LOCAL SSH</a>
+                        <a href="#TAB_JAP_LOCAL" data-toggle="tab">JAP LOCAL</a>
                     </li>
                     <li>
-                        <a href="#TAB_LOCAL_WS" data-toggle="tab">LOCAL WS</a>
+                        <a href="#TAB_JAP_LOCAL_SSH" data-toggle="tab">JAP LOCAL SSH</a>
                     </li>
                     <li>
-                        <a href="#TAB_REMOTE_SSH" data-toggle="tab">REMOTE SSH</a>
+                        <a href="#TAB_JAP_LOCAL_WS" data-toggle="tab">JAP LOCAL WS</a>
                     </li>
                     <li>
-                        <a href="#TAB_REMOTE_WS" data-toggle="tab">REMOTE WS</a>
+                        <a href="#TAB_JAP_REMOTE_SSH" data-toggle="tab">JAP REMOTE SSH</a>
+                    </li>
+                    <li>
+                        <a href="#TAB_JAP_REMOTE_WS" data-toggle="tab">JAP REMOTE WS</a>
                     </li>
                 </ul>
                 <div class="tab-content">
-                    <div class="tab-pane active" id="TAB_LOCAL">
-                        <h2>LOCAL</h2>
-                        <p>
-                            <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_START">START</button>
-                            <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_STOP">STOP</button>
-                        </p>
-                        <hr>
-                        <div data-bind="template: {name: template_LOCAL().name(), data: template_LOCAL().data()}">
+                    <div class="tab-pane active" id="TAB_JAP">
+                        <h2>JAP</h2>
+                        <div data-bind="template: {name: template_JAP().name(), data: template_JAP().data()}">
                         </div>
                     </div>
-                    <div class="tab-pane" id="TAB_LOCAL_SSH">
-                        <h2>LOCAL SSH</h2>
+                    <div class="tab-pane" id="TAB_JAP_LOCAL">
+                        <h2>JAP LOCAL</h2>
                         <p>
-                            <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_SSH_START">START</button>
-                            <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_SSH_STOP">STOP</button>
+                            <button type="button" class="btn input-medium" data-bind="click: action_JAP_LOCAL_START">START</button>
+                            <button type="button" class="btn input-medium" data-bind="click: action_JAP_LOCAL_STOP">STOP</button>
                         </p>
                         <hr>
-                        <div data-bind="template: {name: template_LOCAL_SSH().name(), data: template_LOCAL_SSH().data()}">
+                        <div data-bind="template: {name: template_JAP_LOCAL().name(), data: template_JAP_LOCAL().data()}">
                         </div>
                     </div>
-                    <div class="tab-pane" id="TAB_LOCAL_WS">
-                        <h2>LOCAL WS</h2>
+                    <div class="tab-pane" id="TAB_JAP_LOCAL_SSH">
+                        <h2>JAP LOCAL SSH</h2>
                         <p>
-                            <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_WS_START">START</button>
-                            <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_WS_STOP">STOP</button>
+                            <button type="button" class="btn input-medium" data-bind="click: action_JAP_LOCAL_SSH_START">START</button>
+                            <button type="button" class="btn input-medium" data-bind="click: action_JAP_LOCAL_SSH_STOP">STOP</button>
                         </p>
                         <hr>
-                        <div data-bind="template: {name: template_LOCAL_WS().name(), data: template_LOCAL_WS().data()}">
+                        <div data-bind="template: {name: template_JAP_LOCAL_SSH().name(), data: template_JAP_LOCAL_SSH().data()}">
                         </div>
                     </div>
-                    <div class="tab-pane" id="TAB_REMOTE_SSH">
-                        <h2>REMOTE SSH</h2>
+                    <div class="tab-pane" id="TAB_JAP_LOCAL_WS">
+                        <h2>JAP LOCAL WS</h2>
                         <p>
-                            <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_SSH_START">START</button>
-                            <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_SSH_STOP">STOP</button>
+                            <button type="button" class="btn input-medium" data-bind="click: action_JAP_LOCAL_WS_START">START</button>
+                            <button type="button" class="btn input-medium" data-bind="click: action_JAP_LOCAL_WS_STOP">STOP</button>
                         </p>
                         <hr>
-                        <div data-bind="template: {name: template_REMOTE_SSH().name(), data: template_REMOTE_SSH().data()}">
+                        <div data-bind="template: {name: template_JAP_LOCAL_WS().name(), data: template_JAP_LOCAL_WS().data()}">
                         </div>
                     </div>
-                    <div class="tab-pane" id="TAB_REMOTE_WS">
-                        <h2>REMOTE WS</h2>
+                    <div class="tab-pane" id="TAB_JAP_REMOTE_SSH">
+                        <h2>JAP REMOTE SSH</h2>
                         <p>
-                            <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_WS_START">START</button>
-                            <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_WS_STOP">STOP</button>
+                            <button type="button" class="btn input-medium" data-bind="click: action_JAP_REMOTE_SSH_START">START</button>
+                            <button type="button" class="btn input-medium" data-bind="click: action_JAP_REMOTE_SSH_STOP">STOP</button>
                         </p>
                         <hr>
-                        <div data-bind="template: {name: template_REMOTE_WS().name(), data: template_REMOTE_WS().data()}">
+                        <div data-bind="template: {name: template_JAP_REMOTE_SSH().name(), data: template_JAP_REMOTE_SSH().data()}">
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="TAB_JAP_REMOTE_WS">
+                        <h2>JAP REMOTE WS</h2>
+                        <p>
+                            <button type="button" class="btn input-medium" data-bind="click: action_JAP_REMOTE_WS_START">START</button>
+                            <button type="button" class="btn input-medium" data-bind="click: action_JAP_REMOTE_WS_STOP">STOP</button>
+                        </p>
+                        <hr>
+                        <div data-bind="template: {name: template_JAP_REMOTE_WS().name(), data: template_JAP_REMOTE_WS().data()}">
                         </div>
                     </div>
                 </div>
@@ -110,9 +118,9 @@
             </p>
         </div>
         
-        <script type="text/html" id="TEMPLATE_LOCAL">
+        <script type="text/html" id="TEMPLATE_JAP">
             <div>
-                <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_UPDATE">UPDATE</button>
+                <button type="button" class="btn input-medium" data-bind="click: action_JAP_UPDATE">UPDATE</button>
             </div>
             <div class="block1">
                 <h3>1 LOGGER</h3>
@@ -129,7 +137,18 @@
                         </select>
                     </p>
                 </div>
-                <h3>2 LOCAL PROXY SERVER</h3>
+            </div>
+            <div>
+                <button type="button" class="btn input-medium" data-bind="click: action_JAP_UPDATE">UPDATE</button>
+            </div>
+        </script>
+        
+        <script type="text/html" id="TEMPLATE_JAP_LOCAL">
+            <div>
+                <button type="button" class="btn input-medium" data-bind="click: action_JAP_LOCAL_UPDATE">UPDATE</button>
+            </div>
+            <div class="block1">
+                <h3>1 LOCAL PROXY SERVER</h3>
                 <div class="block2">
                     <p>
                         <label>ADDRESS</label>
@@ -138,22 +157,22 @@
                         <input type="text" class="input-xlarge" data-bind="value: data.LOCAL_PROXY_SERVER.PORT">
                     </p>
                 </div>
-                <h3>3 PROXY SERVERS</h3>
+                <h3>2 PROXY SERVERS</h3>
                 <div class="block2">
-                    <div data-bind="template: {name: template_LOCAL_PROXY_SERVERS().name(), data: template_LOCAL_PROXY_SERVERS().data()}">
+                    <div data-bind="template: {name: template_JAP_LOCAL_PROXY_SERVERS().name(), data: template_JAP_LOCAL_PROXY_SERVERS().data()}">
                     </div>
                 </div>
             </div>
             <div>
-                <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_UPDATE">UPDATE</button>
+                <button type="button" class="btn input-medium" data-bind="click: action_JAP_LOCAL_UPDATE">UPDATE</button>
             </div>
         </script>
         
-        <script type="text/html" id="TEMPLATE_LOCAL_PROXY_SERVERS">
+        <script type="text/html" id="TEMPLATE_JAP_LOCAL_PROXY_SERVERS">
             <p>
-                <button type="button" class="btn input-medium" data-bind="click: load_LOCAL_PROXY_SERVERS_ADD">ADD</button>
+                <button type="button" class="btn input-medium" data-bind="click: load_JAP_LOCAL_PROXY_SERVERS_ADD">ADD</button>
                 <!-- ko if: data.PROXY_SERVERS().length > 0 -->
-                    <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_PROXY_SERVERS_REMOVE_ALL">REMOVE ALL</button>
+                    <button type="button" class="btn input-medium" data-bind="click: action_JAP_LOCAL_PROXY_SERVERS_REMOVE_ALL">REMOVE ALL</button>
                 <!-- /ko -->
             </p>
             <!-- ko if: data.PROXY_SERVERS().length > 0 -->
@@ -173,27 +192,27 @@
                                 <td data-bind="text: ADDRESS"></td>
                                 <td data-bind="text: PORT"></td>
                                 <td>
-                                    <button type="button" class="btn input-medium" data-bind="click: $parent.load_LOCAL_PROXY_SERVERS_UPDATE">UPDATE</button>
-                                    <button type="button" class="btn input-medium" data-bind="click: $parent.action_LOCAL_PROXY_SERVERS_REMOVE">REMOVE</button>
+                                    <button type="button" class="btn input-medium" data-bind="click: $parent.load_JAP_LOCAL_PROXY_SERVERS_UPDATE">UPDATE</button>
+                                    <button type="button" class="btn input-medium" data-bind="click: $parent.action_JAP_LOCAL_PROXY_SERVERS_REMOVE">REMOVE</button>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
                 </p>
                 <p>
-                    <button type="button" class="btn input-medium" data-bind="click: load_LOCAL_PROXY_SERVERS_ADD">ADD</button>
-                    <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_PROXY_SERVERS_REMOVE_ALL">REMOVE ALL</button>
+                    <button type="button" class="btn input-medium" data-bind="click: load_JAP_LOCAL_PROXY_SERVERS_ADD">ADD</button>
+                    <button type="button" class="btn input-medium" data-bind="click: action_JAP_LOCAL_PROXY_SERVERS_REMOVE_ALL">REMOVE ALL</button>
                 </p>
             <!-- /ko -->
         </script>
         
-        <script type="text/html" id="TEMPLATE_LOCAL_PROXY_SERVER">
+        <script type="text/html" id="TEMPLATE_JAP_LOCAL_PROXY_SERVER">
             <div>
-                <!-- ko if: action == "LOCAL_PROXY_SERVERS_ADD" -->
-                    <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_PROXY_SERVERS_ADD">ADD</button>
+                <!-- ko if: action == "JAP_LOCAL_PROXY_SERVERS_ADD" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_JAP_LOCAL_PROXY_SERVERS_ADD">ADD</button>
                 <!-- /ko -->
-                <!-- ko if: action == "LOCAL_PROXY_SERVERS_UPDATE" -->
-                    <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_PROXY_SERVERS_UPDATE">UPDATE</button>
+                <!-- ko if: action == "JAP_LOCAL_PROXY_SERVERS_UPDATE" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_JAP_LOCAL_PROXY_SERVERS_UPDATE">UPDATE</button>
                 <!-- /ko -->
                 <button type="button" class="btn input-medium" data-bind="click: cancel">CANCEL</button>
             </div>
@@ -211,7 +230,7 @@
                         <label>PORT</label>
                         <input type="text" class="input-xlarge" data-bind="value: data.PORT">
                     </p>
-                    <h3>3.1 AUTHENTICATION</h3>
+                    <h3>2.1 AUTHENTICATION</h3>
                     <div class="block2">
                         <p>
                             <label>USERNAME</label>
@@ -223,36 +242,22 @@
                 </div>
             </div>
             <div>
-                <!-- ko if: action == "LOCAL_PROXY_SERVERS_ADD" -->
-                    <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_PROXY_SERVERS_ADD">ADD</button>
+                <!-- ko if: action == "JAP_LOCAL_PROXY_SERVERS_ADD" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_JAP_LOCAL_PROXY_SERVERS_ADD">ADD</button>
                 <!-- /ko -->
-                <!-- ko if: action == "LOCAL_PROXY_SERVERS_UPDATE" -->
-                    <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_PROXY_SERVERS_UPDATE">UPDATE</button>
+                <!-- ko if: action == "JAP_LOCAL_PROXY_SERVERS_UPDATE" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_JAP_LOCAL_PROXY_SERVERS_UPDATE">UPDATE</button>
                 <!-- /ko -->
                 <button type="button" class="btn input-medium" data-bind="click: cancel">CANCEL</button>
             </div>
         </script>
         
-        <script type="text/html" id="TEMPLATE_LOCAL_SSH">
+        <script type="text/html" id="TEMPLATE_JAP_LOCAL_SSH">
             <div>
-                <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_SSH_UPDATE">UPDATE</button>
+                <button type="button" class="btn input-medium" data-bind="click: action_JAP_LOCAL_SSH_UPDATE">UPDATE</button>
             </div>
             <div class="block1">
-                <h3>1 LOGGER</h3>
-                <div class="block2">
-                    <p>
-                        <label>LEVEL</label>
-                        <select data-bind="value: data.LOGGER.LEVEL">
-                            <option></option>
-                            <option>DEBUG</option>
-                            <option>INFO</option>
-                            <option>WARNING</option>
-                            <option>ERROR</option>
-                            <option>CRITICAL</option>
-                        </select>
-                    </p>
-                </div>
-                <h3>2 LOCAL PROXY SERVER</h3>
+                <h3>1 LOCAL PROXY SERVER</h3>
                 <div class="block2">
                     <p>
                         <label>ADDRESS</label>
@@ -260,33 +265,33 @@
                         <label>PORT</label>
                         <input type="text" class="input-xlarge" data-bind="value: data.LOCAL_PROXY_SERVER.PORT">
                     </p>
-                    <h3>2.1 KEYS</h3>
+                    <h3>1.1 KEYS</h3>
                     <div class="block2">
-                        <div data-bind="template: {name: template_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS().name(), data: template_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS().data()}">
+                        <div data-bind="template: {name: template_JAP_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS().name(), data: template_JAP_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS().data()}">
                         </div>
                     </div>
                 </div>
-                <h3>3 REMOTE PROXY SERVERS</h3>
+                <h3>2 REMOTE PROXY SERVERS</h3>
                 <div class="block2">
-                    <div data-bind="template: {name: template_LOCAL_SSH_REMOTE_PROXY_SERVERS().name(), data: template_LOCAL_SSH_REMOTE_PROXY_SERVERS().data()}">
+                    <div data-bind="template: {name: template_JAP_LOCAL_SSH_REMOTE_PROXY_SERVERS().name(), data: template_JAP_LOCAL_SSH_REMOTE_PROXY_SERVERS().data()}">
                     </div>
                 </div>
-                <h3>4 PROXY SERVERS</h3>
+                <h3>3 PROXY SERVERS</h3>
                 <div class="block2">
-                    <div data-bind="template: {name: template_LOCAL_SSH_PROXY_SERVERS().name(), data: template_LOCAL_SSH_PROXY_SERVERS().data()}">
+                    <div data-bind="template: {name: template_JAP_LOCAL_SSH_PROXY_SERVERS().name(), data: template_JAP_LOCAL_SSH_PROXY_SERVERS().data()}">
                     </div>
                 </div>
             </div>
             <div>
-                <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_SSH_UPDATE">UPDATE</button>
+                <button type="button" class="btn input-medium" data-bind="click: action_JAP_LOCAL_SSH_UPDATE">UPDATE</button>
             </div>
         </script>
         
-        <script type="text/html" id="TEMPLATE_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS">
+        <script type="text/html" id="TEMPLATE_JAP_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS">
             <p>
-                <button type="button" class="btn input-medium" data-bind="click: load_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_ADD">ADD</button>
+                <button type="button" class="btn input-medium" data-bind="click: load_JAP_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_ADD">ADD</button>
                 <!-- ko if: data.LOCAL_PROXY_SERVER.KEYS().length > 0 -->
-                    <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_REMOVE_ALL">REMOVE ALL</button>
+                    <button type="button" class="btn input-medium" data-bind="click: action_JAP_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_REMOVE_ALL">REMOVE ALL</button>
                 <!-- /ko -->
             </p>
             <!-- ko if: data.LOCAL_PROXY_SERVER.KEYS().length > 0 -->
@@ -306,33 +311,33 @@
                                 <td data-bind="text: PUBLIC.FILE"></td>
                                 <td data-bind="text: PRIVATE.FILE"></td>
                                 <td>
-                                    <button type="button" class="btn input-medium" data-bind="click: $parent.load_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_UPDATE">UPDATE</button>
-                                    <button type="button" class="btn input-medium" data-bind="click: $parent.action_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_REMOVE">REMOVE</button>
+                                    <button type="button" class="btn input-medium" data-bind="click: $parent.load_JAP_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_UPDATE">UPDATE</button>
+                                    <button type="button" class="btn input-medium" data-bind="click: $parent.action_JAP_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_REMOVE">REMOVE</button>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
                 </p>
                 <p>
-                    <button type="button" class="btn input-medium" data-bind="click: load_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_ADD">ADD</button>
-                    <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_REMOVE_ALL">REMOVE ALL</button>
+                    <button type="button" class="btn input-medium" data-bind="click: load_JAP_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_ADD">ADD</button>
+                    <button type="button" class="btn input-medium" data-bind="click: action_JAP_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_REMOVE_ALL">REMOVE ALL</button>
                 </p>
             <!-- /ko -->
         </script>
         
-        <script type="text/html" id="TEMPLATE_LOCAL_SSH_LOCAL_PROXY_SERVER_KEY">
+        <script type="text/html" id="TEMPLATE_JAP_LOCAL_SSH_LOCAL_PROXY_SERVER_KEY">
             <div>
-                <!-- ko if: action == "LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_ADD" -->
-                    <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_ADD">ADD</button>
+                <!-- ko if: action == "JAP_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_ADD" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_JAP_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_ADD">ADD</button>
                 <!-- /ko -->
-                <!-- ko if: action == "LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_UPDATE" -->
-                    <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_UPDATE">UPDATE</button>
+                <!-- ko if: action == "JAP_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_UPDATE" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_JAP_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_UPDATE">UPDATE</button>
                 <!-- /ko -->
                 <button type="button" class="btn input-medium" data-bind="click: cancel">CANCEL</button>
             </div>
             <div class="block1">
                 <div class="block2">
-                    <h3>2.1.1 PUBLIC</h3>
+                    <h3>1.1.1 PUBLIC</h3>
                     <div class="block2">
                         <p>
                             <label>FILE</label>
@@ -341,7 +346,7 @@
                             <input type="password" class="input-xlarge" data-bind="value: data.PUBLIC.PASSPHRASE">
                         </p>
                     </div>
-                    <h3>2.1.2 PRIVATE</h3>
+                    <h3>1.1.2 PRIVATE</h3>
                     <div class="block2">
                         <p>
                             <label>FILE</label>
@@ -353,21 +358,21 @@
                 </div>
             </div>
             <div>
-                <!-- ko if: action == "LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_ADD" -->
-                    <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_ADD">ADD</button>
+                <!-- ko if: action == "JAP_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_ADD" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_JAP_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_ADD">ADD</button>
                 <!-- /ko -->
-                <!-- ko if: action == "LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_UPDATE" -->
-                    <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_UPDATE">UPDATE</button>
+                <!-- ko if: action == "JAP_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_UPDATE" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_JAP_LOCAL_SSH_LOCAL_PROXY_SERVER_KEYS_UPDATE">UPDATE</button>
                 <!-- /ko -->
                 <button type="button" class="btn input-medium" data-bind="click: cancel">CANCEL</button>
             </div>
         </script>
         
-        <script type="text/html" id="TEMPLATE_LOCAL_SSH_REMOTE_PROXY_SERVERS">
+        <script type="text/html" id="TEMPLATE_JAP_LOCAL_SSH_REMOTE_PROXY_SERVERS">
             <p>
-                <button type="button" class="btn input-medium" data-bind="click: load_LOCAL_SSH_REMOTE_PROXY_SERVERS_ADD">ADD</button>
+                <button type="button" class="btn input-medium" data-bind="click: load_JAP_LOCAL_SSH_REMOTE_PROXY_SERVERS_ADD">ADD</button>
                 <!-- ko if: data.REMOTE_PROXY_SERVERS().length > 0 -->
-                    <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_SSH_REMOTE_PROXY_SERVERS_REMOVE_ALL">REMOVE ALL</button>
+                    <button type="button" class="btn input-medium" data-bind="click: action_JAP_LOCAL_SSH_REMOTE_PROXY_SERVERS_REMOVE_ALL">REMOVE ALL</button>
                 <!-- /ko -->
             </p>
             <!-- ko if: data.REMOTE_PROXY_SERVERS().length > 0 -->
@@ -387,27 +392,27 @@
                                 <td data-bind="text: ADDRESS"></td>
                                 <td data-bind="text: PORT"></td>
                                 <td>
-                                    <button type="button" class="btn input-medium" data-bind="click: $parent.load_LOCAL_SSH_REMOTE_PROXY_SERVERS_UPDATE">UPDATE</button>
-                                    <button type="button" class="btn input-medium" data-bind="click: $parent.action_LOCAL_SSH_REMOTE_PROXY_SERVERS_REMOVE">REMOVE</button>
+                                    <button type="button" class="btn input-medium" data-bind="click: $parent.load_JAP_LOCAL_SSH_REMOTE_PROXY_SERVERS_UPDATE">UPDATE</button>
+                                    <button type="button" class="btn input-medium" data-bind="click: $parent.action_JAP_LOCAL_SSH_REMOTE_PROXY_SERVERS_REMOVE">REMOVE</button>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
                 </p>
                 <p>
-                    <button type="button" class="btn input-medium" data-bind="click: load_LOCAL_SSH_REMOTE_PROXY_SERVERS_ADD">ADD</button>
-                    <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_SSH_REMOTE_PROXY_SERVERS_REMOVE_ALL">REMOVE ALL</button>
+                    <button type="button" class="btn input-medium" data-bind="click: load_JAP_LOCAL_SSH_REMOTE_PROXY_SERVERS_ADD">ADD</button>
+                    <button type="button" class="btn input-medium" data-bind="click: action_JAP_LOCAL_SSH_REMOTE_PROXY_SERVERS_REMOVE_ALL">REMOVE ALL</button>
                 </p>
             <!-- /ko -->
         </script>
         
-        <script type="text/html" id="TEMPLATE_LOCAL_SSH_REMOTE_PROXY_SERVER">
+        <script type="text/html" id="TEMPLATE_JAP_LOCAL_SSH_REMOTE_PROXY_SERVER">
             <div>
-                <!-- ko if: action == "LOCAL_SSH_REMOTE_PROXY_SERVERS_ADD" -->
-                    <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_SSH_REMOTE_PROXY_SERVERS_ADD">ADD</button>
+                <!-- ko if: action == "JAP_LOCAL_SSH_REMOTE_PROXY_SERVERS_ADD" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_JAP_LOCAL_SSH_REMOTE_PROXY_SERVERS_ADD">ADD</button>
                 <!-- /ko -->
-                <!-- ko if: action == "LOCAL_SSH_REMOTE_PROXY_SERVERS_UPDATE" -->
-                    <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_SSH_REMOTE_PROXY_SERVERS_UPDATE">UPDATE</button>
+                <!-- ko if: action == "JAP_LOCAL_SSH_REMOTE_PROXY_SERVERS_UPDATE" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_JAP_LOCAL_SSH_REMOTE_PROXY_SERVERS_UPDATE">UPDATE</button>
                 <!-- /ko -->
                 <button type="button" class="btn input-medium" data-bind="click: cancel">CANCEL</button>
             </div>
@@ -419,7 +424,7 @@
                         <label>PORT</label>
                         <input type="text" class="input-xlarge" data-bind="value: data.PORT">
                     </p>
-                    <h3>3.1 AUTHENTICATION</h3>
+                    <h3>2.1 AUTHENTICATION</h3>
                     <div class="block2">
                         <p>
                             <label>USERNAME</label>
@@ -428,9 +433,9 @@
                             <input type="password" class="input-xlarge" data-bind="value: data.AUTHENTICATION.PASSWORD">
                         </p>
                     </div>
-                    <h3>3.2 KEY</h3>
+                    <h3>2.2 KEY</h3>
                     <div class="block2">
-                        <h3>3.2.1 AUTHENTICATION</h3>
+                        <h3>2.2.1 AUTHENTICATION</h3>
                         <div class="block2">
                             <p>
                                 <label>FINGERPRINT</label>
@@ -441,21 +446,21 @@
                 </div>
             </div>
             <div>
-                <!-- ko if: action == "LOCAL_SSH_REMOTE_PROXY_SERVERS_ADD" -->
-                    <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_SSH_REMOTE_PROXY_SERVERS_ADD">ADD</button>
+                <!-- ko if: action == "JAP_LOCAL_SSH_REMOTE_PROXY_SERVERS_ADD" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_JAP_LOCAL_SSH_REMOTE_PROXY_SERVERS_ADD">ADD</button>
                 <!-- /ko -->
-                <!-- ko if: action == "LOCAL_SSH_REMOTE_PROXY_SERVERS_UPDATE" -->
-                    <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_SSH_REMOTE_PROXY_SERVERS_UPDATE">UPDATE</button>
+                <!-- ko if: action == "JAP_LOCAL_SSH_REMOTE_PROXY_SERVERS_UPDATE" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_JAP_LOCAL_SSH_REMOTE_PROXY_SERVERS_UPDATE">UPDATE</button>
                 <!-- /ko -->
                 <button type="button" class="btn input-medium" data-bind="click: cancel">CANCEL</button>
             </div>
         </script>
         
-        <script type="text/html" id="TEMPLATE_LOCAL_SSH_PROXY_SERVERS">
+        <script type="text/html" id="TEMPLATE_JAP_LOCAL_SSH_PROXY_SERVERS">
             <p>
-                <button type="button" class="btn input-medium" data-bind="click: load_LOCAL_SSH_PROXY_SERVERS_ADD">ADD</button>
+                <button type="button" class="btn input-medium" data-bind="click: load_JAP_LOCAL_SSH_PROXY_SERVERS_ADD">ADD</button>
                 <!-- ko if: data.PROXY_SERVERS().length > 0 -->
-                    <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_SSH_PROXY_SERVERS_REMOVE_ALL">REMOVE ALL</button>
+                    <button type="button" class="btn input-medium" data-bind="click: action_JAP_LOCAL_SSH_PROXY_SERVERS_REMOVE_ALL">REMOVE ALL</button>
                 <!-- /ko -->
             </p>
             <!-- ko if: data.PROXY_SERVERS().length > 0 -->
@@ -475,27 +480,27 @@
                                 <td data-bind="text: ADDRESS"></td>
                                 <td data-bind="text: PORT"></td>
                                 <td>
-                                    <button type="button" class="btn input-medium" data-bind="click: $parent.load_LOCAL_SSH_PROXY_SERVERS_UPDATE">UPDATE</button>
-                                    <button type="button" class="btn input-medium" data-bind="click: $parent.action_LOCAL_SSH_PROXY_SERVERS_REMOVE">REMOVE</button>
+                                    <button type="button" class="btn input-medium" data-bind="click: $parent.load_JAP_LOCAL_SSH_PROXY_SERVERS_UPDATE">UPDATE</button>
+                                    <button type="button" class="btn input-medium" data-bind="click: $parent.action_JAP_LOCAL_SSH_PROXY_SERVERS_REMOVE">REMOVE</button>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
                 </p>
                 <p>
-                    <button type="button" class="btn input-medium" data-bind="click: load_LOCAL_SSH_PROXY_SERVERS_ADD">ADD</button>
-                    <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_SSH_PROXY_SERVERS_REMOVE_ALL">REMOVE ALL</button>
+                    <button type="button" class="btn input-medium" data-bind="click: load_JAP_LOCAL_SSH_PROXY_SERVERS_ADD">ADD</button>
+                    <button type="button" class="btn input-medium" data-bind="click: action_JAP_LOCAL_SSH_PROXY_SERVERS_REMOVE_ALL">REMOVE ALL</button>
                 </p>
             <!-- /ko -->
         </script>
         
-        <script type="text/html" id="TEMPLATE_LOCAL_SSH_PROXY_SERVER">
+        <script type="text/html" id="TEMPLATE_JAP_LOCAL_SSH_PROXY_SERVER">
             <div>
-                <!-- ko if: action == "LOCAL_SSH_PROXY_SERVERS_ADD" -->
-                    <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_SSH_PROXY_SERVERS_ADD">ADD</button>
+                <!-- ko if: action == "JAP_LOCAL_SSH_PROXY_SERVERS_ADD" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_JAP_LOCAL_SSH_PROXY_SERVERS_ADD">ADD</button>
                 <!-- /ko -->
-                <!-- ko if: action == "LOCAL_SSH_PROXY_SERVERS_UPDATE" -->
-                    <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_SSH_PROXY_SERVERS_UPDATE">UPDATE</button>
+                <!-- ko if: action == "JAP_LOCAL_SSH_PROXY_SERVERS_UPDATE" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_JAP_LOCAL_SSH_PROXY_SERVERS_UPDATE">UPDATE</button>
                 <!-- /ko -->
                 <button type="button" class="btn input-medium" data-bind="click: cancel">CANCEL</button>
             </div>
@@ -513,7 +518,7 @@
                         <label>PORT</label>
                         <input type="text" class="input-xlarge" data-bind="value: data.PORT">
                     </p>
-                    <h3>4.1 AUTHENTICATION</h3>
+                    <h3>3.1 AUTHENTICATION</h3>
                     <div class="block2">
                         <p>
                             <label>USERNAME</label>
@@ -525,36 +530,22 @@
                 </div>
             </div>
             <div>
-                <!-- ko if: action == "LOCAL_SSH_PROXY_SERVERS_ADD" -->
-                    <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_SSH_PROXY_SERVERS_ADD">ADD</button>
+                <!-- ko if: action == "JAP_LOCAL_SSH_PROXY_SERVERS_ADD" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_JAP_LOCAL_SSH_PROXY_SERVERS_ADD">ADD</button>
                 <!-- /ko -->
-                <!-- ko if: action == "LOCAL_SSH_PROXY_SERVERS_UPDATE" -->
-                    <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_SSH_PROXY_SERVERS_UPDATE">UPDATE</button>
+                <!-- ko if: action == "JAP_LOCAL_SSH_PROXY_SERVERS_UPDATE" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_JAP_LOCAL_SSH_PROXY_SERVERS_UPDATE">UPDATE</button>
                 <!-- /ko -->
                 <button type="button" class="btn input-medium" data-bind="click: cancel">CANCEL</button>
             </div>
         </script>
         
-        <script type="text/html" id="TEMPLATE_LOCAL_WS">
+        <script type="text/html" id="TEMPLATE_JAP_LOCAL_WS">
             <div>
-                <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_WS_UPDATE">UPDATE</button>
+                <button type="button" class="btn input-medium" data-bind="click: action_JAP_LOCAL_WS_UPDATE">UPDATE</button>
             </div>
             <div class="block1">
-                <h3>1 LOGGER</h3>
-                <div class="block2">
-                    <p>
-                        <label>LEVEL</label>
-                        <select data-bind="value: data.LOGGER.LEVEL">
-                            <option></option>
-                            <option>DEBUG</option>
-                            <option>INFO</option>
-                            <option>WARNING</option>
-                            <option>ERROR</option>
-                            <option>CRITICAL</option>
-                        </select>
-                    </p>
-                </div>
-                <h3>2 LOCAL PROXY SERVER</h3>
+                <h3>1 LOCAL PROXY SERVER</h3>
                 <div class="block2">
                     <p>
                         <label>ADDRESS</label>
@@ -563,27 +554,27 @@
                         <input type="text" class="input-xlarge" data-bind="value: data.LOCAL_PROXY_SERVER.PORT">
                     </p>
                 </div>
-                <h3>3 REMOTE PROXY SERVERS</h3>
+                <h3>2 REMOTE PROXY SERVERS</h3>
                 <div class="block2">
-                    <div data-bind="template: {name: template_LOCAL_WS_REMOTE_PROXY_SERVERS().name(), data: template_LOCAL_WS_REMOTE_PROXY_SERVERS().data()}">
+                    <div data-bind="template: {name: template_JAP_LOCAL_WS_REMOTE_PROXY_SERVERS().name(), data: template_JAP_LOCAL_WS_REMOTE_PROXY_SERVERS().data()}">
                     </div>
                 </div>
-                <h3>4 PROXY SERVERS</h3>
+                <h3>3 PROXY SERVERS</h3>
                 <div class="block2">
-                    <div data-bind="template: {name: template_LOCAL_WS_PROXY_SERVERS().name(), data: template_LOCAL_WS_PROXY_SERVERS().data()}">
+                    <div data-bind="template: {name: template_JAP_LOCAL_WS_PROXY_SERVERS().name(), data: template_JAP_LOCAL_WS_PROXY_SERVERS().data()}">
                     </div>
                 </div>
             </div>
             <div>
-                <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_WS_UPDATE">UPDATE</button>
+                <button type="button" class="btn input-medium" data-bind="click: action_JAP_LOCAL_WS_UPDATE">UPDATE</button>
             </div>
         </script>
         
-        <script type="text/html" id="TEMPLATE_LOCAL_WS_REMOTE_PROXY_SERVERS">
+        <script type="text/html" id="TEMPLATE_JAP_LOCAL_WS_REMOTE_PROXY_SERVERS">
             <p>
-                <button type="button" class="btn input-medium" data-bind="click: load_LOCAL_WS_REMOTE_PROXY_SERVERS_ADD">ADD</button>
+                <button type="button" class="btn input-medium" data-bind="click: load_JAP_LOCAL_WS_REMOTE_PROXY_SERVERS_ADD">ADD</button>
                 <!-- ko if: data.REMOTE_PROXY_SERVERS().length > 0 -->
-                    <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_WS_REMOTE_PROXY_SERVERS_REMOVE_ALL">REMOVE ALL</button>
+                    <button type="button" class="btn input-medium" data-bind="click: action_JAP_LOCAL_WS_REMOTE_PROXY_SERVERS_REMOVE_ALL">REMOVE ALL</button>
                 <!-- /ko -->
             </p>
             <!-- ko if: data.REMOTE_PROXY_SERVERS().length > 0 -->
@@ -603,27 +594,27 @@
                                 <td data-bind="text: ADDRESS"></td>
                                 <td data-bind="text: PORT"></td>
                                 <td>
-                                    <button type="button" class="btn input-medium" data-bind="click: $parent.load_LOCAL_WS_REMOTE_PROXY_SERVERS_UPDATE">UPDATE</button>
-                                    <button type="button" class="btn input-medium" data-bind="click: $parent.action_LOCAL_WS_REMOTE_PROXY_SERVERS_REMOVE">REMOVE</button>
+                                    <button type="button" class="btn input-medium" data-bind="click: $parent.load_JAP_LOCAL_WS_REMOTE_PROXY_SERVERS_UPDATE">UPDATE</button>
+                                    <button type="button" class="btn input-medium" data-bind="click: $parent.action_JAP_LOCAL_WS_REMOTE_PROXY_SERVERS_REMOVE">REMOVE</button>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
                 </p>
                 <p>
-                    <button type="button" class="btn input-medium" data-bind="click: load_LOCAL_WS_REMOTE_PROXY_SERVERS_ADD">ADD</button>
-                    <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_WS_REMOTE_PROXY_SERVERS_REMOVE_ALL">REMOVE ALL</button>
+                    <button type="button" class="btn input-medium" data-bind="click: load_JAP_LOCAL_WS_REMOTE_PROXY_SERVERS_ADD">ADD</button>
+                    <button type="button" class="btn input-medium" data-bind="click: action_JAP_LOCAL_WS_REMOTE_PROXY_SERVERS_REMOVE_ALL">REMOVE ALL</button>
                 </p>
             <!-- /ko -->
         </script>
         
-        <script type="text/html" id="TEMPLATE_LOCAL_WS_REMOTE_PROXY_SERVER">
+        <script type="text/html" id="TEMPLATE_JAP_LOCAL_WS_REMOTE_PROXY_SERVER">
             <div>
-                <!-- ko if: action == "LOCAL_WS_REMOTE_PROXY_SERVERS_ADD" -->
-                    <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_WS_REMOTE_PROXY_SERVERS_ADD">ADD</button>
+                <!-- ko if: action == "JAP_LOCAL_WS_REMOTE_PROXY_SERVERS_ADD" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_JAP_LOCAL_WS_REMOTE_PROXY_SERVERS_ADD">ADD</button>
                 <!-- /ko -->
-                <!-- ko if: action == "LOCAL_WS_REMOTE_PROXY_SERVERS_UPDATE" -->
-                    <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_WS_REMOTE_PROXY_SERVERS_UPDATE">UPDATE</button>
+                <!-- ko if: action == "JAP_LOCAL_WS_REMOTE_PROXY_SERVERS_UPDATE" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_JAP_LOCAL_WS_REMOTE_PROXY_SERVERS_UPDATE">UPDATE</button>
                 <!-- /ko -->
                 <button type="button" class="btn input-medium" data-bind="click: cancel">CANCEL</button>
             </div>
@@ -641,7 +632,7 @@
                         <label>PORT</label>
                         <input type="text" class="input-xlarge" data-bind="value: data.PORT">
                     </p>
-                    <h3>3.1 AUTHENTICATION</h3>
+                    <h3>2.1 AUTHENTICATION</h3>
                     <div class="block2">
                         <p>
                             <label>USERNAME</label>
@@ -650,9 +641,9 @@
                             <input type="password" class="input-xlarge" data-bind="value: data.AUTHENTICATION.PASSWORD">
                         </p>
                     </div>
-                    <h3>3.2 CERTIFICATE</h3>
+                    <h3>2.2 CERTIFICATE</h3>
                     <div class="block2">
-                        <h3>3.2.1 AUTHENTICATION</h3>
+                        <h3>2.2.1 AUTHENTICATION</h3>
                         <div class="block2">
                             <p>
                                 <label>FILE</label>
@@ -663,21 +654,21 @@
                 </div>
             </div>
             <div>
-                <!-- ko if: action == "LOCAL_WS_REMOTE_PROXY_SERVERS_ADD" -->
-                    <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_WS_REMOTE_PROXY_SERVERS_ADD">ADD</button>
+                <!-- ko if: action == "JAP_LOCAL_WS_REMOTE_PROXY_SERVERS_ADD" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_JAP_LOCAL_WS_REMOTE_PROXY_SERVERS_ADD">ADD</button>
                 <!-- /ko -->
-                <!-- ko if: action == "LOCAL_WS_REMOTE_PROXY_SERVERS_UPDATE" -->
-                    <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_WS_REMOTE_PROXY_SERVERS_UPDATE">UPDATE</button>
+                <!-- ko if: action == "JAP_LOCAL_WS_REMOTE_PROXY_SERVERS_UPDATE" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_JAP_LOCAL_WS_REMOTE_PROXY_SERVERS_UPDATE">UPDATE</button>
                 <!-- /ko -->
                 <button type="button" class="btn input-medium" data-bind="click: cancel">CANCEL</button>
             </div>
         </script>
         
-        <script type="text/html" id="TEMPLATE_LOCAL_WS_PROXY_SERVERS">
+        <script type="text/html" id="TEMPLATE_JAP_LOCAL_WS_PROXY_SERVERS">
             <p>
-                <button type="button" class="btn input-medium" data-bind="click: load_LOCAL_WS_PROXY_SERVERS_ADD">ADD</button>
+                <button type="button" class="btn input-medium" data-bind="click: load_JAP_LOCAL_WS_PROXY_SERVERS_ADD">ADD</button>
                 <!-- ko if: data.PROXY_SERVERS().length > 0 -->
-                    <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_WS_PROXY_SERVERS_REMOVE_ALL">REMOVE ALL</button>
+                    <button type="button" class="btn input-medium" data-bind="click: action_JAP_LOCAL_WS_PROXY_SERVERS_REMOVE_ALL">REMOVE ALL</button>
                 <!-- /ko -->
             </p>
             <!-- ko if: data.PROXY_SERVERS().length > 0 -->
@@ -697,27 +688,27 @@
                                 <td data-bind="text: ADDRESS"></td>
                                 <td data-bind="text: PORT"></td>
                                 <td>
-                                    <button type="button" class="btn input-medium" data-bind="click: $parent.load_LOCAL_WS_PROXY_SERVERS_UPDATE">UPDATE</button>
-                                    <button type="button" class="btn input-medium" data-bind="click: $parent.action_LOCAL_WS_PROXY_SERVERS_REMOVE">REMOVE</button>
+                                    <button type="button" class="btn input-medium" data-bind="click: $parent.load_JAP_LOCAL_WS_PROXY_SERVERS_UPDATE">UPDATE</button>
+                                    <button type="button" class="btn input-medium" data-bind="click: $parent.action_JAP_LOCAL_WS_PROXY_SERVERS_REMOVE">REMOVE</button>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
                 </p>
                 <p>
-                    <button type="button" class="btn input-medium" data-bind="click: load_LOCAL_WS_PROXY_SERVERS_ADD">ADD</button>
-                    <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_WS_PROXY_SERVERS_REMOVE_ALL">REMOVE ALL</button>
+                    <button type="button" class="btn input-medium" data-bind="click: load_JAP_LOCAL_WS_PROXY_SERVERS_ADD">ADD</button>
+                    <button type="button" class="btn input-medium" data-bind="click: action_JAP_LOCAL_WS_PROXY_SERVERS_REMOVE_ALL">REMOVE ALL</button>
                 </p>
             <!-- /ko -->
         </script>
         
-        <script type="text/html" id="TEMPLATE_LOCAL_WS_PROXY_SERVER">
+        <script type="text/html" id="TEMPLATE_JAP_LOCAL_WS_PROXY_SERVER">
             <div>
-                <!-- ko if: action == "LOCAL_WS_PROXY_SERVERS_ADD" -->
-                    <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_WS_PROXY_SERVERS_ADD">ADD</button>
+                <!-- ko if: action == "JAP_LOCAL_WS_PROXY_SERVERS_ADD" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_JAP_LOCAL_WS_PROXY_SERVERS_ADD">ADD</button>
                 <!-- /ko -->
-                <!-- ko if: action == "LOCAL_WS_PROXY_SERVERS_UPDATE" -->
-                    <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_WS_PROXY_SERVERS_UPDATE">UPDATE</button>
+                <!-- ko if: action == "JAP_LOCAL_WS_PROXY_SERVERS_UPDATE" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_JAP_LOCAL_WS_PROXY_SERVERS_UPDATE">UPDATE</button>
                 <!-- /ko -->
                 <button type="button" class="btn input-medium" data-bind="click: cancel">CANCEL</button>
             </div>
@@ -735,7 +726,7 @@
                         <label>PORT</label>
                         <input type="text" class="input-xlarge" data-bind="value: data.PORT">
                     </p>
-                    <h3>4.1 AUTHENTICATION</h3>
+                    <h3>3.1 AUTHENTICATION</h3>
                     <div class="block2">
                         <p>
                             <label>USERNAME</label>
@@ -747,36 +738,22 @@
                 </div>
             </div>
             <div>
-                <!-- ko if: action == "LOCAL_WS_PROXY_SERVERS_ADD" -->
-                    <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_WS_PROXY_SERVERS_ADD">ADD</button>
+                <!-- ko if: action == "JAP_LOCAL_WS_PROXY_SERVERS_ADD" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_JAP_LOCAL_WS_PROXY_SERVERS_ADD">ADD</button>
                 <!-- /ko -->
-                <!-- ko if: action == "LOCAL_WS_PROXY_SERVERS_UPDATE" -->
-                    <button type="button" class="btn input-medium" data-bind="click: action_LOCAL_WS_PROXY_SERVERS_UPDATE">UPDATE</button>
+                <!-- ko if: action == "JAP_LOCAL_WS_PROXY_SERVERS_UPDATE" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_JAP_LOCAL_WS_PROXY_SERVERS_UPDATE">UPDATE</button>
                 <!-- /ko -->
                 <button type="button" class="btn input-medium" data-bind="click: cancel">CANCEL</button>
             </div>
         </script>
         
-        <script type="text/html" id="TEMPLATE_REMOTE_SSH">
+        <script type="text/html" id="TEMPLATE_JAP_REMOTE_SSH">
             <div>
-                <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_SSH_UPDATE">UPDATE</button>
+                <button type="button" class="btn input-medium" data-bind="click: action_JAP_REMOTE_SSH_UPDATE">UPDATE</button>
             </div>
             <div class="block1">
-                <h3>1 LOGGER</h3>
-                <div class="block2">
-                    <p>
-                        <label>LEVEL</label>
-                        <select data-bind="value: data.LOGGER.LEVEL">
-                            <option></option>
-                            <option>DEBUG</option>
-                            <option>INFO</option>
-                            <option>WARNING</option>
-                            <option>ERROR</option>
-                            <option>CRITICAL</option>
-                        </select>
-                    </p>
-                </div>
-                <h3>2 REMOTE PROXY SERVER</h3>
+                <h3>1 REMOTE PROXY SERVER</h3>
                 <div class="block2">
                     <p>
                         <label>ADDRESS</label>
@@ -784,14 +761,14 @@
                         <label>PORT</label>
                         <input type="text" class="input-xlarge" data-bind="value: data.REMOTE_PROXY_SERVER.PORT">
                     </p>
-                    <h3>2.1 AUTHENTICATION</h3>
+                    <h3>1.1 AUTHENTICATION</h3>
                     <div class="block2">
-                        <div data-bind="template: {name: template_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS().name(), data: template_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS().data()}">
+                        <div data-bind="template: {name: template_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS().name(), data: template_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS().data()}">
                         </div>
                     </div>
-                    <h3>2.2 KEY</h3>
+                    <h3>1.2 KEY</h3>
                     <div class="block2">
-                        <h3>2.2.1 PUBLIC</h3>
+                        <h3>1.2.1 PUBLIC</h3>
                         <div class="block2">
                             <p>
                                 <label>FILE</label>
@@ -800,7 +777,7 @@
                                 <input type="text" class="input-xlarge" data-bind="value: data.REMOTE_PROXY_SERVER.KEY.PUBLIC.PASSPHRASE">
                             </p>
                         </div>
-                        <h3>2.2.1 PRIVATE</h3>
+                        <h3>1.2.2 PRIVATE</h3>
                         <div class="block2">
                             <p>
                                 <label>FILE</label>
@@ -811,22 +788,22 @@
                         </div>
                     </div>
                 </div>
-                <h3>3 PROXY SERVERS</h3>
+                <h3>2 PROXY SERVERS</h3>
                 <div class="block2">
-                    <div data-bind="template: {name: template_REMOTE_SSH_PROXY_SERVERS().name(), data: template_REMOTE_SSH_PROXY_SERVERS().data()}">
+                    <div data-bind="template: {name: template_JAP_REMOTE_SSH_PROXY_SERVERS().name(), data: template_JAP_REMOTE_SSH_PROXY_SERVERS().data()}">
                     </div>
                 </div>
             </div>
             <div>
-                <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_SSH_UPDATE">UPDATE</button>
+                <button type="button" class="btn input-medium" data-bind="click: action_JAP_REMOTE_SSH_UPDATE">UPDATE</button>
             </div>
         </script>
         
-        <script type="text/html" id="TEMPLATE_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS">
+        <script type="text/html" id="TEMPLATE_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS">
             <p>
-                <button type="button" class="btn input-medium" data-bind="click: load_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD">ADD</button>
+                <button type="button" class="btn input-medium" data-bind="click: load_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD">ADD</button>
                 <!-- ko if: data.REMOTE_PROXY_SERVER.AUTHENTICATION().length > 0 -->
-                    <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_REMOVE_ALL">REMOVE ALL</button>
+                    <button type="button" class="btn input-medium" data-bind="click: action_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_REMOVE_ALL">REMOVE ALL</button>
                 <!-- /ko -->
             </p>
             <!-- ko if: data.REMOTE_PROXY_SERVER.AUTHENTICATION().length > 0 -->
@@ -844,27 +821,27 @@
                                 <td data-bind="text: $index() + 1"></td>
                                 <td data-bind="text: USERNAME"></td>
                                 <td>
-                                    <button type="button" class="btn input-medium" data-bind="click: $parent.load_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE">UPDATE</button>
-                                    <button type="button" class="btn input-medium" data-bind="click: $parent.action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_REMOVE">REMOVE</button>
+                                    <button type="button" class="btn input-medium" data-bind="click: $parent.load_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE">UPDATE</button>
+                                    <button type="button" class="btn input-medium" data-bind="click: $parent.action_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_REMOVE">REMOVE</button>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
                 </p>
                 <p>
-                    <button type="button" class="btn input-medium" data-bind="click: load_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD">ADD</button>
-                    <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_REMOVE_ALL">REMOVE ALL</button>
+                    <button type="button" class="btn input-medium" data-bind="click: load_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD">ADD</button>
+                    <button type="button" class="btn input-medium" data-bind="click: action_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_REMOVE_ALL">REMOVE ALL</button>
                 </p>
             <!-- /ko -->
         </script>
         
-        <script type="text/html" id="TEMPLATE_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION">
+        <script type="text/html" id="TEMPLATE_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION">
             <div>
-                <!-- ko if: action == "REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD" -->
-                    <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD">ADD</button>
+                <!-- ko if: action == "JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD">ADD</button>
                 <!-- /ko -->
-                <!-- ko if: action == "REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE" -->
-                    <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE">UPDATE</button>
+                <!-- ko if: action == "JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE">UPDATE</button>
                 <!-- /ko -->
                 <button type="button" class="btn input-medium" data-bind="click: cancel">CANCEL</button>
             </div>
@@ -876,29 +853,29 @@
                         <label>PASSWORD</label>
                         <input type="password" class="input-xlarge" data-bind="value: data.PASSWORD">
                     </p>
-                    <h3>2.1.1 KEYS</h3>
+                    <h3>1.1.1 KEYS</h3>
                     <div class="block2">
-                        <div data-bind="template: {name: template_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS().name(), data: template_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS().data()}">
+                        <div data-bind="template: {name: template_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS().name(), data: template_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS().data()}">
                         </div>
                     </div>
                 </div>
             </div>
             <div>
-                <!-- ko if: action == "REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD" -->
-                    <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD">ADD</button>
+                <!-- ko if: action == "JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD">ADD</button>
                 <!-- /ko -->
-                <!-- ko if: action == "REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE" -->
-                    <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE">UPDATE</button>
+                <!-- ko if: action == "JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE">UPDATE</button>
                 <!-- /ko -->
                 <button type="button" class="btn input-medium" data-bind="click: cancel">CANCEL</button>
             </div>
         </script>
         
-        <script type="text/html" id="TEMPLATE_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS">
+        <script type="text/html" id="TEMPLATE_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS">
             <p>
-                <button type="button" class="btn input-medium" data-bind="click: load_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_ADD">ADD</button>
+                <button type="button" class="btn input-medium" data-bind="click: load_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_ADD">ADD</button>
                 <!-- ko if: data.KEYS().length > 0 -->
-                    <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_REMOVE_ALL">REMOVE ALL</button>
+                    <button type="button" class="btn input-medium" data-bind="click: action_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_REMOVE_ALL">REMOVE ALL</button>
                 <!-- /ko -->
             </p>
             <!-- ko if: data.KEYS().length > 0 -->
@@ -916,32 +893,32 @@
                                 <td data-bind="text: $index() + 1"></td>
                                 <td data-bind="text: PUBLIC.FILE"></td>
                                 <td>
-                                    <button type="button" class="btn input-medium" data-bind="click: $parent.load_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_UPDATE">UPDATE</button>
-                                    <button type="button" class="btn input-medium" data-bind="click: $parent.action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_REMOVE">REMOVE</button>
+                                    <button type="button" class="btn input-medium" data-bind="click: $parent.load_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_UPDATE">UPDATE</button>
+                                    <button type="button" class="btn input-medium" data-bind="click: $parent.action_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_REMOVE">REMOVE</button>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
                 </p>
                 <p>
-                    <button type="button" class="btn input-medium" data-bind="click: load_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_ADD">ADD</button>
-                    <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_REMOVE_ALL">REMOVE ALL</button>
+                    <button type="button" class="btn input-medium" data-bind="click: load_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_ADD">ADD</button>
+                    <button type="button" class="btn input-medium" data-bind="click: action_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_REMOVE_ALL">REMOVE ALL</button>
                 </p>
             <!-- /ko -->
         </script>
         
-        <script type="text/html" id="TEMPLATE_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEY">
+        <script type="text/html" id="TEMPLATE_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEY">
             <div>
-                <!-- ko if: action == "REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_ADD" -->
-                    <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_ADD">ADD</button>
+                <!-- ko if: action == "JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_ADD" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_ADD">ADD</button>
                 <!-- /ko -->
-                <!-- ko if: action == "REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_UPDATE" -->
-                    <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_UPDATE">UPDATE</button>
+                <!-- ko if: action == "JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_UPDATE" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_UPDATE">UPDATE</button>
                 <!-- /ko -->
                 <button type="button" class="btn input-medium" data-bind="click: cancel">CANCEL</button>
             </div>
             <div class="block1">
-                <h3>2.1.1.1 PUBLIC</h3>
+                <h3>1.1.1.1 PUBLIC</h3>
                 <div class="block2">
                     <p>
                         <label>FILE</label>
@@ -952,21 +929,21 @@
                 </div>
             </div>
             <div>
-                <!-- ko if: action == "REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_ADD" -->
-                    <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_ADD">ADD</button>
+                <!-- ko if: action == "JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_ADD" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_ADD">ADD</button>
                 <!-- /ko -->
-                <!-- ko if: action == "REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_UPDATE" -->
-                    <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_UPDATE">UPDATE</button>
+                <!-- ko if: action == "JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_UPDATE" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_JAP_REMOTE_SSH_REMOTE_PROXY_SERVER_AUTHENTICATION_KEYS_UPDATE">UPDATE</button>
                 <!-- /ko -->
                 <button type="button" class="btn input-medium" data-bind="click: cancel">CANCEL</button>
             </div>
         </script>
         
-        <script type="text/html" id="TEMPLATE_REMOTE_SSH_PROXY_SERVERS">
+        <script type="text/html" id="TEMPLATE_JAP_REMOTE_SSH_PROXY_SERVERS">
             <p>
-                <button type="button" class="btn input-medium" data-bind="click: load_REMOTE_SSH_PROXY_SERVERS_ADD">ADD</button>
+                <button type="button" class="btn input-medium" data-bind="click: load_JAP_REMOTE_SSH_PROXY_SERVERS_ADD">ADD</button>
                 <!-- ko if: data.PROXY_SERVERS().length > 0 -->
-                    <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_SSH_PROXY_SERVERS_REMOVE_ALL">REMOVE ALL</button>
+                    <button type="button" class="btn input-medium" data-bind="click: action_JAP_REMOTE_SSH_PROXY_SERVERS_REMOVE_ALL">REMOVE ALL</button>
                 <!-- /ko -->
             </p>
             <!-- ko if: data.PROXY_SERVERS().length > 0 -->
@@ -986,27 +963,27 @@
                                 <td data-bind="text: ADDRESS"></td>
                                 <td data-bind="text: PORT"></td>
                                 <td>
-                                    <button type="button" class="btn input-medium" data-bind="click: $parent.load_REMOTE_SSH_PROXY_SERVERS_UPDATE">UPDATE</button>
-                                    <button type="button" class="btn input-medium" data-bind="click: $parent.action_REMOTE_SSH_PROXY_SERVERS_REMOVE">REMOVE</button>
+                                    <button type="button" class="btn input-medium" data-bind="click: $parent.load_JAP_REMOTE_SSH_PROXY_SERVERS_UPDATE">UPDATE</button>
+                                    <button type="button" class="btn input-medium" data-bind="click: $parent.action_JAP_REMOTE_SSH_PROXY_SERVERS_REMOVE">REMOVE</button>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
                 </p>
                 <p>
-                    <button type="button" class="btn input-medium" data-bind="click: load_REMOTE_SSH_PROXY_SERVERS_ADD">ADD</button>
-                    <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_SSH_PROXY_SERVERS_REMOVE_ALL">REMOVE ALL</button>
+                    <button type="button" class="btn input-medium" data-bind="click: load_JAP_REMOTE_SSH_PROXY_SERVERS_ADD">ADD</button>
+                    <button type="button" class="btn input-medium" data-bind="click: action_JAP_REMOTE_SSH_PROXY_SERVERS_REMOVE_ALL">REMOVE ALL</button>
                 </p>
             <!-- /ko -->
         </script>
         
-        <script type="text/html" id="TEMPLATE_REMOTE_SSH_PROXY_SERVER">
+        <script type="text/html" id="TEMPLATE_JAP_REMOTE_SSH_PROXY_SERVER">
             <div>
-                <!-- ko if: action == "REMOTE_SSH_PROXY_SERVERS_ADD" -->
-                    <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_SSH_PROXY_SERVERS_ADD">ADD</button>
+                <!-- ko if: action == "JAP_REMOTE_SSH_PROXY_SERVERS_ADD" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_JAP_REMOTE_SSH_PROXY_SERVERS_ADD">ADD</button>
                 <!-- /ko -->
-                <!-- ko if: action == "REMOTE_SSH_PROXY_SERVERS_UPDATE" -->
-                    <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_SSH_PROXY_SERVERS_UPDATE">UPDATE</button>
+                <!-- ko if: action == "JAP_REMOTE_SSH_PROXY_SERVERS_UPDATE" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_JAP_REMOTE_SSH_PROXY_SERVERS_UPDATE">UPDATE</button>
                 <!-- /ko -->
                 <button type="button" class="btn input-medium" data-bind="click: cancel">CANCEL</button>
             </div>
@@ -1024,7 +1001,7 @@
                         <label>PORT</label>
                         <input type="text" class="input-xlarge" data-bind="value: data.PORT">
                     </p>
-                    <h3>3.1 AUTHENTICATION</h3>
+                    <h3>2.1 AUTHENTICATION</h3>
                     <div class="block2">
                         <p>
                             <label>USERNAME</label>
@@ -1036,36 +1013,22 @@
                 </div>
             </div>
             <div>
-                <!-- ko if: action == "REMOTE_SSH_PROXY_SERVERS_ADD" -->
-                    <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_SSH_PROXY_SERVERS_ADD">ADD</button>
+                <!-- ko if: action == "JAP_REMOTE_SSH_PROXY_SERVERS_ADD" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_JAP_REMOTE_SSH_PROXY_SERVERS_ADD">ADD</button>
                 <!-- /ko -->
-                <!-- ko if: action == "REMOTE_SSH_PROXY_SERVERS_UPDATE" -->
-                    <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_SSH_PROXY_SERVERS_UPDATE">UPDATE</button>
+                <!-- ko if: action == "JAP_REMOTE_SSH_PROXY_SERVERS_UPDATE" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_JAP_REMOTE_SSH_PROXY_SERVERS_UPDATE">UPDATE</button>
                 <!-- /ko -->
                 <button type="button" class="btn input-medium" data-bind="click: cancel">CANCEL</button>
             </div>
         </script>
         
-        <script type="text/html" id="TEMPLATE_REMOTE_WS">
+        <script type="text/html" id="TEMPLATE_JAP_REMOTE_WS">
             <div>
-                <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_WS_UPDATE">UPDATE</button>
+                <button type="button" class="btn input-medium" data-bind="click: action_JAP_REMOTE_WS_UPDATE">UPDATE</button>
             </div>
             <div class="block1">
-                <h3>1 LOGGER</h3>
-                <div class="block2">
-                    <p>
-                        <label>LEVEL</label>
-                        <select data-bind="value: data.LOGGER.LEVEL">
-                            <option></option>
-                            <option>DEBUG</option>
-                            <option>INFO</option>
-                            <option>WARNING</option>
-                            <option>ERROR</option>
-                            <option>CRITICAL</option>
-                        </select>
-                    </p>
-                </div>
-                <h3>2 REMOTE PROXY SERVER</h3>
+                <h3>1 REMOTE PROXY SERVER</h3>
                 <div class="block2">
                     <p>
                         <label>TYPE</label>
@@ -1079,18 +1042,18 @@
                         <label>PORT</label>
                         <input type="text" class="input-xlarge" data-bind="value: data.REMOTE_PROXY_SERVER.PORT">
                     </p>
-                    <h3>2.1 AUTHENTICATION</h3>
+                    <h3>1.1 AUTHENTICATION</h3>
                     <div class="block2">
-                        <div data-bind="template: {name: template_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS().name(), data: template_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS().data()}">
+                        <div data-bind="template: {name: template_JAP_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS().name(), data: template_JAP_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS().data()}">
                         </div>
                     </div>
-                    <h3>2.2 CERTIFICATE</h3>
+                    <h3>1.2 CERTIFICATE</h3>
                     <div class="block2">
                         <p>
                             <label>FILE</label>
                             <input type="text" class="input-xlarge" data-bind="value: data.REMOTE_PROXY_SERVER.CERTIFICATE.FILE">
                         </p>
-                        <h3>2.2.1 KEY</h3>
+                        <h3>1.2.1 KEY</h3>
                         <div class="block2">
                             <p>
                                 <label>FILE</label>
@@ -1099,22 +1062,22 @@
                         </div>
                     </div>
                 </div>
-                <h3>3 PROXY SERVERS</h3>
+                <h3>2 PROXY SERVERS</h3>
                 <div class="block2">
-                    <div data-bind="template: {name: template_REMOTE_WS_PROXY_SERVERS().name(), data: template_REMOTE_WS_PROXY_SERVERS().data()}">
+                    <div data-bind="template: {name: template_JAP_REMOTE_WS_PROXY_SERVERS().name(), data: template_JAP_REMOTE_WS_PROXY_SERVERS().data()}">
                     </div>
                 </div>
             </div>
             <div>
-                <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_WS_UPDATE">UPDATE</button>
+                <button type="button" class="btn input-medium" data-bind="click: action_JAP_REMOTE_WS_UPDATE">UPDATE</button>
             </div>
         </script>
         
-        <script type="text/html" id="TEMPLATE_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS">
+        <script type="text/html" id="TEMPLATE_JAP_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS">
             <p>
-                <button type="button" class="btn input-medium" data-bind="click: load_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD">ADD</button>
+                <button type="button" class="btn input-medium" data-bind="click: load_JAP_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD">ADD</button>
                 <!-- ko if: data.REMOTE_PROXY_SERVER.AUTHENTICATION().length > 0 -->
-                    <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_REMOVE_ALL">REMOVE ALL</button>
+                    <button type="button" class="btn input-medium" data-bind="click: action_JAP_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_REMOVE_ALL">REMOVE ALL</button>
                 <!-- /ko -->
             </p>
             <!-- ko if: data.REMOTE_PROXY_SERVER.AUTHENTICATION().length > 0 -->
@@ -1132,27 +1095,27 @@
                                 <td data-bind="text: $index() + 1"></td>
                                 <td data-bind="text: USERNAME"></td>
                                 <td>
-                                    <button type="button" class="btn input-medium" data-bind="click: $parent.load_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE">UPDATE</button>
-                                    <button type="button" class="btn input-medium" data-bind="click: $parent.action_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_REMOVE">REMOVE</button>
+                                    <button type="button" class="btn input-medium" data-bind="click: $parent.load_JAP_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE">UPDATE</button>
+                                    <button type="button" class="btn input-medium" data-bind="click: $parent.action_JAP_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_REMOVE">REMOVE</button>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
                 </p>
                 <p>
-                    <button type="button" class="btn input-medium" data-bind="click: load_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD">ADD</button>
-                    <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_REMOVE_ALL">REMOVE ALL</button>
+                    <button type="button" class="btn input-medium" data-bind="click: load_JAP_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD">ADD</button>
+                    <button type="button" class="btn input-medium" data-bind="click: action_JAP_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_REMOVE_ALL">REMOVE ALL</button>
                 </p>
             <!-- /ko -->
         </script>
         
-        <script type="text/html" id="TEMPLATE_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATION">
+        <script type="text/html" id="TEMPLATE_JAP_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATION">
             <div>
-                <!-- ko if: action == "REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD" -->
-                    <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD">ADD</button>
+                <!-- ko if: action == "JAP_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_JAP_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD">ADD</button>
                 <!-- /ko -->
-                <!-- ko if: action == "REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE" -->
-                    <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE">UPDATE</button>
+                <!-- ko if: action == "JAP_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_JAP_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE">UPDATE</button>
                 <!-- /ko -->
                 <button type="button" class="btn input-medium" data-bind="click: cancel">CANCEL</button>
             </div>
@@ -1167,21 +1130,21 @@
                 </div>
             </div>
             <div>
-                <!-- ko if: action == "REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD" -->
-                    <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD">ADD</button>
+                <!-- ko if: action == "JAP_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_JAP_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_ADD">ADD</button>
                 <!-- /ko -->
-                <!-- ko if: action == "REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE" -->
-                    <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE">UPDATE</button>
+                <!-- ko if: action == "JAP_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_JAP_REMOTE_WS_REMOTE_PROXY_SERVER_AUTHENTICATIONS_UPDATE">UPDATE</button>
                 <!-- /ko -->
                 <button type="button" class="btn input-medium" data-bind="click: cancel">CANCEL</button>
             </div>
         </script>
         
-        <script type="text/html" id="TEMPLATE_REMOTE_WS_PROXY_SERVERS">
+        <script type="text/html" id="TEMPLATE_JAP_REMOTE_WS_PROXY_SERVERS">
             <p>
-                <button type="button" class="btn input-medium" data-bind="click: load_REMOTE_WS_PROXY_SERVERS_ADD">ADD</button>
+                <button type="button" class="btn input-medium" data-bind="click: load_JAP_REMOTE_WS_PROXY_SERVERS_ADD">ADD</button>
                 <!-- ko if: data.PROXY_SERVERS().length > 0 -->
-                    <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_WS_PROXY_SERVERS_REMOVE_ALL">REMOVE ALL</button>
+                    <button type="button" class="btn input-medium" data-bind="click: action_JAP_REMOTE_WS_PROXY_SERVERS_REMOVE_ALL">REMOVE ALL</button>
                 <!-- /ko -->
             </p>
             <!-- ko if: data.PROXY_SERVERS().length > 0 -->
@@ -1201,27 +1164,27 @@
                                 <td data-bind="text: ADDRESS"></td>
                                 <td data-bind="text: PORT"></td>
                                 <td>
-                                    <button type="button" class="btn input-medium" data-bind="click: $parent.load_REMOTE_WS_PROXY_SERVERS_UPDATE">UPDATE</button>
-                                    <button type="button" class="btn input-medium" data-bind="click: $parent.action_REMOTE_WS_PROXY_SERVERS_REMOVE">REMOVE</button>
+                                    <button type="button" class="btn input-medium" data-bind="click: $parent.load_JAP_REMOTE_WS_PROXY_SERVERS_UPDATE">UPDATE</button>
+                                    <button type="button" class="btn input-medium" data-bind="click: $parent.action_JAP_REMOTE_WS_PROXY_SERVERS_REMOVE">REMOVE</button>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
                 </p>
                 <p>
-                    <button type="button" class="btn input-medium" data-bind="click: load_REMOTE_WS_PROXY_SERVERS_ADD">ADD</button>
-                    <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_WS_PROXY_SERVERS_REMOVE_ALL">REMOVE ALL</button>
+                    <button type="button" class="btn input-medium" data-bind="click: load_JAP_REMOTE_WS_PROXY_SERVERS_ADD">ADD</button>
+                    <button type="button" class="btn input-medium" data-bind="click: action_JAP_REMOTE_WS_PROXY_SERVERS_REMOVE_ALL">REMOVE ALL</button>
                 </p>
             <!-- /ko -->
         </script>
         
-        <script type="text/html" id="TEMPLATE_REMOTE_WS_PROXY_SERVER">
+        <script type="text/html" id="TEMPLATE_JAP_REMOTE_WS_PROXY_SERVER">
             <div>
-                <!-- ko if: action == "REMOTE_WS_PROXY_SERVERS_ADD" -->
-                    <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_WS_PROXY_SERVERS_ADD">ADD</button>
+                <!-- ko if: action == "JAP_REMOTE_WS_PROXY_SERVERS_ADD" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_JAP_REMOTE_WS_PROXY_SERVERS_ADD">ADD</button>
                 <!-- /ko -->
-                <!-- ko if: action == "REMOTE_WS_PROXY_SERVERS_UPDATE" -->
-                    <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_WS_PROXY_SERVERS_UPDATE">UPDATE</button>
+                <!-- ko if: action == "JAP_REMOTE_WS_PROXY_SERVERS_UPDATE" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_JAP_REMOTE_WS_PROXY_SERVERS_UPDATE">UPDATE</button>
                 <!-- /ko -->
                 <button type="button" class="btn input-medium" data-bind="click: cancel">CANCEL</button>
             </div>
@@ -1239,7 +1202,7 @@
                         <label>PORT</label>
                         <input type="text" class="input-xlarge" data-bind="value: data.PORT">
                     </p>
-                    <h3>3.1 AUTHENTICATION</h3>
+                    <h3>2.1 AUTHENTICATION</h3>
                     <div class="block2">
                         <p>
                             <label>USERNAME</label>
@@ -1251,11 +1214,11 @@
                 </div>
             </div>
             <div>
-                <!-- ko if: action == "REMOTE_WS_PROXY_SERVERS_ADD" -->
-                    <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_WS_PROXY_SERVERS_ADD">ADD</button>
+                <!-- ko if: action == "JAP_REMOTE_WS_PROXY_SERVERS_ADD" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_JAP_REMOTE_WS_PROXY_SERVERS_ADD">ADD</button>
                 <!-- /ko -->
-                <!-- ko if: action == "REMOTE_WS_PROXY_SERVERS_UPDATE" -->
-                    <button type="button" class="btn input-medium" data-bind="click: action_REMOTE_WS_PROXY_SERVERS_UPDATE">UPDATE</button>
+                <!-- ko if: action == "JAP_REMOTE_WS_PROXY_SERVERS_UPDATE" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_JAP_REMOTE_WS_PROXY_SERVERS_UPDATE">UPDATE</button>
                 <!-- /ko -->
                 <button type="button" class="btn input-medium" data-bind="click: cancel">CANCEL</button>
             </div>

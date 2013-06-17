@@ -1,14 +1,11 @@
 {
-    "LOGGER":
-    {
+    "LOGGER": {
         "LEVEL": "DEBUG"
     },
-    "LOCAL_SERVER":
-    {
+    "LOCAL_SERVER": {
         "ADDRESS": "127.0.0.1",
         "PORT": 8000,
-        "AUTHENTICATION":
-        {
+        "AUTHENTICATION": {
             "USERNAME": "",
             "PASSWORD": ""
         }

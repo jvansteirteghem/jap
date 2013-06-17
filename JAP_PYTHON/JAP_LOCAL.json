@@ -1,1 +1,10 @@
-{"LOGGER":{"LEVEL":""},"LOCAL_PROXY_SERVER":{"ADDRESS":"","PORT":0},"PROXY_SERVERS":[]}
+{
+    "LOGGER": {
+        "LEVEL": ""
+    },
+    "LOCAL_PROXY_SERVER": {
+        "ADDRESS": "",
+        "PORT": 0
+    },
+    "PROXY_SERVERS": []
+}

@@ -12,13 +12,9 @@ You should have received a copy of the GNU General Public License along with thi
 from twisted.internet import reactor
 import logging
 import JAP.JAP
+import JAP.JAP_LOCAL
 
-file = open("./JAP.json", "r")
-data = file.read()
-file.close()
-
-configuration = JAP.JAP.decodeJSON(data)
-JAP.JAP.setDefaultConfiguration(configuration)
+configuration = JAP.JAP_LOCAL.getConfiguration("./JAP.json", JAP.JAP.getDefaultConfiguration)
 
 logging.basicConfig()
 logger = logging.getLogger("JAP")
