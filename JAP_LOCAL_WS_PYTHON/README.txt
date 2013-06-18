@@ -13,24 +13,19 @@ INSTALLATION
 - execute JAP_LOCAL_WS.bat
 - open
 	- FIREFOX
-		- click TOOLS, OPTIONS
-		- click ADVANCED, NETWORK, SETTINGS
-		- check MANUAL PROXY CONFIGURATION
-		- in SOCKS write 127.0.0.1 and LOCAL_PROXY_SERVER.PORT
-		- check SOCKS v5
-		- click OK
-		- click OK
-	- INTERNET EXPLORER
-		- click TOOLS, INTERNET OPTIONS
-		- click CONNECTIONS, LAN SETTINGS
-		- uncheck AUTOMATICALLY DETECT PROXY SETTINGS
-		- uncheck USE A PROXY AUTOMATIC CONFIGURATION SCRIPT
-		- check USE A PROXY SERVER FOR YOUR LAN (THESE SETTINGS WILL NOT APPLY TO DAIL-UP OR VPN CONNECTIONS)
-		- click ADVANCED
-		- in SOCKS write 127.0.0.1 and LOCAL_PROXY_SERVER.PORT
-		- click OK
-		- click OK
-		- click OK
+		- configure PROXY SERVER
+			- click TOOLS, OPTIONS
+			- click ADVANCED, NETWORK, SETTINGS
+			- check MANUAL PROXY CONFIGURATION
+			- in SOCKS write 127.0.0.1 and LOCAL_PROXY_SERVER.PORT
+			- check SOCKS v5
+			- click OK
+			- click OK
+		- configure PROXY SERVER DNS
+			- open about:config
+			- click I'LL BE CAREFUL, I PROMISE!
+			- set NETWORK.PROXY.SOCKS_REMOTE_DNS to TRUE
+			- close
 
 IMPORTANT
 ---------
