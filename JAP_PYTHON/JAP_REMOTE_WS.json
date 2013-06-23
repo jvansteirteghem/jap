@@ -2,6 +2,12 @@
     "LOGGER": {
         "LEVEL": ""
     },
+    "DNS_RESOLVER": {
+        "HOSTS": {
+            "FILE": ""
+        },
+        "SERVERS": []
+    },
     "REMOTE_PROXY_SERVER": {
         "TYPE": "",
         "ADDRESS": "",

@@ -2,6 +2,12 @@
     "LOGGER": {
         "LEVEL": ""
     },
+    "DNS_RESOLVER": {
+        "HOSTS": {
+            "FILE": ""
+        },
+        "SERVERS": []
+    },
     "LOCAL_PROXY_SERVER": {
         "ADDRESS": "",
         "PORT": 0
