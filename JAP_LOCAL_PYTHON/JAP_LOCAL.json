@@ -3,6 +3,22 @@
     {
         "LEVEL": "DEBUG"
     },
+    "DNS_RESOLVER":
+    {
+        "HOSTS":
+        {
+            "FILE": ""
+        },
+        "SERVERS":
+        [
+            /*
+            {
+                "ADDRESS": "",
+                "PORT": 0
+            }
+            */
+        ]
+    },
     "LOCAL_PROXY_SERVER":
     {
         "ADDRESS": "127.0.0.1",

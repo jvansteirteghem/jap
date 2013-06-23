@@ -3,6 +3,22 @@
     {
         "LEVEL": "DEBUG"
     },
+    "DNS_RESOLVER":
+    {
+        "HOSTS":
+        {
+            "FILE": ""
+        },
+        "SERVERS":
+        [
+            /*
+            {
+                "ADDRESS": "",
+                "PORT": 0
+            }
+            */
+        ]
+    },
     "REMOTE_PROXY_SERVER":
     {
         "ADDRESS": "",

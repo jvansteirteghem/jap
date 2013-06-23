@@ -10,6 +10,7 @@ You should have received a copy of the GNU General Public License along with thi
 """
 
 from twisted.internet import reactor, ssl
+from twisted.names import client
 import logging
 import JAP.JAP_LOCAL
 import JAP.JAP_REMOTE_WS
@@ -31,6 +32,21 @@ elif configuration["LOGGER"]["LEVEL"] == "CRITICAL":
     logger.setLevel(logging.CRITICAL)
 else:
     logger.setLevel(logging.NOTSET)
+
+resolverHosts = None
+if configuration["DNS_RESOLVER"]["HOSTS"]["FILE"] != "":
+    resolverHosts = configuration["DNS_RESOLVER"]["HOSTS"]["FILE"]
+
+resolverServers = None
+if len(configuration["DNS_RESOLVER"]["SERVERS"]) != 0:
+    resolverServers = []
+    i = 0
+    while i < len(configuration["DNS_RESOLVER"]["SERVERS"]):
+        resolverServers.append((configuration["DNS_RESOLVER"]["SERVERS"][i]["ADDRESS"], configuration["DNS_RESOLVER"]["SERVERS"][i]["PORT"]))
+        i = i + 1
+
+resolver = client.createResolver(hosts=resolverHosts, servers=resolverServers)
+reactor.installResolver(resolver)
 
 if configuration["REMOTE_PROXY_SERVER"]["TYPE"] == "HTTPS":
     factory = JAP.JAP_REMOTE_WS.WSInputProtocolFactory(configuration, "wss://" + str(configuration["REMOTE_PROXY_SERVER"]["ADDRESS"]) + ":" + str(configuration["REMOTE_PROXY_SERVER"]["PORT"]), debug = False)

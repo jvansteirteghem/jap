@@ -13,6 +13,7 @@ from zope.interface import implements
 from twisted.cred import portal, checkers, credentials
 from twisted.cred.error import UnauthorizedLogin
 from twisted.internet import defer, reactor, ssl, tcp
+from twisted.names import client
 from twisted.web import server, static, resource, guard
 import logging
 import collections
@@ -29,6 +30,15 @@ def getDefaultConfiguration(configuration=None):
     
     configuration.setdefault("LOGGER", collections.OrderedDict())
     configuration["LOGGER"].setdefault("LEVEL", "")
+    configuration.setdefault("DNS_RESOLVER", collections.OrderedDict())
+    configuration["DNS_RESOLVER"].setdefault("HOSTS", collections.OrderedDict())
+    configuration["DNS_RESOLVER"]["HOSTS"].setdefault("FILE", "")
+    configuration["DNS_RESOLVER"].setdefault("SERVERS", [])
+    i = 0
+    while i < len(configuration["DNS_RESOLVER"]["SERVERS"]):
+        configuration["DNS_RESOLVER"]["SERVERS"][i].setdefault("ADDRESS", "")
+        configuration["DNS_RESOLVER"]["SERVERS"][i].setdefault("PORT", 0)
+        i = i + 1
     configuration.setdefault("LOCAL_SERVER", collections.OrderedDict())
     configuration["LOCAL_SERVER"].setdefault("ADDRESS", "")
     configuration["LOCAL_SERVER"].setdefault("PORT", 0)
@@ -39,6 +49,15 @@ def getDefaultConfiguration(configuration=None):
     defaultConfiguration = collections.OrderedDict()
     defaultConfiguration["LOGGER"] = collections.OrderedDict()
     defaultConfiguration["LOGGER"]["LEVEL"] = configuration["LOGGER"]["LEVEL"]
+    defaultConfiguration["DNS_RESOLVER"] = collections.OrderedDict()
+    defaultConfiguration["DNS_RESOLVER"]["HOSTS"] = collections.OrderedDict()
+    defaultConfiguration["DNS_RESOLVER"]["HOSTS"]["FILE"] = configuration["DNS_RESOLVER"]["HOSTS"]["FILE"]
+    defaultConfiguration["DNS_RESOLVER"]["SERVERS"] = [collections.OrderedDict()] * len(configuration["DNS_RESOLVER"]["SERVERS"])
+    i = 0
+    while i < len(configuration["DNS_RESOLVER"]["SERVERS"]):
+        defaultConfiguration["DNS_RESOLVER"]["SERVERS"][i]["ADDRESS"] = configuration["DNS_RESOLVER"]["SERVERS"][i]["ADDRESS"]
+        defaultConfiguration["DNS_RESOLVER"]["SERVERS"][i]["PORT"] = configuration["DNS_RESOLVER"]["SERVERS"][i]["PORT"]
+        i = i + 1
     defaultConfiguration["LOCAL_SERVER"] = collections.OrderedDict()
     defaultConfiguration["LOCAL_SERVER"]["ADDRESS"] = configuration["LOCAL_SERVER"]["ADDRESS"]
     defaultConfiguration["LOCAL_SERVER"]["PORT"] = configuration["LOCAL_SERVER"]["PORT"]
@@ -178,6 +197,21 @@ class API(resource.Resource):
             logger.setLevel(logging.CRITICAL)
         else:
             logger.setLevel(logging.NOTSET)
+        
+        resolverHosts = None
+        if configuration["DNS_RESOLVER"]["HOSTS"]["FILE"] != "":
+            resolverHosts = configuration["DNS_RESOLVER"]["HOSTS"]["FILE"]
+        
+        resolverServers = None
+        if len(configuration["DNS_RESOLVER"]["SERVERS"]) != 0:
+            resolverServers = []
+            i = 0
+            while i < len(configuration["DNS_RESOLVER"]["SERVERS"]):
+                resolverServers.append((configuration["DNS_RESOLVER"]["SERVERS"][i]["ADDRESS"], configuration["DNS_RESOLVER"]["SERVERS"][i]["PORT"]))
+                i = i + 1
+        
+        resolver = client.createResolver(hosts=resolverHosts, servers=resolverServers)
+        reactor.installResolver(resolver)
         
         return ""
     
@@ -381,16 +415,11 @@ class HTTPUsernamePasswordCredentialsChecker:
     def requestAvatarId(self, credentials):
         authorized = False;
         
-        if self.configuration["LOCAL_SERVER"]["AUTHENTICATION"]["USERNAME"] == credentials.username:
-            if self.configuration["LOCAL_SERVER"]["AUTHENTICATION"]["PASSWORD"] != "":
-                if self.configuration["LOCAL_SERVER"]["AUTHENTICATION"]["PASSWORD"] == credentials.password:
-                    authorized = True
-            
-            if authorized == False:
-                return defer.fail(UnauthorizedLogin("ERROR_CREDENTIALS_PASSWORD"))
+        if self.configuration["LOCAL_SERVER"]["AUTHENTICATION"]["USERNAME"] == credentials.username and self.configuration["LOCAL_SERVER"]["AUTHENTICATION"]["PASSWORD"] == credentials.password:
+            authorized = True
         
         if authorized == False:
-            return defer.fail(UnauthorizedLogin("ERROR_CREDENTIALS_USERNAME"))
+            return defer.fail(UnauthorizedLogin("ERROR_CREDENTIALS"))
         
         return defer.succeed(credentials.username)
  
@@ -407,17 +436,18 @@ def createSite(configuration):
     resource = static.File("./WWW")
     resource.putChild("API", API())
     
-    realm = HTTPRealm(resource)
-    
-    checkers = [
-        HTTPUsernamePasswordCredentialsChecker(configuration)
-    ]
-    
-    credentialFactories = [
-        guard.BasicCredentialFactory("JAP")
-    ]
-    
-    resource = guard.HTTPAuthSessionWrapper(portal.Portal(realm, checkers), credentialFactories)
+    if configuration["LOCAL_SERVER"]["AUTHENTICATION"]["USERNAME"] != "":
+        realm = HTTPRealm(resource)
+        
+        checkers = [
+            HTTPUsernamePasswordCredentialsChecker(configuration)
+        ]
+        
+        credentialFactories = [
+            guard.BasicCredentialFactory("JAP")
+        ]
+        
+        resource = guard.HTTPAuthSessionWrapper(portal.Portal(realm, checkers), credentialFactories)
     
     site = server.Site(resource)
     

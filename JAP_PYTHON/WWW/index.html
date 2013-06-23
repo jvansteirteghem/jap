@@ -137,9 +137,93 @@
                         </select>
                     </p>
                 </div>
+                <h3>2 DNS RESOLVER</h3>
+                <div class="block2">
+                    <h3>2.1 HOSTS</h3>
+                    <div class="block2">
+                        <p>
+                            <label>FILE</label>
+                            <input type="text" class="input-xlarge" data-bind="value: data.DNS_RESOLVER.HOSTS.FILE">
+                        </p>
+                    </div>
+                    <h3>2.2 SERVERS</h3>
+                    <div class="block2">
+                        <div data-bind="template: {name: template_JAP_DNS_RESOLVER_SERVERS().name(), data: template_JAP_DNS_RESOLVER_SERVERS().data()}">
+                        </div>
+                    </div>
+                </div>
             </div>
             <div>
                 <button type="button" class="btn input-medium" data-bind="click: action_JAP_UPDATE">UPDATE</button>
+            </div>
+        </script>
+        
+        <script type="text/html" id="TEMPLATE_JAP_DNS_RESOLVER_SERVERS">
+            <p>
+                <button type="button" class="btn input-medium" data-bind="click: load_JAP_DNS_RESOLVER_SERVERS_ADD">ADD</button>
+                <!-- ko if: data.DNS_RESOLVER.SERVERS().length > 0 -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_JAP_DNS_RESOLVER_SERVERS_REMOVE_ALL">REMOVE ALL</button>
+                <!-- /ko -->
+            </p>
+            <!-- ko if: data.DNS_RESOLVER.SERVERS().length > 0 -->
+                <p>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th style="width: 50%;">ADDRESS</th>
+                                <th style="width: 50%;">PORT</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody data-bind="foreach: data.DNS_RESOLVER.SERVERS">
+                            <tr>
+                                <td data-bind="text: $index() + 1"></td>
+                                <td data-bind="text: ADDRESS"></td>
+                                <td data-bind="text: PORT"></td>
+                                <td>
+                                    <button type="button" class="btn input-medium" data-bind="click: $parent.load_JAP_DNS_RESOLVER_SERVERS_UPDATE">UPDATE</button>
+                                    <button type="button" class="btn input-medium" data-bind="click: $parent.action_JAP_DNS_RESOLVER_SERVERS_REMOVE">REMOVE</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </p>
+                <p>
+                    <button type="button" class="btn input-medium" data-bind="click: load_JAP_DNS_RESOLVER_SERVERS_ADD">ADD</button>
+                    <button type="button" class="btn input-medium" data-bind="click: action_JAP_DNS_RESOLVER_SERVERS_REMOVE_ALL">REMOVE ALL</button>
+                </p>
+            <!-- /ko -->
+        </script>
+        
+        <script type="text/html" id="TEMPLATE_JAP_DNS_RESOLVER_SERVER">
+            <div>
+                <!-- ko if: action == "JAP_DNS_RESOLVER_SERVERS_ADD" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_JAP_DNS_RESOLVER_SERVERS_ADD">ADD</button>
+                <!-- /ko -->
+                <!-- ko if: action == "JAP_DNS_RESOLVER_SERVERS_UPDATE" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_JAP_DNS_RESOLVER_SERVERS_UPDATE">UPDATE</button>
+                <!-- /ko -->
+                <button type="button" class="btn input-medium" data-bind="click: cancel">CANCEL</button>
+            </div>
+            <div class="block1">
+                <div class="block2">
+                    <p>
+                        <label>ADDRESS</label>
+                        <input type="text" class="input-xlarge" data-bind="value: data.ADDRESS">
+                        <label>PORT</label>
+                        <input type="text" class="input-xlarge" data-bind="value: data.PORT">
+                    </p>
+                </div>
+            </div>
+            <div>
+                <!-- ko if: action == "JAP_DNS_RESOLVER_SERVERS_ADD" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_JAP_DNS_RESOLVER_SERVERS_ADD">ADD</button>
+                <!-- /ko -->
+                <!-- ko if: action == "JAP_DNS_RESOLVER_SERVERS_UPDATE" -->
+                    <button type="button" class="btn input-medium" data-bind="click: action_JAP_DNS_RESOLVER_SERVERS_UPDATE">UPDATE</button>
+                <!-- /ko -->
+                <button type="button" class="btn input-medium" data-bind="click: cancel">CANCEL</button>
             </div>
         </script>
         

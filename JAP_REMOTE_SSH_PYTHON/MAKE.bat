@@ -11,6 +11,7 @@ cd JAP_REMOTE_SSH_PYTHON-%JAP_REMOTE_SSH_PYTHON_VERSION%
 copy ..\..\JAP_REMOTE_SSH.bat JAP_REMOTE_SSH.bat
 copy ..\..\JAP_REMOTE_SSH.json JAP_REMOTE_SSH.json
 copy ..\..\JAP_REMOTE_SSH.py JAP_REMOTE_SSH.py
+copy ..\..\H H
 copy ..\..\KP.bat KP.bat
 copy ..\..\KP.pem KP.pem
 copy ..\..\README.txt README.txt
@@ -33,6 +34,7 @@ copy ..\PYINSTALLER\dist\JAP_REMOTE_SSH.exe JAP_REMOTE_SSH.exe
 copy ..\..\JAP_REMOTE_SSH_PYTHON_WINDOWS\JAP_REMOTE_SSH.bat JAP_REMOTE_SSH.bat
 copy ..\..\JAP_REMOTE_SSH_PYTHON_WINDOWS\README.txt README.txt
 copy ..\..\JAP_REMOTE_SSH.json JAP_REMOTE_SSH.json
+copy ..\..\H H
 copy ..\..\KP.bat KP.bat
 copy ..\..\KP.pem KP.pem
 cd ..

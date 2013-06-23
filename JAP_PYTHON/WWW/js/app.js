@@ -11,6 +11,12 @@ function JAP_ViewModel(parent) {
         "LOGGER": {
             "LEVEL": ""
         },
+        "DNS_RESOLVER": {
+            "HOSTS": {
+                "FILE": ""
+            },
+            "SERVERS": []
+        },
         "LOCAL_SERVER": {
             "ADDRESS": "",
             "PORT": 0,
@@ -24,6 +30,14 @@ function JAP_ViewModel(parent) {
     
     self.action_JAP_UPDATE = function() {
         var data = ko.mapping.toJS(self.data);
+        
+        for(var i = 0; i < data.DNS_RESOLVER.SERVERS.length; i = i + 1) {
+            if($.isNumeric(data.DNS_RESOLVER.SERVERS[i].PORT)) {
+                data.DNS_RESOLVER.SERVERS[i].PORT = Number(data.DNS_RESOLVER.SERVERS[i].PORT);
+            } else {
+                data.DNS_RESOLVER.SERVERS[i].PORT = 0;
+            }
+        }
         
         $.ajax({
             "type": "POST",
@@ -43,6 +57,38 @@ function JAP_ViewModel(parent) {
         )
     }
     
+    self.action_JAP_DNS_RESOLVER_SERVERS_ADD = function(data) {
+        self.data.DNS_RESOLVER.SERVERS.push(data);
+    }
+    
+    self.action_JAP_DNS_RESOLVER_SERVERS_UPDATE = function(selectedData, data) {
+        ko.mapping.fromJS(ko.mapping.toJS(data), {}, selectedData);
+    }
+    
+    self.action_JAP_DNS_RESOLVER_SERVERS_REMOVE = function(selectedData) {
+        self.data.DNS_RESOLVER.SERVERS.remove(selectedData);
+    }
+    
+    self.action_JAP_DNS_RESOLVER_SERVERS_REMOVE_ALL = function() {
+        self.data.DNS_RESOLVER.SERVERS.removeAll();
+    }
+    
+    self.load_JAP_DNS_RESOLVER_SERVERS_ADD = function() {
+        self.template_JAP_DNS_RESOLVER_SERVERS(new Template("TEMPLATE_JAP_DNS_RESOLVER_SERVER", new JAP_DNS_RESOLVER_SERVERS_ADD_ViewModel(self)));
+    }
+    
+    self.load_JAP_DNS_RESOLVER_SERVERS_UPDATE = function(data) {
+        self.template_JAP_DNS_RESOLVER_SERVERS(new Template("TEMPLATE_JAP_DNS_RESOLVER_SERVER", new JAP_DNS_RESOLVER_SERVERS_UPDATE_ViewModel(self, data)));
+    }
+    
+    self.template_JAP_DNS_RESOLVER_SERVERS = ko.observable();
+    
+    self.load_JAP_DNS_RESOLVER_SERVERS = function() {
+        self.template_JAP_DNS_RESOLVER_SERVERS(new Template("TEMPLATE_JAP_DNS_RESOLVER_SERVERS", self));
+    }
+    
+    self.load_JAP_DNS_RESOLVER_SERVERS();
+    
     $.ajax({
         "type": "GET",
         "url": "/API",
@@ -60,6 +106,43 @@ function JAP_ViewModel(parent) {
             Alertify.log.error("JAP - NOT OK");
         }
     );
+}
+
+function JAP_DNS_RESOLVER_SERVERS_ADD_ViewModel(parent) {
+    var self = this;
+    self.parent = parent;
+    self.defaultData = {
+        "ADDRESS": "",
+        "PORT": 0
+    }
+    self.data = ko.mapping.fromJS(self.defaultData);
+    self.action = "JAP_DNS_RESOLVER_SERVERS_ADD";
+    
+    self.action_JAP_DNS_RESOLVER_SERVERS_ADD = function() {
+        self.parent.action_JAP_DNS_RESOLVER_SERVERS_ADD(self.data);
+        self.parent.load_JAP_DNS_RESOLVER_SERVERS();
+    }
+    
+    self.cancel = function() {
+        self.parent.load_JAP_DNS_RESOLVER_SERVERS();
+    }
+}
+
+function JAP_DNS_RESOLVER_SERVERS_UPDATE_ViewModel(parent, data) {
+    var self = this;
+    self.parent = parent;
+    self.selectedData = data;
+    self.data = ko.mapping.fromJS(ko.mapping.toJS(self.selectedData));
+    self.action = "JAP_DNS_RESOLVER_SERVERS_UPDATE";
+    
+    self.action_JAP_DNS_RESOLVER_SERVERS_UPDATE = function() {
+        self.parent.action_JAP_DNS_RESOLVER_SERVERS_UPDATE(self.selectedData, self.data);
+        self.parent.load_JAP_DNS_RESOLVER_SERVERS();
+    }
+    
+    self.cancel = function() {
+        self.parent.load_JAP_DNS_RESOLVER_SERVERS();
+    }
 }
 
 function JAP_LOCAL_ViewModel(parent) {

@@ -22,6 +22,7 @@ copy ..\..\CA.srl CA.srl
 copy ..\..\CAK.pem CAK.pem
 copy ..\..\CK.pem CK.pem
 copy ..\..\CR.pem CR.pem
+copy ..\..\H H
 copy ..\..\README.txt README.txt
 mkdir JAP
 cd JAP
@@ -79,6 +80,7 @@ copy ..\..\CA.srl CA.srl
 copy ..\..\CAK.pem CAK.pem
 copy ..\..\CK.pem CK.pem
 copy ..\..\CR.pem CR.pem
+copy ..\..\H H
 cd ..
 %SEVENZIP_HOME%\7z.exe a -tzip JAP_REMOTE_WS_PYTHON_WINDOWS-%JAP_REMOTE_WS_PYTHON_WINDOWS_VERSION%.zip JAP_REMOTE_WS_PYTHON_WINDOWS-%JAP_REMOTE_WS_PYTHON_WINDOWS_VERSION%
 cd ..

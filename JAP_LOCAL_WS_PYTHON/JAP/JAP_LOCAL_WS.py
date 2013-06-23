@@ -28,6 +28,15 @@ def getDefaultConfiguration(configuration=None):
     
     configuration.setdefault("LOGGER", collections.OrderedDict())
     configuration["LOGGER"].setdefault("LEVEL", "")
+    configuration.setdefault("DNS_RESOLVER", collections.OrderedDict())
+    configuration["DNS_RESOLVER"].setdefault("HOSTS", collections.OrderedDict())
+    configuration["DNS_RESOLVER"]["HOSTS"].setdefault("FILE", "")
+    configuration["DNS_RESOLVER"].setdefault("SERVERS", [])
+    i = 0
+    while i < len(configuration["DNS_RESOLVER"]["SERVERS"]):
+        configuration["DNS_RESOLVER"]["SERVERS"][i].setdefault("ADDRESS", "")
+        configuration["DNS_RESOLVER"]["SERVERS"][i].setdefault("PORT", 0)
+        i = i + 1
     configuration.setdefault("LOCAL_PROXY_SERVER", collections.OrderedDict())
     configuration["LOCAL_PROXY_SERVER"].setdefault("ADDRESS", "")
     configuration["LOCAL_PROXY_SERVER"].setdefault("PORT", 0)
@@ -59,6 +68,15 @@ def getDefaultConfiguration(configuration=None):
     defaultConfiguration = collections.OrderedDict()
     defaultConfiguration["LOGGER"] = collections.OrderedDict()
     defaultConfiguration["LOGGER"]["LEVEL"] = configuration["LOGGER"]["LEVEL"]
+    defaultConfiguration["DNS_RESOLVER"] = collections.OrderedDict()
+    defaultConfiguration["DNS_RESOLVER"]["HOSTS"] = collections.OrderedDict()
+    defaultConfiguration["DNS_RESOLVER"]["HOSTS"]["FILE"] = configuration["DNS_RESOLVER"]["HOSTS"]["FILE"]
+    defaultConfiguration["DNS_RESOLVER"]["SERVERS"] = [collections.OrderedDict()] * len(configuration["DNS_RESOLVER"]["SERVERS"])
+    i = 0
+    while i < len(configuration["DNS_RESOLVER"]["SERVERS"]):
+        defaultConfiguration["DNS_RESOLVER"]["SERVERS"][i]["ADDRESS"] = configuration["DNS_RESOLVER"]["SERVERS"][i]["ADDRESS"]
+        defaultConfiguration["DNS_RESOLVER"]["SERVERS"][i]["PORT"] = configuration["DNS_RESOLVER"]["SERVERS"][i]["PORT"]
+        i = i + 1
     defaultConfiguration["LOCAL_PROXY_SERVER"] = collections.OrderedDict()
     defaultConfiguration["LOCAL_PROXY_SERVER"]["ADDRESS"] = configuration["LOCAL_PROXY_SERVER"]["ADDRESS"]
     defaultConfiguration["LOCAL_PROXY_SERVER"]["PORT"] = configuration["LOCAL_PROXY_SERVER"]["PORT"]

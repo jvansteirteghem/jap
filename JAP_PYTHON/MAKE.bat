@@ -28,6 +28,7 @@ copy ..\..\CA_DEFAULT.pem CA_DEFAULT.pem
 copy ..\..\CAK.pem CAK.pem
 copy ..\..\CK.pem CK.pem
 copy ..\..\CR.pem CR.pem
+copy ..\..\H H
 copy ..\..\KP.bat KP.bat
 copy ..\..\KP.pem KP.pem
 copy ..\..\README.txt README.txt
@@ -71,6 +72,7 @@ copy ..\..\CA_DEFAULT.pem CA_DEFAULT.pem
 copy ..\..\CAK.pem CAK.pem
 copy ..\..\CK.pem CK.pem
 copy ..\..\CR.pem CR.pem
+copy ..\..\H H
 copy ..\..\KP.bat KP.bat
 copy ..\..\KP.pem KP.pem
 cd ..
