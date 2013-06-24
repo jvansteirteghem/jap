@@ -11,6 +11,7 @@ You should have received a copy of the GNU General Public License along with thi
 
 from twisted.internet import protocol, reactor, tcp
 from twisted.internet.abstract import isIPAddress, isIPv6Address
+from twisted.names import client, resolve, cache, hosts
 import base64
 import struct
 import json
@@ -20,6 +21,21 @@ import re
 import collections
 
 logger = logging.getLogger(__name__)
+
+def createResolver(configuration):
+    resolverFile = configuration["DNS_RESOLVER"]["HOSTS"]["FILE"]
+    resolverServers = []
+    i = 0
+    while i < len(configuration["DNS_RESOLVER"]["SERVERS"]):
+        resolverServers.append((configuration["DNS_RESOLVER"]["SERVERS"][i]["ADDRESS"], configuration["DNS_RESOLVER"]["SERVERS"][i]["PORT"]))
+        i = i + 1
+    
+    resolvers = []
+    resolvers.append(hosts.Resolver(file=resolverFile))
+    resolvers.append(cache.CacheResolver())
+    resolvers.append(client.Resolver(servers=resolverServers))
+    
+    return resolve.ResolverChain(resolvers)
 
 class TunnelProtocol(protocol.Protocol):
     def __init__(self):
@@ -351,9 +367,6 @@ def getDefaultConfiguration(configuration=None):
         configuration["DNS_RESOLVER"]["SERVERS"][i].setdefault("ADDRESS", "")
         configuration["DNS_RESOLVER"]["SERVERS"][i].setdefault("PORT", 0)
         i = i + 1
-    configuration.setdefault("LOCAL_PROXY_SERVER", collections.OrderedDict())
-    configuration["LOCAL_PROXY_SERVER"].setdefault("ADDRESS", "")
-    configuration["LOCAL_PROXY_SERVER"].setdefault("PORT", 0)
     configuration.setdefault("PROXY_SERVERS", [])
     i = 0
     while i < len(configuration["PROXY_SERVERS"]):
@@ -363,8 +376,10 @@ def getDefaultConfiguration(configuration=None):
         configuration["PROXY_SERVERS"][i].setdefault("AUTHENTICATION", collections.OrderedDict())
         configuration["PROXY_SERVERS"][i]["AUTHENTICATION"].setdefault("USERNAME", "")
         configuration["PROXY_SERVERS"][i]["AUTHENTICATION"].setdefault("PASSWORD", "")
-        
         i = i + 1
+    configuration.setdefault("LOCAL_PROXY_SERVER", collections.OrderedDict())
+    configuration["LOCAL_PROXY_SERVER"].setdefault("ADDRESS", "")
+    configuration["LOCAL_PROXY_SERVER"].setdefault("PORT", 0)
     
     defaultConfiguration = collections.OrderedDict()
     defaultConfiguration["LOGGER"] = collections.OrderedDict()
@@ -372,26 +387,27 @@ def getDefaultConfiguration(configuration=None):
     defaultConfiguration["DNS_RESOLVER"] = collections.OrderedDict()
     defaultConfiguration["DNS_RESOLVER"]["HOSTS"] = collections.OrderedDict()
     defaultConfiguration["DNS_RESOLVER"]["HOSTS"]["FILE"] = configuration["DNS_RESOLVER"]["HOSTS"]["FILE"]
-    defaultConfiguration["DNS_RESOLVER"]["SERVERS"] = [collections.OrderedDict()] * len(configuration["DNS_RESOLVER"]["SERVERS"])
+    defaultConfiguration["DNS_RESOLVER"]["SERVERS"] = []
     i = 0
     while i < len(configuration["DNS_RESOLVER"]["SERVERS"]):
+        defaultConfiguration["DNS_RESOLVER"]["SERVERS"].append(collections.OrderedDict())
         defaultConfiguration["DNS_RESOLVER"]["SERVERS"][i]["ADDRESS"] = configuration["DNS_RESOLVER"]["SERVERS"][i]["ADDRESS"]
         defaultConfiguration["DNS_RESOLVER"]["SERVERS"][i]["PORT"] = configuration["DNS_RESOLVER"]["SERVERS"][i]["PORT"]
         i = i + 1
-    defaultConfiguration["LOCAL_PROXY_SERVER"] = collections.OrderedDict()
-    defaultConfiguration["LOCAL_PROXY_SERVER"]["ADDRESS"] = configuration["LOCAL_PROXY_SERVER"]["ADDRESS"]
-    defaultConfiguration["LOCAL_PROXY_SERVER"]["PORT"] = configuration["LOCAL_PROXY_SERVER"]["PORT"]
-    defaultConfiguration["PROXY_SERVERS"] = [collections.OrderedDict()] * len(configuration["PROXY_SERVERS"])
+    defaultConfiguration["PROXY_SERVERS"] = []
     i = 0
     while i < len(configuration["PROXY_SERVERS"]):
+        defaultConfiguration["PROXY_SERVERS"].append(collections.OrderedDict())
         defaultConfiguration["PROXY_SERVERS"][i]["TYPE"] = configuration["PROXY_SERVERS"][i]["TYPE"]
         defaultConfiguration["PROXY_SERVERS"][i]["ADDRESS"] = configuration["PROXY_SERVERS"][i]["ADDRESS"]
         defaultConfiguration["PROXY_SERVERS"][i]["PORT"] = configuration["PROXY_SERVERS"][i]["PORT"]
         defaultConfiguration["PROXY_SERVERS"][i]["AUTHENTICATION"] = configuration["PROXY_SERVERS"][i]["AUTHENTICATION"]
         defaultConfiguration["PROXY_SERVERS"][i]["AUTHENTICATION"]["USERNAME"] = configuration["PROXY_SERVERS"][i]["AUTHENTICATION"]["USERNAME"]
         defaultConfiguration["PROXY_SERVERS"][i]["AUTHENTICATION"]["PASSWORD"] = configuration["PROXY_SERVERS"][i]["AUTHENTICATION"]["PASSWORD"]
-        
         i = i + 1
+    defaultConfiguration["LOCAL_PROXY_SERVER"] = collections.OrderedDict()
+    defaultConfiguration["LOCAL_PROXY_SERVER"]["ADDRESS"] = configuration["LOCAL_PROXY_SERVER"]["ADDRESS"]
+    defaultConfiguration["LOCAL_PROXY_SERVER"]["PORT"] = configuration["LOCAL_PROXY_SERVER"]["PORT"]
     
     return defaultConfiguration
 

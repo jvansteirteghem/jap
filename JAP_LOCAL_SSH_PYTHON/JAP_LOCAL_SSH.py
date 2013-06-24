@@ -10,7 +10,6 @@ You should have received a copy of the GNU General Public License along with thi
 """
 
 from twisted.internet import reactor
-from twisted.names import client
 import logging
 import JAP.JAP_LOCAL
 import JAP.JAP_LOCAL_SSH
@@ -33,19 +32,7 @@ elif configuration["LOGGER"]["LEVEL"] == "CRITICAL":
 else:
     logger.setLevel(logging.NOTSET)
 
-resolverHosts = None
-if configuration["DNS_RESOLVER"]["HOSTS"]["FILE"] != "":
-    resolverHosts = configuration["DNS_RESOLVER"]["HOSTS"]["FILE"]
-
-resolverServers = None
-if len(configuration["DNS_RESOLVER"]["SERVERS"]) != 0:
-    resolverServers = []
-    i = 0
-    while i < len(configuration["DNS_RESOLVER"]["SERVERS"]):
-        resolverServers.append((configuration["DNS_RESOLVER"]["SERVERS"][i]["ADDRESS"], configuration["DNS_RESOLVER"]["SERVERS"][i]["PORT"]))
-        i = i + 1
-
-resolver = client.createResolver(hosts=resolverHosts, servers=resolverServers)
+resolver = JAP.JAP_LOCAL.createResolver(configuration)
 reactor.installResolver(resolver)
 
 factory = JAP.JAP_LOCAL_SSH.SSHInputProtocolFactory(configuration)

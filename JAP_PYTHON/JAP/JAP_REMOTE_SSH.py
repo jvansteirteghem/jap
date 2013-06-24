@@ -37,6 +37,16 @@ def getDefaultConfiguration(configuration=None):
         configuration["DNS_RESOLVER"]["SERVERS"][i].setdefault("ADDRESS", "")
         configuration["DNS_RESOLVER"]["SERVERS"][i].setdefault("PORT", 0)
         i = i + 1
+    configuration.setdefault("PROXY_SERVERS", [])
+    i = 0
+    while i < len(configuration["PROXY_SERVERS"]):
+        configuration["PROXY_SERVERS"][i].setdefault("TYPE", "")
+        configuration["PROXY_SERVERS"][i].setdefault("ADDRESS", "")
+        configuration["PROXY_SERVERS"][i].setdefault("PORT", 0)
+        configuration["PROXY_SERVERS"][i].setdefault("AUTHENTICATION", collections.OrderedDict())
+        configuration["PROXY_SERVERS"][i]["AUTHENTICATION"].setdefault("USERNAME", "")
+        configuration["PROXY_SERVERS"][i]["AUTHENTICATION"].setdefault("PASSWORD", "")
+        i = i + 1
     configuration.setdefault("REMOTE_PROXY_SERVER", collections.OrderedDict())
     configuration["REMOTE_PROXY_SERVER"].setdefault("ADDRESS", "")
     configuration["REMOTE_PROXY_SERVER"].setdefault("PORT", 0)
@@ -60,17 +70,6 @@ def getDefaultConfiguration(configuration=None):
     configuration["REMOTE_PROXY_SERVER"]["KEY"].setdefault("PRIVATE", collections.OrderedDict())
     configuration["REMOTE_PROXY_SERVER"]["KEY"]["PRIVATE"].setdefault("FILE", "")
     configuration["REMOTE_PROXY_SERVER"]["KEY"]["PRIVATE"].setdefault("PASSPHRASE", "")
-    configuration.setdefault("PROXY_SERVERS", [])
-    i = 0
-    while i < len(configuration["PROXY_SERVERS"]):
-        configuration["PROXY_SERVERS"][i].setdefault("TYPE", "")
-        configuration["PROXY_SERVERS"][i].setdefault("ADDRESS", "")
-        configuration["PROXY_SERVERS"][i].setdefault("PORT", 0)
-        configuration["PROXY_SERVERS"][i].setdefault("AUTHENTICATION", collections.OrderedDict())
-        configuration["PROXY_SERVERS"][i]["AUTHENTICATION"].setdefault("USERNAME", "")
-        configuration["PROXY_SERVERS"][i]["AUTHENTICATION"].setdefault("PASSWORD", "")
-        
-        i = i + 1
     
     defaultConfiguration = collections.OrderedDict()
     defaultConfiguration["LOGGER"] = collections.OrderedDict()
@@ -78,23 +77,37 @@ def getDefaultConfiguration(configuration=None):
     defaultConfiguration["DNS_RESOLVER"] = collections.OrderedDict()
     defaultConfiguration["DNS_RESOLVER"]["HOSTS"] = collections.OrderedDict()
     defaultConfiguration["DNS_RESOLVER"]["HOSTS"]["FILE"] = configuration["DNS_RESOLVER"]["HOSTS"]["FILE"]
-    defaultConfiguration["DNS_RESOLVER"]["SERVERS"] = [collections.OrderedDict()] * len(configuration["DNS_RESOLVER"]["SERVERS"])
+    defaultConfiguration["DNS_RESOLVER"]["SERVERS"] = []
     i = 0
     while i < len(configuration["DNS_RESOLVER"]["SERVERS"]):
+        defaultConfiguration["DNS_RESOLVER"]["SERVERS"].append(collections.OrderedDict())
         defaultConfiguration["DNS_RESOLVER"]["SERVERS"][i]["ADDRESS"] = configuration["DNS_RESOLVER"]["SERVERS"][i]["ADDRESS"]
         defaultConfiguration["DNS_RESOLVER"]["SERVERS"][i]["PORT"] = configuration["DNS_RESOLVER"]["SERVERS"][i]["PORT"]
+        i = i + 1
+    defaultConfiguration["PROXY_SERVERS"] = []
+    i = 0
+    while i < len(configuration["PROXY_SERVERS"]):
+        defaultConfiguration["PROXY_SERVERS"].append(collections.OrderedDict())
+        defaultConfiguration["PROXY_SERVERS"][i]["TYPE"] = configuration["PROXY_SERVERS"][i]["TYPE"]
+        defaultConfiguration["PROXY_SERVERS"][i]["ADDRESS"] = configuration["PROXY_SERVERS"][i]["ADDRESS"]
+        defaultConfiguration["PROXY_SERVERS"][i]["PORT"] = configuration["PROXY_SERVERS"][i]["PORT"]
+        defaultConfiguration["PROXY_SERVERS"][i]["AUTHENTICATION"] = collections.OrderedDict()
+        defaultConfiguration["PROXY_SERVERS"][i]["AUTHENTICATION"]["USERNAME"] = configuration["PROXY_SERVERS"][i]["AUTHENTICATION"]["USERNAME"]
+        defaultConfiguration["PROXY_SERVERS"][i]["AUTHENTICATION"]["PASSWORD"] = configuration["PROXY_SERVERS"][i]["AUTHENTICATION"]["PASSWORD"]
         i = i + 1
     defaultConfiguration["REMOTE_PROXY_SERVER"] = collections.OrderedDict()
     defaultConfiguration["REMOTE_PROXY_SERVER"]["ADDRESS"] = configuration["REMOTE_PROXY_SERVER"]["ADDRESS"]
     defaultConfiguration["REMOTE_PROXY_SERVER"]["PORT"] = configuration["REMOTE_PROXY_SERVER"]["PORT"]
-    defaultConfiguration["REMOTE_PROXY_SERVER"]["AUTHENTICATION"] = [collections.OrderedDict()] * len(configuration["REMOTE_PROXY_SERVER"]["AUTHENTICATION"])
+    defaultConfiguration["REMOTE_PROXY_SERVER"]["AUTHENTICATION"] = []
     i = 0
     while i < len(configuration["REMOTE_PROXY_SERVER"]["AUTHENTICATION"]):
+        defaultConfiguration["REMOTE_PROXY_SERVER"]["AUTHENTICATION"].append(collections.OrderedDict())
         defaultConfiguration["REMOTE_PROXY_SERVER"]["AUTHENTICATION"][i]["USERNAME"] = configuration["REMOTE_PROXY_SERVER"]["AUTHENTICATION"][i]["USERNAME"]
         defaultConfiguration["REMOTE_PROXY_SERVER"]["AUTHENTICATION"][i]["PASSWORD"] = configuration["REMOTE_PROXY_SERVER"]["AUTHENTICATION"][i]["PASSWORD"]
-        defaultConfiguration["REMOTE_PROXY_SERVER"]["AUTHENTICATION"][i]["KEYS"] = [collections.OrderedDict()] * len(configuration["REMOTE_PROXY_SERVER"]["AUTHENTICATION"][i]["KEYS"])
+        defaultConfiguration["REMOTE_PROXY_SERVER"]["AUTHENTICATION"][i]["KEYS"] = []
         j = 0
         while j < len(configuration["REMOTE_PROXY_SERVER"]["AUTHENTICATION"][i]["KEYS"]):
+            defaultConfiguration["REMOTE_PROXY_SERVER"]["AUTHENTICATION"][i]["KEYS"].append(collections.OrderedDict())
             defaultConfiguration["REMOTE_PROXY_SERVER"]["AUTHENTICATION"][i]["KEYS"][j]["PUBLIC"] = collections.OrderedDict()
             defaultConfiguration["REMOTE_PROXY_SERVER"]["AUTHENTICATION"][i]["KEYS"][j]["PUBLIC"]["FILE"] = configuration["REMOTE_PROXY_SERVER"]["AUTHENTICATION"][i]["KEYS"][j]["PUBLIC"]["FILE"]
             defaultConfiguration["REMOTE_PROXY_SERVER"]["AUTHENTICATION"][i]["KEYS"][j]["PUBLIC"]["PASSPHRASE"] = configuration["REMOTE_PROXY_SERVER"]["AUTHENTICATION"][i]["KEYS"][j]["PUBLIC"]["PASSPHRASE"]
@@ -107,17 +120,6 @@ def getDefaultConfiguration(configuration=None):
     defaultConfiguration["REMOTE_PROXY_SERVER"]["KEY"]["PRIVATE"] = collections.OrderedDict()
     defaultConfiguration["REMOTE_PROXY_SERVER"]["KEY"]["PRIVATE"]["FILE"] = configuration["REMOTE_PROXY_SERVER"]["KEY"]["PRIVATE"]["FILE"]
     defaultConfiguration["REMOTE_PROXY_SERVER"]["KEY"]["PRIVATE"]["PASSPHRASE"] = configuration["REMOTE_PROXY_SERVER"]["KEY"]["PRIVATE"]["PASSPHRASE"]
-    defaultConfiguration["PROXY_SERVERS"] = [collections.OrderedDict()] * len(configuration["PROXY_SERVERS"])
-    i = 0
-    while i < len(configuration["PROXY_SERVERS"]):
-        defaultConfiguration["PROXY_SERVERS"][i]["TYPE"] = configuration["PROXY_SERVERS"][i]["TYPE"]
-        defaultConfiguration["PROXY_SERVERS"][i]["ADDRESS"] = configuration["PROXY_SERVERS"][i]["ADDRESS"]
-        defaultConfiguration["PROXY_SERVERS"][i]["PORT"] = configuration["PROXY_SERVERS"][i]["PORT"]
-        defaultConfiguration["PROXY_SERVERS"][i]["AUTHENTICATION"] = collections.OrderedDict()
-        defaultConfiguration["PROXY_SERVERS"][i]["AUTHENTICATION"]["USERNAME"] = configuration["PROXY_SERVERS"][i]["AUTHENTICATION"]["USERNAME"]
-        defaultConfiguration["PROXY_SERVERS"][i]["AUTHENTICATION"]["PASSWORD"] = configuration["PROXY_SERVERS"][i]["AUTHENTICATION"]["PASSWORD"]
-        
-        i = i + 1
     
     return defaultConfiguration
 

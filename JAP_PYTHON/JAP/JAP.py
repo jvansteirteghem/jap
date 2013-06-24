@@ -13,7 +13,6 @@ from zope.interface import implements
 from twisted.cred import portal, checkers, credentials
 from twisted.cred.error import UnauthorizedLogin
 from twisted.internet import defer, reactor, ssl, tcp
-from twisted.names import client
 from twisted.web import server, static, resource, guard
 import logging
 import collections
@@ -52,9 +51,10 @@ def getDefaultConfiguration(configuration=None):
     defaultConfiguration["DNS_RESOLVER"] = collections.OrderedDict()
     defaultConfiguration["DNS_RESOLVER"]["HOSTS"] = collections.OrderedDict()
     defaultConfiguration["DNS_RESOLVER"]["HOSTS"]["FILE"] = configuration["DNS_RESOLVER"]["HOSTS"]["FILE"]
-    defaultConfiguration["DNS_RESOLVER"]["SERVERS"] = [collections.OrderedDict()] * len(configuration["DNS_RESOLVER"]["SERVERS"])
+    defaultConfiguration["DNS_RESOLVER"]["SERVERS"] = []
     i = 0
     while i < len(configuration["DNS_RESOLVER"]["SERVERS"]):
+        defaultConfiguration["DNS_RESOLVER"]["SERVERS"].append(collections.OrderedDict())
         defaultConfiguration["DNS_RESOLVER"]["SERVERS"][i]["ADDRESS"] = configuration["DNS_RESOLVER"]["SERVERS"][i]["ADDRESS"]
         defaultConfiguration["DNS_RESOLVER"]["SERVERS"][i]["PORT"] = configuration["DNS_RESOLVER"]["SERVERS"][i]["PORT"]
         i = i + 1
@@ -198,19 +198,7 @@ class API(resource.Resource):
         else:
             logger.setLevel(logging.NOTSET)
         
-        resolverHosts = None
-        if configuration["DNS_RESOLVER"]["HOSTS"]["FILE"] != "":
-            resolverHosts = configuration["DNS_RESOLVER"]["HOSTS"]["FILE"]
-        
-        resolverServers = None
-        if len(configuration["DNS_RESOLVER"]["SERVERS"]) != 0:
-            resolverServers = []
-            i = 0
-            while i < len(configuration["DNS_RESOLVER"]["SERVERS"]):
-                resolverServers.append((configuration["DNS_RESOLVER"]["SERVERS"][i]["ADDRESS"], configuration["DNS_RESOLVER"]["SERVERS"][i]["PORT"]))
-                i = i + 1
-        
-        resolver = client.createResolver(hosts=resolverHosts, servers=resolverServers)
+        resolver = JAP_LOCAL.createResolver(configuration)
         reactor.installResolver(resolver)
         
         return ""

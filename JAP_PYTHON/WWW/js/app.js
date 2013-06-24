@@ -152,11 +152,17 @@ function JAP_LOCAL_ViewModel(parent) {
         "LOGGER": {
             "LEVEL": ""
         },
+        "DNS_RESOLVER": {
+            "HOSTS": {
+                "FILE": ""
+            },
+            "SERVERS": []
+        },
+        "PROXY_SERVERS": [],
         "LOCAL_PROXY_SERVER": {
             "ADDRESS": "",
             "PORT": 0
-        },
-        "PROXY_SERVERS": []
+        }
     }
     self.data = ko.mapping.fromJS(self.defaultData);
     
@@ -295,13 +301,19 @@ function JAP_LOCAL_SSH_ViewModel(parent) {
         "LOGGER": {
             "LEVEL": ""
         },
+        "DNS_RESOLVER": {
+            "HOSTS": {
+                "FILE": ""
+            },
+            "SERVERS": []
+        },
+        "PROXY_SERVERS": [],
         "LOCAL_PROXY_SERVER": {
             "ADDRESS": "",
             "PORT": 0,
             "KEYS": []
         },
-        "REMOTE_PROXY_SERVERS":[],
-        "PROXY_SERVERS": []
+        "REMOTE_PROXY_SERVERS":[]
     }
     self.data = ko.mapping.fromJS(self.defaultData);
     
@@ -601,12 +613,18 @@ function JAP_LOCAL_WS_ViewModel(parent) {
         "LOGGER": {
             "LEVEL": ""
         },
+        "DNS_RESOLVER": {
+            "HOSTS": {
+                "FILE": ""
+            },
+            "SERVERS": []
+        },
+        "PROXY_SERVERS": [],
         "LOCAL_PROXY_SERVER": {
             "ADDRESS": "",
             "PORT": 0
         },
-        "REMOTE_PROXY_SERVERS": [],
-        "PROXY_SERVERS": []
+        "REMOTE_PROXY_SERVERS": []
     }
     self.data = ko.mapping.fromJS(self.defaultData);
     
@@ -832,6 +850,13 @@ function JAP_REMOTE_SSH_ViewModel(parent) {
         "LOGGER": {
             "LEVEL": ""
         },
+        "DNS_RESOLVER": {
+            "HOSTS": {
+                "FILE": ""
+            },
+            "SERVERS": []
+        },
+        "PROXY_SERVERS": [],
         "REMOTE_PROXY_SERVER": {
             "ADDRESS": "",
             "PORT": 0,
@@ -846,8 +871,7 @@ function JAP_REMOTE_SSH_ViewModel(parent) {
                     "PASSPHRASE": ""
                 }
             }
-        },
-        "PROXY_SERVERS": []
+        }
     }
     self.data = ko.mapping.fromJS(self.defaultData);
     
@@ -1159,6 +1183,13 @@ function JAP_REMOTE_WS_ViewModel(parent) {
         "LOGGER": {
             "LEVEL": "DEBUG"
         },
+        "DNS_RESOLVER": {
+            "HOSTS": {
+                "FILE": ""
+            },
+            "SERVERS": []
+        },
+        "PROXY_SERVERS": [],
         "REMOTE_PROXY_SERVER": {
             "TYPE": "",
             "ADDRESS": "",
@@ -1170,8 +1201,7 @@ function JAP_REMOTE_WS_ViewModel(parent) {
                 },
                 "FILE": ""
             }
-        },
-        "PROXY_SERVERS": []
+        }
     }
     self.data = ko.mapping.fromJS(self.defaultData);
     

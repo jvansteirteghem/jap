@@ -7,22 +7,19 @@
     {
         "HOSTS":
         {
-            "FILE": ""
+            "FILE": "H"
         },
         "SERVERS":
         [
-            /*
             {
-                "ADDRESS": "",
-                "PORT": 0
+                "ADDRESS": "8.8.8.8",
+                "PORT": 53
+            },
+            {
+                "ADDRESS": "8.8.4.4",
+                "PORT": 53
             }
-            */
         ]
-    },
-    "LOCAL_PROXY_SERVER":
-    {
-        "ADDRESS": "127.0.0.1",
-        "PORT": 1080
     },
     "PROXY_SERVERS":
     [
@@ -38,5 +35,10 @@
             }
         }
         */
-    ]
+    ],
+    "LOCAL_PROXY_SERVER":
+    {
+        "ADDRESS": "127.0.0.1",
+        "PORT": 1080
+    }
 }

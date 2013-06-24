@@ -8,6 +8,7 @@
         },
         "SERVERS": []
     },
+    "PROXY_SERVERS": [],
     "REMOTE_PROXY_SERVER": {
         "TYPE": "",
         "ADDRESS": "",
@@ -19,6 +20,5 @@
             },
             "FILE": ""
         }
-    },
-    "PROXY_SERVERS": []
+    }
 }

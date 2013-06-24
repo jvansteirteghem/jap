@@ -8,6 +8,7 @@
         },
         "SERVERS": []
     },
+    "PROXY_SERVERS": [],
     "REMOTE_PROXY_SERVER": {
         "ADDRESS": "",
         "PORT": 0,
@@ -22,6 +23,5 @@
                 "PASSPHRASE": ""
             }
         }
-    },
-    "PROXY_SERVERS": []
+    }
 }

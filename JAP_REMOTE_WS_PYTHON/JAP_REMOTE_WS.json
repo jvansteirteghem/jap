@@ -7,18 +7,35 @@
     {
         "HOSTS":
         {
-            "FILE": ""
+            "FILE": "H"
         },
         "SERVERS":
         [
-            /*
             {
-                "ADDRESS": "",
-                "PORT": 0
+                "ADDRESS": "8.8.8.8",
+                "PORT": 53
+            },
+            {
+                "ADDRESS": "8.8.4.4",
+                "PORT": 53
             }
-            */
         ]
     },
+    "PROXY_SERVERS":
+    [
+        /*
+        {
+            "TYPE": "",
+            "ADDRESS": "",
+            "PORT": 0,
+            "AUTHENTICATION":
+            {
+                "USERNAME": "",
+                "PASSWORD": ""
+            }
+        }
+        */
+    ],
     "REMOTE_PROXY_SERVER":
     {
         "TYPE": "",
@@ -41,20 +58,5 @@
             },
             "FILE": ""
         }
-    },
-    "PROXY_SERVERS":
-    [
-        /*
-        {
-            "TYPE": "",
-            "ADDRESS": "",
-            "PORT": 0,
-            "AUTHENTICATION":
-            {
-                "USERNAME": "",
-                "PASSWORD": ""
-            }
-        }
-        */
-    ]
+    }
 }

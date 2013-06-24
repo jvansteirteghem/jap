@@ -8,9 +8,9 @@
         },
         "SERVERS": []
     },
+    "PROXY_SERVERS": [],
     "LOCAL_PROXY_SERVER": {
         "ADDRESS": "",
         "PORT": 0
-    },
-    "PROXY_SERVERS": []
+    }
 }
