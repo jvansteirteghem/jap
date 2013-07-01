@@ -1,7 +1,7 @@
 set SEVENZIP_HOME="C:\Program Files\7-Zip"
 set PYINSTALLER_HOME="C:\pyinstaller-SNAPSHOT"
-set JAP_LOCAL_WS_PYTHON_VERSION=3.0.0-SNAPSHOT
-set JAP_LOCAL_WS_PYTHON_WINDOWS_VERSION=3.0.0-SNAPSHOT
+set JAP_LOCAL_WS_PYTHON_VERSION=3.0.0-SNAPSHOT-2
+set JAP_LOCAL_WS_PYTHON_WINDOWS_VERSION=3.0.0-SNAPSHOT-2
 if exist MAKE rmdir MAKE /s /q
 mkdir MAKE
 cd MAKE
@@ -13,7 +13,7 @@ copy ..\..\JAP_LOCAL_WS.json JAP_LOCAL_WS.json
 copy ..\..\JAP_LOCAL_WS.py JAP_LOCAL_WS.py
 copy ..\..\CA.pem CA.pem
 copy ..\..\CA_DEFAULT.pem CA_DEFAULT.pem
-copy ..\..\H H
+copy ..\..\H.txt H.txt
 copy ..\..\README.txt README.txt
 mkdir JAP
 cd JAP
@@ -36,7 +36,7 @@ copy ..\..\JAP_LOCAL_WS_PYTHON_WINDOWS\README.txt README.txt
 copy ..\..\JAP_LOCAL_WS.json JAP_LOCAL_WS.json
 copy ..\..\CA.pem CA.pem
 copy ..\..\CA_DEFAULT.pem CA_DEFAULT.pem
-copy ..\..\H H
+copy ..\..\H.txt H.txt
 cd ..
 %SEVENZIP_HOME%\7z.exe a -tzip JAP_LOCAL_WS_PYTHON_WINDOWS-%JAP_LOCAL_WS_PYTHON_WINDOWS_VERSION%.zip JAP_LOCAL_WS_PYTHON_WINDOWS-%JAP_LOCAL_WS_PYTHON_WINDOWS_VERSION%
 cd ..

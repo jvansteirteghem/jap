@@ -7,7 +7,7 @@
     {
         "HOSTS":
         {
-            "FILE": "H"
+            "FILE": "H.txt"
         },
         "SERVERS":
         [

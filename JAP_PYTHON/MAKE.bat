@@ -1,7 +1,7 @@
 set SEVENZIP_HOME="C:\Program Files\7-Zip"
 set PYINSTALLER_HOME="C:\pyinstaller-SNAPSHOT"
-set JAP_PYTHON_VERSION=3.0.0-SNAPSHOT
-set JAP_PYTHON_WINDOWS_VERSION=3.0.0-SNAPSHOT
+set JAP_PYTHON_VERSION=3.0.0-SNAPSHOT-2
+set JAP_PYTHON_WINDOWS_VERSION=3.0.0-SNAPSHOT-2
 if exist MAKE rmdir MAKE /s /q
 mkdir MAKE
 cd MAKE
@@ -28,7 +28,7 @@ copy ..\..\CA_DEFAULT.pem CA_DEFAULT.pem
 copy ..\..\CAK.pem CAK.pem
 copy ..\..\CK.pem CK.pem
 copy ..\..\CR.pem CR.pem
-copy ..\..\H H
+copy ..\..\H.txt H.txt
 copy ..\..\KP.bat KP.bat
 copy ..\..\KP.pem KP.pem
 copy ..\..\README.txt README.txt
@@ -72,7 +72,7 @@ copy ..\..\CA_DEFAULT.pem CA_DEFAULT.pem
 copy ..\..\CAK.pem CAK.pem
 copy ..\..\CK.pem CK.pem
 copy ..\..\CR.pem CR.pem
-copy ..\..\H H
+copy ..\..\H.txt H.txt
 copy ..\..\KP.bat KP.bat
 copy ..\..\KP.pem KP.pem
 cd ..
