@@ -9,7 +9,8 @@ This program is distributed in the hope that it will be useful, but WITHOUT ANY 
 You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 """
 
-from twisted.internet import protocol, reactor, tcp
+from zope.interface import implements
+from twisted.internet import protocol, reactor, tcp, interfaces
 from twisted.internet.abstract import isIPAddress, isIPv6Address
 from twisted.names import client, resolve, cache, hosts
 import base64
@@ -436,6 +437,8 @@ def setConfiguration(configurationFile, configuration, getDefaultConfiguration=N
     file.close()
 
 class OutputProtocol(protocol.Protocol):
+    implements(interfaces.IPushProducer)
+    
     def __init__(self):
         logger.debug("OutputProtocol.__init__")
         
@@ -464,10 +467,15 @@ class OutputProtocol(protocol.Protocol):
     def inputProtocol_connectionMade(self):
         logger.debug("OutputProtocol.inputProtocol_connectionMade")
         
+        if self.connectionState == 1:
+            self.transport.registerProducer(self.inputProtocol, True)
+        
     def inputProtocol_connectionLost(self, reason):
         logger.debug("OutputProtocol.inputProtocol_connectionLost")
         
         if self.connectionState == 1:
+            self.transport.unregisterProducer()
+            
             self.transport.loseConnection()
         
     def inputProtocol_dataReceived(self, data):
@@ -475,6 +483,24 @@ class OutputProtocol(protocol.Protocol):
         
         if self.connectionState == 1:
             self.transport.write(data)
+    
+    def pauseProducing(self):
+        logger.debug("OutputProtocol.pauseProducing")
+        
+        if self.connectionState == 1:
+            self.transport.pauseProducing()
+    
+    def resumeProducing(self):
+        logger.debug("OutputProtocol.resumeProducing")
+        
+        if self.connectionState == 1:
+            self.transport.resumeProducing()
+    
+    def stopProducing(self):
+        logger.debug("OutputProtocol.stopProducing")
+        
+        if self.connectionState == 1:
+            self.transport.stopProducing()
 
 class OutputProtocolFactory(protocol.ClientFactory):
     def __init__(self, inputProtocol):
@@ -494,6 +520,8 @@ class OutputProtocolFactory(protocol.ClientFactory):
         self.inputProtocol.outputProtocol_connectionFailed(reason)
 
 class InputProtocol(protocol.Protocol):
+    implements(interfaces.IPushProducer)
+    
     def __init__(self):
         logger.debug("InputProtocol.__init__")
         
@@ -603,6 +631,10 @@ class InputProtocol(protocol.Protocol):
             
             self.data = ""
             self.dataState = 2
+            
+            self.transport.registerProducer(self.outputProtocol, True)
+            
+            self.outputProtocol.inputProtocol_connectionMade()
         else:
             if self.connectionState == 2:
                 self.outputProtocol.inputProtocol_connectionLost(None)
@@ -619,6 +651,8 @@ class InputProtocol(protocol.Protocol):
         logger.debug("InputProtocol.outputProtocol_connectionLost")
         
         if self.connectionState == 1:
+            self.transport.unregisterProducer()
+            
             self.transport.loseConnection()
         else:
             if self.connectionState == 2:
@@ -632,6 +666,24 @@ class InputProtocol(protocol.Protocol):
         else:
             if self.connectionState == 2:
                 self.outputProtocol.inputProtocol_connectionLost(None)
+    
+    def pauseProducing(self):
+        logger.debug("InputProtocol.pauseProducing")
+        
+        if self.connectionState == 1:
+            self.transport.pauseProducing()
+    
+    def resumeProducing(self):
+        logger.debug("InputProtocol.resumeProducing")
+        
+        if self.connectionState == 1:
+            self.transport.resumeProducing()
+    
+    def stopProducing(self):
+        logger.debug("InputProtocol.stopProducing")
+        
+        if self.connectionState == 1:
+            self.transport.stopProducing()
         
 class InputProtocolFactory(protocol.ClientFactory):
     def __init__(self, configuration):

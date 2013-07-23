@@ -10,7 +10,7 @@ You should have received a copy of the GNU General Public License along with thi
 """
 
 from zope.interface import implements
-from twisted.internet import defer
+from twisted.internet import defer, interfaces as interfaces2
 from twisted.conch import avatar, interfaces
 from twisted.conch.error import ValidPublicKey
 from twisted.conch.ssh import channel, factory, forwarding, keys
@@ -130,6 +130,8 @@ class SSHOutputProtocolFactory(JAP_LOCAL.OutputProtocolFactory):
     pass
 
 class SSHChannel(channel.SSHChannel):
+    implements(interfaces2.IPushProducer)
+    
     name = "direct-tcpip"
     
     def __init__(self, remoteAddressPort, *args, **kw):
@@ -202,10 +204,14 @@ class SSHChannel(channel.SSHChannel):
     def outputProtocol_connectionMade(self):
         logger.debug("SSHChannel.outputProtocol_connectionMade")
         
-        self.outputProtocol.inputProtocol_dataReceived(self.data)
-        
-        self.data = ""
-        self.dataState = 1
+        if self.connectionState == 1:
+            self.outputProtocol.inputProtocol_dataReceived(self.data)
+            
+            self.data = ""
+            self.dataState = 1
+        else:
+            if self.connectionState == 2:
+                self.outputProtocol.inputProtocol_connectionLost(None)
         
     def outputProtocol_connectionFailed(self, reason):
         logger.debug("SSHChannel.outputProtocol_connectionFailed")
@@ -218,12 +224,46 @@ class SSHChannel(channel.SSHChannel):
         
         if self.connectionState == 1:
             self.loseConnection()
+        else:
+            if self.connectionState == 2:
+                self.outputProtocol.inputProtocol_connectionLost(None)
         
     def outputProtocol_dataReceived(self, data):
         logger.debug("SSHChannel.outputProtocol_dataReceived")
         
         if self.connectionState == 1:
             self.write(data)
+        else:
+            if self.connectionState == 2:
+                self.outputProtocol.inputProtocol_connectionLost(None)
+    
+    def pauseProducing(self):
+        logger.debug("SSHChannel.pauseProducing")
+        
+        if self.connectionState == 1:
+            self.localWindowSize = 0
+    
+    def resumeProducing(self):
+        logger.debug("SSHChannel.resumeProducing")
+        
+        if self.connectionState == 1:
+            self.localWindowSize = 131072
+    
+    def stopProducing(self):
+        logger.debug("SSHChannel.stopProducing")
+        
+        if self.connectionState == 1:
+            self.localWindowSize = 0
+    
+    def startWriting(self):
+        logger.debug("SSHChannel.startWriting")
+        
+        self.outputProtocol.resumeProducing()
+    
+    def stopWriting(self):
+        logger.debug("SSHChannel.stopWriting")
+        
+        self.outputProtocol.pauseProducing()
 
 def openSSHChannel(remoteWindow, remoteMaxPacket, data, avatar):
     remoteAdressPort, localAddressPort = forwarding.unpackOpen_direct_tcpip(data)

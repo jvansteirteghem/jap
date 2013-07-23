@@ -9,7 +9,8 @@ This program is distributed in the hope that it will be useful, but WITHOUT ANY 
 You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 """
 
-from twisted.internet import reactor, protocol
+from zope.interface import implements
+from twisted.internet import reactor, protocol, interfaces
 import logging
 import collections
 import autobahn.websocket
@@ -100,6 +101,8 @@ def getDefaultConfiguration(configuration=None):
     return defaultConfiguration
 
 class WSInputProtocol(autobahn.websocket.WebSocketServerProtocol):
+    implements(interfaces.IPushProducer)
+    
     def __init__(self):
         logger.debug("WSInputProtocol.__init__")
         
@@ -175,6 +178,13 @@ class WSInputProtocol(autobahn.websocket.WebSocketServerProtocol):
     def processMessageState1(self):
         logger.debug("WSInputProtocol.processMessageState1")
         
+        if len(self.message) == 0:
+            self.outputProtocol.resumeProducing()
+            
+            return
+        
+        self.sendMessage("", True)
+        
         self.outputProtocol.inputProtocol_dataReceived(self.message)
         
         self.message = ""
@@ -216,11 +226,31 @@ class WSInputProtocol(autobahn.websocket.WebSocketServerProtocol):
     def outputProtocol_dataReceived(self, data):
         logger.debug("WSInputProtocol.outputProtocol_dataReceived")
         
+        self.outputProtocol.pauseProducing()
+        
         if self.connectionState == 1:
             self.sendMessage(data, True)
         else:
             if self.connectionState == 2:
                 self.outputProtocol.inputProtocol_connectionLost(None)
+    
+    def pauseProducing(self):
+        logger.debug("WSInputProtocol.pauseProducing")
+        
+        if self.connectionState == 1:
+            self.transport.pauseProducing()
+    
+    def resumeProducing(self):
+        logger.debug("WSInputProtocol.resumeProducing")
+        
+        if self.connectionState == 1:
+            self.transport.resumeProducing()
+    
+    def stopProducing(self):
+        logger.debug("WSInputProtocol.stopProducing")
+        
+        if self.connectionState == 1:
+            self.transport.stopProducing()
 
 class WSInputProtocolFactory(autobahn.websocket.WebSocketServerFactory):
     def __init__(self, configuration, *args, **kwargs):

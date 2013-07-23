@@ -9,7 +9,8 @@ This program is distributed in the hope that it will be useful, but WITHOUT ANY 
 You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 """
 
-from twisted.internet import protocol, reactor, defer
+from zope.interface import implements
+from twisted.internet import protocol, reactor, defer, interfaces
 from twisted.conch.ssh import transport, userauth, connection, keys, channel, forwarding
 import struct
 import random
@@ -127,6 +128,8 @@ def getDefaultConfiguration(configuration=None):
     return defaultConfiguration
 
 class SSHChannel(channel.SSHChannel):
+    implements(interfaces.IPushProducer)
+    
     name = "direct-tcpip"
     
     def __init__(self, *args, **kw):
@@ -187,6 +190,34 @@ class SSHChannel(channel.SSHChannel):
         
         if self.connectionState == 1:
             self.write(data)
+    
+    def pauseProducing(self):
+        logger.debug("SSHChannel.pauseProducing")
+        
+        if self.connectionState == 1:
+            self.localWindowSize = 0
+    
+    def resumeProducing(self):
+        logger.debug("SSHChannel.resumeProducing")
+        
+        if self.connectionState == 1:
+            self.localWindowSize = 131072
+    
+    def stopProducing(self):
+        logger.debug("SSHChannel.stopProducing")
+        
+        if self.connectionState == 1:
+            self.localWindowSize = 0
+    
+    def startWriting(self):
+        logger.debug("SSHChannel.startWriting")
+        
+        self.inputProtocol.resumeProducing()
+    
+    def stopWriting(self):
+        logger.debug("SSHChannel.stopWriting")
+        
+        self.inputProtocol.pauseProducing()
 
 class SSHClientTransport(transport.SSHClientTransport):
     def __init__(self):
@@ -332,7 +363,7 @@ class SSHInputProtocol(JAP_LOCAL.InputProtocol):
         JAP_LOCAL.InputProtocol.__init__(self)
         
         self.i = 0
-        
+    
     def connect(self):
         logger.debug("SSHInputProtocol.connect")
         
