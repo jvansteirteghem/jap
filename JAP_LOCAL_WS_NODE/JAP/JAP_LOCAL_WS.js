@@ -12,7 +12,7 @@ You should have received a copy of the GNU General Public License along with thi
 var fs = require("fs");
 var http = require("http");
 var net = require("net");
-var websocket = require("websocket");
+var websocket = require("streamws");
 var util = require("util");
 var events = require("events");
 var tls = require("tls");
@@ -121,13 +121,11 @@ module.exports.setDefaultConfiguration = setDefaultConfiguration;
 var createServer = function(configuration) {
 	server = net.createServer(function(connection) {
 		console.log("server.connect");
-		console.log("server.connections: " + server.connections);
 		
 		var state = 0;
 		var localConnection = null;
 		var localConnectionState = 0;
 		var remoteConnection = null;
-		var remoteConnectionState = 0;
 		var remoteAddress = null;
 		var remotePort = null;
 		
@@ -135,22 +133,20 @@ var createServer = function(configuration) {
 		localConnectionState = 1;
 		
 		localConnection.on("data", function(data) {
-			if(state === 0) {
+			if(state == 0) {
 				var buffer = new Buffer(2);
 				buffer.write("\u0005", 0, 1, "binary");
 				buffer.write("\u0000", 1, 1, "binary");
 				
-				if(localConnectionState == 1) {
-					localConnection.write(buffer);
-				}
+				localConnection.write(buffer);
 				
 				state = 1;
 				
 				return;
 			}
 			
-			if(state === 1) {
-				if(data[1] === 2) {
+			if(state == 1) {
+				if(data[1] == 2) {
 					console.log("error: unsupported command code: 0x02 (establish a TCP/IP port binding)");
 					
 					var buffer = new Buffer(2);
@@ -166,7 +162,7 @@ var createServer = function(configuration) {
 					return;
 				}
 				
-				if(data[1] === 3) {
+				if(data[1] == 3) {
 					console.log("error: unsupported command code: 0x03 (associate a UDP port)");
 					
 					var buffer = new Buffer(2);
@@ -182,7 +178,7 @@ var createServer = function(configuration) {
 					return;
 				}
 				
-				if(data[3] === 4) {
+				if(data[3] == 4) {
 					console.log("error: unsupported address type: 0x04 (IPv6 address)");
 					
 					var buffer = new Buffer(2);
@@ -198,12 +194,12 @@ var createServer = function(configuration) {
 					return;
 				}
 				
-				if(data[3] === 1) {
+				if(data[3] == 1) {
 					remoteAddress = data[4] + "." + data[5] + "." + data[6] + "." + data[7];
 					remotePort = data.readUInt16BE(8);
 				}
 				
-				if(data[3] === 3) {
+				if(data[3] == 3) {
 					var remoteAddressLength = data[4];
 					remoteAddress = data.slice(5, 5 + remoteAddressLength).toString("binary");
 					remotePort = data.readUInt16BE(5 + remoteAddressLength);
@@ -217,8 +213,8 @@ var createServer = function(configuration) {
 				var requestUrl = configuration.REMOTE_PROXY_SERVERS[i].ADDRESS + ":" + configuration.REMOTE_PROXY_SERVERS[i].PORT + "/";
 				var requestOptions = {};
 				
-				if(configuration.REMOTE_PROXY_SERVERS[i].TYPE === "HTTP") {
-					if(configuration.PROXY_SERVER.ADDRESS === "") {
+				if(configuration.REMOTE_PROXY_SERVERS[i].TYPE == "HTTP") {
+					if(configuration.PROXY_SERVER.ADDRESS == "") {
 						requestOptions.agent = null;
 					} else {
 						requestOptions.proxy = {};
@@ -262,7 +258,7 @@ var createServer = function(configuration) {
 						requestOptions.rejectUnauthorized = false;
 					}
 					
-					if(configuration.PROXY_SERVER.ADDRESS === "") {
+					if(configuration.PROXY_SERVER.ADDRESS == "") {
 						requestOptions.agent = null;
 					} else {
 						requestOptions.proxy = {};
@@ -279,93 +275,89 @@ var createServer = function(configuration) {
 					requestUrl = "wss://" + requestUrl;
 				}
 				
-				var client = new websocket.client();
+				remoteConnection = new websocket(requestUrl, requestOptions);
 				
-				client.on("connectFailed", function(error) {
-					console.log("client.connectFailed");
-					console.log("error: " + error.toString());
+				remoteConnection.on("open", function() {
+					console.log("remoteConnection.open");
 					
-					remoteConnectionState = 2;
+					var request = {};
+					request["REMOTE_PROXY_SERVER"] = {};
+					request["REMOTE_PROXY_SERVER"]["AUTHENTICATION"] = {};
+					request["REMOTE_PROXY_SERVER"]["AUTHENTICATION"]["USERNAME"] = configuration.REMOTE_PROXY_SERVERS[i].AUTHENTICATION.USERNAME;
+					request["REMOTE_PROXY_SERVER"]["AUTHENTICATION"]["PASSWORD"] = configuration.REMOTE_PROXY_SERVERS[i].AUTHENTICATION.PASSWORD;
+					request["REMOTE_ADDRESS"] = remoteAddress
+					request["REMOTE_PORT"] = remotePort
+					
+					var message = JSON.stringify(request);
+					
+					remoteConnection.send(message, {binary: false});
+				});
+				
+				remoteConnection.on("message", function(message) {
+					console.log("remoteConnection.message");
+					
+					if(state == 1) {
+						var response = JSON.parse(message);
+						
+						var buffer = new Buffer(10);
+						buffer.write("\u0005", 0, 1, "binary");
+						buffer.write("\u0000", 1, 1, "binary");
+						buffer.write("\u0000", 2, 1, "binary");
+						buffer.write("\u0001", 3, 1, "binary");
+						buffer.write("\u0000", 4, 1, "binary");
+						buffer.write("\u0000", 5, 1, "binary");
+						
+						if(localConnectionState == 1) {
+							localConnection.write(buffer);
+						}
+						
+						state = 2;
+						
+						return;
+					}
+					
+					if(state == 2) {
+						console.log("remoteConnection.message: messageLength=" + message.length);
+						
+						if(message.length == 0) {
+							if(localConnectionState == 1) {
+								localConnection.resume();
+							}
+							
+							return;
+						}
+						
+						remoteConnection.send("", {binary: true});
+						
+						if(localConnectionState == 1) {
+							if(!localConnection.write(message)) {
+								remoteConnection.pause();
+							}
+						}
+						
+						return;
+					}
+				});
+				
+				remoteConnection.on("close", function() {
+					console.log("remoteConnection.close");
 					
 					if(localConnectionState == 1) {
 						localConnection.end();
 					}
 				});
 				
-				client.on("connect", function(connection) {
-					console.log("client.connect");
-					
-					remoteConnection = connection;
-					remoteConnectionState = 1;
-					
-					remoteConnection.on("error", function(error) {
-						console.log("remoteConnection.error");
-						console.log("error: " + error.toString());
-						
-						remoteConnectionState = 2;
-						
-						if(localConnectionState == 1) {
-							localConnection.end();
-						}
-					});
-					remoteConnection.on("close", function() {
-						console.log("remoteConnection.close");
-						
-						remoteConnectionState = 2;
-						
-						if(localConnectionState == 1) {
-							localConnection.end();
-						}
-					});
-					remoteConnection.on("message", function(message) {
-						console.log("remoteConnection.message");
-						
-						if(state === 1) {
-							response = JSON.parse(message.utf8Data);
-							
-							var buffer = new Buffer(10);
-							buffer.write("\u0005", 0, 1, "binary");
-							buffer.write("\u0000", 1, 1, "binary");
-							buffer.write("\u0000", 2, 1, "binary");
-							buffer.write("\u0001", 3, 1, "binary");
-							buffer.write("\u0000", 4, 1, "binary");
-							buffer.write("\u0000", 5, 1, "binary");
-							
-							if(localConnectionState == 1) {
-								localConnection.write(buffer);
-							}
-							
-							state = 2;
-							
-							return;
-						}
-						
-						if(localConnectionState == 1) {
-							localConnection.write(message.binaryData);
-						}
-					});
-					
-					if(remoteConnectionState == 1) {
-						var request = {};
-						request["REMOTE_PROXY_SERVER"] = {};
-						request["REMOTE_PROXY_SERVER"]["AUTHENTICATION"] = {};
-						request["REMOTE_PROXY_SERVER"]["AUTHENTICATION"]["USERNAME"] = configuration.REMOTE_PROXY_SERVERS[i].AUTHENTICATION.USERNAME;
-						request["REMOTE_PROXY_SERVER"]["AUTHENTICATION"]["PASSWORD"] = configuration.REMOTE_PROXY_SERVERS[i].AUTHENTICATION.PASSWORD;
-						request["REMOTE_ADDRESS"] = remoteAddress
-						request["REMOTE_PORT"] = remotePort
-						
-						message2 = JSON.stringify(request);
-						
-						remoteConnection.sendUTF(message2);
-					}
+				remoteConnection.on("error", function(error) {
+					console.log("remoteConnection.error");
+					console.log("error: " + error.toString());
 				});
-				
-				client.connect(requestUrl, requestOptions);
 			}
 			
-			if(state === 2) {
-				if(remoteConnectionState == 1) {
-					remoteConnection.sendBytes(data);
+			if(state == 2) {
+				localConnection.pause();
+				
+				if(remoteConnection.readyState == websocket.OPEN) {
+					remoteConnection.send(data, {binary: true});
 				}
 			}
 		});
@@ -375,24 +367,38 @@ var createServer = function(configuration) {
 			
 			localConnectionState = 2;
 			
-			if(remoteConnection && remoteConnectionState == 1) {
+			if(remoteConnection && remoteConnection.readyState == websocket.OPEN) {
 				remoteConnection.close();
 			}
+		});
+		
+		localConnection.on("close", function(hadError) {
+			console.log("localConnection.close");
 			
-			console.log("server.connections: " + server.connections);
+			localConnectionState = 2;
+			
+			if(hadError) {
+				if(remoteConnection && remoteConnection.readyState == websocket.OPEN) {
+					remoteConnection.terminate();
+				}
+			} else {
+				if(remoteConnection && remoteConnection.readyState == websocket.OPEN) {
+					remoteConnection.close();
+				}
+			}
 		});
 		
 		localConnection.on("error", function(error) {
 			console.log("localConnection.error");
 			console.log("error: " + error.toString());
+		});
+		
+		localConnection.on("drain", function() {
+			console.log("localConnection.drain");
 			
-			localConnectionState = 2;
-			
-			if(remoteConnection && remoteConnectionState == 1) {
-				remoteConnection.close();
+			if(remoteConnection && remoteConnection.readyState == websocket.OPEN) {
+				remoteConnection.resume();
 			}
-			
-			console.log("server.connections: " + server.connections);
 		});
 	});
 	

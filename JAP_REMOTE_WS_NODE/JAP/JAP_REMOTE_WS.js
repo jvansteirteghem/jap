@@ -10,7 +10,7 @@ You should have received a copy of the GNU General Public License along with thi
 */
 
 var net = require("net");
-var websocket = require("websocket");
+var websocket = require("streamws");
 
 var setDefaultConfiguration = function(configuration) {
 	configuration = configuration || {};
@@ -33,28 +33,26 @@ var setDefaultConfiguration = function(configuration) {
 
 module.exports.setDefaultConfiguration = setDefaultConfiguration;
 
-var createServer = function(server, configuration) {
-	var websocketServer = new websocket.server({httpServer: server});
+var createServer = function(server2, configuration) {
+	var websocketServer = new websocket.Server({server: server2});
 	
-	websocketServer.on("request", function (request) {
-		console.log("server.request");
+	websocketServer.on("connection", function (connection) {
+		console.log("server.connection");
 		
 		var state = 0;
 		var localConnection = null;
-		var localConnectionState = 0;
 		var remoteConnection = null;
 		var remoteConnectionState = 0;
 		var remoteAddress = "";
 		var remotePort = 0;
 		
-		localConnection = request.accept(null, request.origin);
-		localConnectionState = 1;
+		localConnection = connection;
 		
-		localConnection.on("message", function(message) {
+		localConnection.on("message", function(message, flags) {
 			console.log("localConnection.message");
 			
 			if(state == 0) {
-				var request = JSON.parse(message.utf8Data);
+				var request = JSON.parse(message);
 				
 				var authorized = false;
 				
@@ -96,8 +94,8 @@ var createServer = function(server, configuration) {
 					
 					var message = JSON.stringify(response);
 					
-					if(localConnectionState == 1) {
-						localConnection.sendUTF(message);
+					if(localConnection.readyState == websocket.OPEN) {
+						localConnection.send(message, {binary: false});
 					}
 					
 					state = 1;
@@ -108,8 +106,10 @@ var createServer = function(server, configuration) {
 				remoteConnection.on("data", function(data) {
 					console.log("remoteConnection.data");
 					
-					if(localConnectionState == 1) {
-						localConnection.sendBytes(data);
+					remoteConnection.pause();
+					
+					if(localConnection.readyState == websocket.OPEN) {
+						localConnection.send(data, {binary: true});
 					}
 				});
 				
@@ -118,19 +118,37 @@ var createServer = function(server, configuration) {
 					
 					remoteConnectionState = 2;
 					
-					if(localConnectionState == 1) {
+					if(localConnection.readyState == websocket.OPEN) {
 						localConnection.close();
+					}
+				});
+				
+				remoteConnection.on("close", function(hadError) {
+					console.log("remoteConnection.close");
+					
+					remoteConnectionState = 2;
+					
+					if(hadError) {
+						if(localConnection.readyState == websocket.OPEN) {
+							localConnection.terminate();
+						}
+					} else {
+						if(localConnection.readyState == websocket.OPEN) {
+							localConnection.close();
+						}
 					}
 				});
 				
 				remoteConnection.on("error", function(error) {
 					console.log("remoteConnection.error");
 					console.log("error: " + error.toString());
+				});
+				
+				remoteConnection.on("drain", function() {
+					console.log("remoteConnection.drain");
 					
-					remoteConnectionState = 2;
-					
-					if(localConnectionState == 1) {
-						localConnection.close();
+					if(localConnection.readyState == websocket.OPEN) {
+						localConnection.resume();
 					}
 				});
 				
@@ -138,20 +156,32 @@ var createServer = function(server, configuration) {
 			}
 			
 			if(state == 1) {
+				console.log("localConnection.message: messageLength=" + message.length);
+				
+				if(message.length == 0) {
+					if(remoteConnectionState == 1) {
+						remoteConnection.resume();
+					}
+					
+					return;
+				}
+				
+				localConnection.send("", {binary: true});
+				
 				if(remoteConnectionState == 1) {
-					remoteConnection.write(message.binaryData);
+					if(!remoteConnection.write(message)) {
+						localConnection.pause();
+					}
 				}
 				
 				return;
 			}
-		})
+		});
 		
 		localConnection.on("close", function() {
 			console.log("localConnection.close");
 			
-			localConnectionState = 2;
-			
-			if(remoteConnection == 1) {
+			if(remoteConnectionState == 1) {
 				remoteConnection.end();
 			}
 		});
@@ -159,12 +189,6 @@ var createServer = function(server, configuration) {
 		localConnection.on("error", function(error) {
 			console.log("localConnection.error");
 			console.log("error: " + error.toString());
-			
-			localConnectionState = 2;
-			
-			if(remoteConnection == 1) {
-				remoteConnection.end();
-			}
 		});
 	});
 	
