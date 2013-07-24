@@ -3,6 +3,16 @@
 	{
 		"LEVEL": "DEBUG"
 	},
+	"PROXY_SERVER":
+	{
+		"ADDRESS": "",
+		"PORT": 0,
+		"AUTHENTICATION":
+		{
+			"USERNAME": "",
+			"PASSWORD": ""
+		}
+	},
 	"LOCAL_PROXY_SERVER":
 	{
 		"ADDRESS": "127.0.0.1",
@@ -27,15 +37,5 @@
 				}
 			}
 		}
-	],
-	"PROXY_SERVER":
-	{
-		"ADDRESS": "",
-		"PORT": 0,
-		"AUTHENTICATION":
-		{
-			"USERNAME": "",
-			"PASSWORD": ""
-		}
-	}
+	]
 }

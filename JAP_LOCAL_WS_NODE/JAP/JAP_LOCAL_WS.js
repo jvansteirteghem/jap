@@ -17,21 +17,21 @@ var util = require("util");
 var events = require("events");
 var tls = require("tls");
 
-function HTTPAgent(options) {
+function HTTPAgent(configuration) {
 	events.EventEmitter.call(this);
 	
 	var self = this;
-	self.options = options || {};
+	self.configuration = configuration;
 	
 	self.createConnection = function(options, cb) {
 		var requestOptions = {};
-		requestOptions.host = options.proxy.host;
-		requestOptions.port = options.proxy.port;
+		requestOptions.host = self.configuration.PROXY_SERVER.ADDRESS;
+		requestOptions.port = self.configuration.PROXY_SERVER.PORT;
 		requestOptions.method = "CONNECT";
 		requestOptions.path = options.host + ":" + options.port;
 		requestOptions.headers = {};
-		requestOptions.headers["Proxy-Authorization"] = "Basic " + new Buffer(options.proxy.auth).toString("base64");
-		requestOptions.agent = null;
+		requestOptions.headers["Proxy-Authorization"] = "Basic " + new Buffer(self.configuration.PROXY_SERVER.AUTHENTICATION.USERNAME + ":" + self.configuration.PROXY_SERVER.AUTHENTICATION.PASSWORD).toString("base64");
+		requestOptions.agent = false;
 		
 		var request = http.request(requestOptions);
 		
@@ -52,7 +52,7 @@ util.inherits(HTTPAgent, events.EventEmitter);
 HTTPAgent.prototype.addRequest = function(request, host, port, localAddress) {
 	var self = this;
 	
-	var options = util._extend({}, self.options);
+	var options = {};
 	options.request = request;
 	options.host = host;
 	options.port = port;
@@ -91,6 +91,12 @@ HTTPSAgent.prototype.createSocket = function(options, cb) {
 
 var setDefaultConfiguration = function(configuration) {
 	configuration = configuration || {};
+	configuration.PROXY_SERVER = configuration.PROXY_SERVER || {};
+	configuration.PROXY_SERVER.ADDRESS = configuration.PROXY_SERVER.ADDRESS || "";
+	configuration.PROXY_SERVER.PORT = configuration.PROXY_SERVER.PORT || 0;
+	configuration.PROXY_SERVER.AUTHENTICATION = configuration.PROXY_SERVER.AUTHENTICATION || {};
+	configuration.PROXY_SERVER.AUTHENTICATION.USERNAME = configuration.PROXY_SERVER.AUTHENTICATION.USERNAME || "";
+	configuration.PROXY_SERVER.AUTHENTICATION.PASSWORD = configuration.PROXY_SERVER.AUTHENTICATION.PASSWORD || "";
 	configuration.LOCAL_PROXY_SERVER = configuration.LOCAL_PROXY_SERVER || {};
 	configuration.LOCAL_PROXY_SERVER.ADDRESS = configuration.LOCAL_PROXY_SERVER.ADDRESS || "";
 	configuration.LOCAL_PROXY_SERVER.PORT = configuration.LOCAL_PROXY_SERVER.PORT || 0;
@@ -106,12 +112,6 @@ var setDefaultConfiguration = function(configuration) {
 		configuration.REMOTE_PROXY_SERVERS[i].CERTIFICATE.AUTHENTICATION = configuration.REMOTE_PROXY_SERVERS[i].CERTIFICATE.AUTHENTICATION || {};
 		configuration.REMOTE_PROXY_SERVERS[i].CERTIFICATE.AUTHENTICATION.FILE = configuration.REMOTE_PROXY_SERVERS[i].CERTIFICATE.AUTHENTICATION.FILE || "";
 	}
-	configuration.PROXY_SERVER = configuration.PROXY_SERVER || {};
-	configuration.PROXY_SERVER.ADDRESS = configuration.PROXY_SERVER.ADDRESS || "";
-	configuration.PROXY_SERVER.PORT = configuration.PROXY_SERVER.PORT || 0;
-	configuration.PROXY_SERVER.AUTHENTICATION = configuration.PROXY_SERVER.AUTHENTICATION || {};
-	configuration.PROXY_SERVER.AUTHENTICATION.USERNAME = configuration.PROXY_SERVER.AUTHENTICATION.USERNAME || "";
-	configuration.PROXY_SERVER.AUTHENTICATION.PASSWORD = configuration.PROXY_SERVER.AUTHENTICATION.PASSWORD || "";
 	
 	return configuration;
 }
@@ -215,17 +215,9 @@ var createServer = function(configuration) {
 				
 				if(configuration.REMOTE_PROXY_SERVERS[i].TYPE == "HTTP") {
 					if(configuration.PROXY_SERVER.ADDRESS == "") {
-						requestOptions.agent = null;
+						requestOptions.agent = false;
 					} else {
-						requestOptions.proxy = {};
-						requestOptions.proxy.host = configuration.PROXY_SERVER.ADDRESS;
-						requestOptions.proxy.port = configuration.PROXY_SERVER.PORT;
-						
-						if(configuration.PROXY_SERVER.AUTHENTICATION.USERNAME !== "") {
-							requestOptions.proxy.auth = configuration.PROXY_SERVER.AUTHENTICATION.USERNAME + ":" + configuration.PROXY_SERVER.AUTHENTICATION.PASSWORD;
-						}
-						
-						requestOptions.agent = new HTTPAgent(requestOptions);
+						requestOptions.agent = new HTTPAgent(configuration);
 					}
 					
 					requestUrl = "ws://" + requestUrl;
@@ -255,21 +247,14 @@ var createServer = function(configuration) {
 						requestOptions.ca = certificates;
 						requestOptions.rejectUnauthorized = true;
 					} else {
+						requestOptions.ca = [];
 						requestOptions.rejectUnauthorized = false;
 					}
 					
 					if(configuration.PROXY_SERVER.ADDRESS == "") {
-						requestOptions.agent = null;
+						requestOptions.agent = false;
 					} else {
-						requestOptions.proxy = {};
-						requestOptions.proxy.host = configuration.PROXY_SERVER.ADDRESS;
-						requestOptions.proxy.port = configuration.PROXY_SERVER.PORT;
-						
-						if(configuration.PROXY_SERVER.AUTHENTICATION.USERNAME !== "") {
-							requestOptions.proxy.auth = configuration.PROXY_SERVER.AUTHENTICATION.USERNAME + ":" + configuration.PROXY_SERVER.AUTHENTICATION.PASSWORD;
-						}
-						
-						requestOptions.agent = new HTTPSAgent(requestOptions);
+						requestOptions.agent = new HTTPSAgent(configuration);
 					}
 					
 					requestUrl = "wss://" + requestUrl;
