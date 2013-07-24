@@ -209,6 +209,8 @@ class SSHChannel(channel.SSHChannel):
             
             self.data = ""
             self.dataState = 1
+            
+            self.outputProtocol.inputProtocol_connectionMade()
         else:
             if self.connectionState == 2:
                 self.outputProtocol.inputProtocol_connectionLost(None)

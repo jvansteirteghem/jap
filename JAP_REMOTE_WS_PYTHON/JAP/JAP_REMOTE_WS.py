@@ -180,7 +180,6 @@ class WSInputProtocol(autobahn.websocket.WebSocketServerProtocol):
         
         if len(self.message) == 0:
             self.outputProtocol.resumeProducing()
-            
             return
         
         self.sendMessage("", True)
@@ -204,6 +203,8 @@ class WSInputProtocol(autobahn.websocket.WebSocketServerProtocol):
             
             self.message = ""
             self.messageState = 1
+            
+            self.outputProtocol.inputProtocol_connectionMade()
         else:
             if self.connectionState == 2:
                 self.outputProtocol.inputProtocol_connectionLost(None)

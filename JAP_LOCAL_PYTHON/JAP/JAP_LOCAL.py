@@ -475,7 +475,6 @@ class OutputProtocol(protocol.Protocol):
         
         if self.connectionState == 1:
             self.transport.unregisterProducer()
-            
             self.transport.loseConnection()
         
     def inputProtocol_dataReceived(self, data):
@@ -626,13 +625,13 @@ class InputProtocol(protocol.Protocol):
         logger.debug("InputProtocol.outputProtocol_connectionMade")
         
         if self.connectionState == 1:
+            self.transport.registerProducer(self.outputProtocol, True)
+            
             response = struct.pack('!BBBBIH', 0x05, 0x00, 0x00, 0x01, 0, 0)
             self.transport.write(response)
             
             self.data = ""
             self.dataState = 2
-            
-            self.transport.registerProducer(self.outputProtocol, True)
             
             self.outputProtocol.inputProtocol_connectionMade()
         else:
@@ -652,7 +651,6 @@ class InputProtocol(protocol.Protocol):
         
         if self.connectionState == 1:
             self.transport.unregisterProducer()
-            
             self.transport.loseConnection()
         else:
             if self.connectionState == 2:

@@ -175,7 +175,6 @@ class WSOutputProtocol(autobahn.websocket.WebSocketClientProtocol):
         
         if len(self.message) == 0:
             self.inputProtocol.resumeProducing()
-            
             return
         
         self.sendMessage("", True)
