@@ -630,10 +630,10 @@ class InputProtocol(protocol.Protocol):
             response = struct.pack('!BBBBIH', 0x05, 0x00, 0x00, 0x01, 0, 0)
             self.transport.write(response)
             
+            self.outputProtocol.inputProtocol_connectionMade()
+            
             self.data = ""
             self.dataState = 2
-            
-            self.outputProtocol.inputProtocol_connectionMade()
         else:
             if self.connectionState == 2:
                 self.outputProtocol.inputProtocol_connectionLost(None)

@@ -201,10 +201,10 @@ class WSInputProtocol(autobahn.websocket.WebSocketServerProtocol):
             
             self.sendMessage(message, False)
             
+            self.outputProtocol.inputProtocol_connectionMade()
+            
             self.message = ""
             self.messageState = 1
-            
-            self.outputProtocol.inputProtocol_connectionMade()
         else:
             if self.connectionState == 2:
                 self.outputProtocol.inputProtocol_connectionLost(None)

@@ -205,12 +205,14 @@ class SSHChannel(channel.SSHChannel):
         logger.debug("SSHChannel.outputProtocol_connectionMade")
         
         if self.connectionState == 1:
-            self.outputProtocol.inputProtocol_dataReceived(self.data)
-            
-            self.data = ""
-            self.dataState = 1
-            
             self.outputProtocol.inputProtocol_connectionMade()
+            
+            if len(self.data) != 0:
+                self.outputProtocol.inputProtocol_dataReceived(self.data)
+                
+                self.data = ""
+            
+            self.dataState = 1
         else:
             if self.connectionState == 2:
                 self.outputProtocol.inputProtocol_connectionLost(None)
