@@ -192,6 +192,11 @@ var createServer = function(server2, configuration) {
 		});
 	});
 	
+	websocketServer.on("error", function(error) {
+		console.log("websocketServer.error");
+		console.log("error: " + error.toString());
+	});
+	
 	return websocketServer;
 }
 
