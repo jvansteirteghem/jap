@@ -149,13 +149,17 @@ var createServer = function(configuration) {
 				if(data[1] == 2) {
 					console.log("error: unsupported command code: 0x02 (establish a TCP/IP port binding)");
 					
-					var buffer = new Buffer(2);
+					var buffer = new Buffer(10);
 					buffer.write("\u0005", 0, 1, "binary");
 					buffer.write("\u0007", 1, 1, "binary");
 					buffer.write("\u0000", 2, 1, "binary");
 					buffer.write("\u0001", 3, 1, "binary");
 					buffer.write("\u0000", 4, 1, "binary");
 					buffer.write("\u0000", 5, 1, "binary");
+					buffer.write("\u0000", 6, 1, "binary");
+					buffer.write("\u0000", 7, 1, "binary");
+					buffer.write("\u0000", 8, 1, "binary");
+					buffer.write("\u0000", 9, 1, "binary");
 					
 					localConnection.end(buffer);
 					
@@ -165,13 +169,17 @@ var createServer = function(configuration) {
 				if(data[1] == 3) {
 					console.log("error: unsupported command code: 0x03 (associate a UDP port)");
 					
-					var buffer = new Buffer(2);
+					var buffer = new Buffer(10);
 					buffer.write("\u0005", 0, 1, "binary");
 					buffer.write("\u0007", 1, 1, "binary");
 					buffer.write("\u0000", 2, 1, "binary");
 					buffer.write("\u0001", 3, 1, "binary");
 					buffer.write("\u0000", 4, 1, "binary");
 					buffer.write("\u0000", 5, 1, "binary");
+					buffer.write("\u0000", 6, 1, "binary");
+					buffer.write("\u0000", 7, 1, "binary");
+					buffer.write("\u0000", 8, 1, "binary");
+					buffer.write("\u0000", 9, 1, "binary");
 					
 					localConnection.end(buffer);
 					
@@ -181,13 +189,17 @@ var createServer = function(configuration) {
 				if(data[3] == 4) {
 					console.log("error: unsupported address type: 0x04 (IPv6 address)");
 					
-					var buffer = new Buffer(2);
+					var buffer = new Buffer(10);
 					buffer.write("\u0005", 0, 1, "binary");
 					buffer.write("\u0008", 1, 1, "binary");
 					buffer.write("\u0000", 2, 1, "binary");
 					buffer.write("\u0001", 3, 1, "binary");
 					buffer.write("\u0000", 4, 1, "binary");
 					buffer.write("\u0000", 5, 1, "binary");
+					buffer.write("\u0000", 6, 1, "binary");
+					buffer.write("\u0000", 7, 1, "binary");
+					buffer.write("\u0000", 8, 1, "binary");
+					buffer.write("\u0000", 9, 1, "binary");
 					
 					localConnection.end(buffer);
 					
@@ -291,6 +303,10 @@ var createServer = function(configuration) {
 						buffer.write("\u0001", 3, 1, "binary");
 						buffer.write("\u0000", 4, 1, "binary");
 						buffer.write("\u0000", 5, 1, "binary");
+						buffer.write("\u0000", 6, 1, "binary");
+						buffer.write("\u0000", 7, 1, "binary");
+						buffer.write("\u0000", 8, 1, "binary");
+						buffer.write("\u0000", 9, 1, "binary");
 						
 						if(localConnectionState == 1) {
 							localConnection.write(buffer);
