@@ -10,7 +10,7 @@ You should have received a copy of the GNU General Public License along with thi
 """
 
 from zope.interface import implements
-from twisted.internet import protocol, reactor, tcp, interfaces
+from twisted.internet import protocol, reactor, tcp, interfaces, base
 from twisted.internet.abstract import isIPAddress, isIPv6Address
 from twisted.names import client, resolve, cache, hosts
 import base64
@@ -23,6 +23,12 @@ import collections
 
 logger = logging.getLogger(__name__)
 
+class HostsResolver(hosts.Resolver):
+    lookupAllRecords = hosts.Resolver.lookupAddress
+
+class ClientResolver(client.Resolver):
+    lookupAllRecords = client.Resolver.lookupAddress
+
 def createResolver(configuration):
     resolverFile = configuration["DNS_RESOLVER"]["HOSTS"]["FILE"]
     resolverServers = []
@@ -32,11 +38,16 @@ def createResolver(configuration):
         i = i + 1
     
     resolvers = []
-    resolvers.append(hosts.Resolver(file=resolverFile))
-    resolvers.append(cache.CacheResolver())
-    resolvers.append(client.Resolver(servers=resolverServers))
+    if resolverFile != "":
+        resolvers.append(HostsResolver(file=resolverFile))
+    if len(resolverServers) != 0:
+        resolvers.append(cache.CacheResolver())
+        resolvers.append(ClientResolver(servers=resolverServers))
     
-    return resolve.ResolverChain(resolvers)
+    if len(resolvers) != 0:
+        return resolve.ResolverChain(resolvers)
+    else:
+        return base.BlockingResolver()
 
 class TunnelProtocol(protocol.Protocol):
     def __init__(self):

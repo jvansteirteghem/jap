@@ -4,18 +4,9 @@
     },
     "DNS_RESOLVER": {
         "HOSTS": {
-            "FILE": "H.txt"
+            "FILE": ""
         },
-        "SERVERS": [
-            {
-                "ADDRESS": "8.8.8.8",
-                "PORT": 53
-            },
-            {
-                "ADDRESS": "8.8.4.4",
-                "PORT": 53
-            }
-        ]
+        "SERVERS": []
     },
     "LOCAL_SERVER": {
         "ADDRESS": "127.0.0.1",

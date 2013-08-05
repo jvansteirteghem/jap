@@ -1,5 +1,5 @@
 set SEVENZIP_HOME="C:\Program Files\7-Zip"
-set JAP_LOCAL_WS_NODE_VERSION=3.0.0-SNAPSHOT-2
+set JAP_LOCAL_WS_NODE_VERSION=3.0.0
 if exist MAKE rmdir MAKE /s /q
 mkdir MAKE
 cd MAKE
