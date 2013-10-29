@@ -1,0 +1,15 @@
+{
+  "name": "JAP_REMOTE_WS_NODE_NODEJITSU",
+  "version": "3.0.0",
+  "engines": {
+    "node": ">= 0.6.0",
+    "npm": ">= 1.0.0"
+  },
+  "dependencies": {
+    "websocket": "git+https://github.com/jvansteirteghem/streamws.git"
+  },
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  }
+}
